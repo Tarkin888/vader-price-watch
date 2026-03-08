@@ -39,6 +39,8 @@ function lotToForm(lot: Lot) {
     source: lot.source,
     lot_ref: lot.lot_ref,
     lot_url: lot.lot_url,
+    era: lot.era ?? "UNKNOWN",
+    cardback_code: lot.cardback_code ?? "UNKNOWN",
     variant_code: lot.variant_code,
     grade_tier_code: lot.grade_tier_code,
     hammer_price_gbp: String(lot.hammer_price_gbp),
