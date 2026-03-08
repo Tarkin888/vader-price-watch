@@ -468,8 +468,8 @@ export default function CollectionAnalytics({ items }: Props) {
                 <ResponsiveContainer width="100%" height={280}>
                   <ScatterChart margin={{ top: 10, right: 20, bottom: 5, left: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                    <XAxis type="number" dataKey="year" domain={["dataMin", "dataMax"]} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                    <YAxis type="number" dataKey="price" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                    <XAxis type="number" dataKey="year" domain={["dataMin", "dataMax"]} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                    <YAxis type="number" dataKey="price" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                     <Tooltip contentStyle={customTooltipStyle} content={({ active, payload }) => {
                       if (!active || !payload?.length) return null;
                       const d = payload[0].payload;
