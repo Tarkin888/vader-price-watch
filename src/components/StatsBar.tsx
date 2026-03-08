@@ -37,7 +37,9 @@ const fmtVal = (n: number, isUSD: boolean) => {
   return `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-const StatsBar = ({ lots, filters }: StatsBarProps) => {
+const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
+  const isUSD = currency === "USD";
+  const fmt = (n: number) => fmtVal(n, isUSD);
   if (lots.length === 0) {
     return (
       <div className="px-6 py-3 border-b border-border text-xs text-muted-foreground tracking-wider">
