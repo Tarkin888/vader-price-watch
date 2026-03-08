@@ -25,6 +25,19 @@ const CATEGORY_TO_VARIANTS: Record<string, string[]> = {
   "OTHER": [],
 };
 
+/** Fallback: map collection category to a lot_era value for broader matching */
+const CATEGORY_TO_ERA: Record<string, string> = {
+  "12 BACK": "SW",
+  "20 BACK": "SW",
+  "21 BACK": "SW",
+  "ESB": "ESB",
+  "ROTJ": "ROTJ",
+  "SECRET OFFER": "SW",
+  "FETT STICKER": "SW",
+  "TRILOGO": "ROTJ",
+  "OTHER": "",
+};
+
 const EstimatedValueCell = ({ item, onUpdated }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -76,7 +89,9 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
     setCalculating(true);
     try {
       const variants = CATEGORY_TO_VARIANTS[item.category] || [];
-      if (variants.length === 0) {
+      const fallbackEra = CATEGORY_TO_ERA[item.category] || "";
+
+      if (variants.length === 0 && !fallbackEra) {
         toast.error("No price tracker mapping for category: " + item.category);
         setCalculating(false);
         return;
@@ -86,8 +101,11 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
       const windows = [1, 2, 3, 0]; // 0 = no cutoff
       let data: any[] | null = null;
       let usedYears = 1;
+      let usedFallback = false;
 
+      // Try variant_code matching first
       for (const years of windows) {
+        if (variants.length === 0) break;
         let query = supabase
           .from("lots")
           .select("total_paid_gbp, sale_date")
@@ -109,6 +127,32 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
         }
       }
 
+      // Fallback: query by era if no variant matches found
+      if ((!data || data.length === 0) && fallbackEra) {
+        usedFallback = true;
+        for (const years of windows) {
+          let query = supabase
+            .from("lots")
+            .select("total_paid_gbp, sale_date")
+            .eq("era", fallbackEra as any);
+
+          if (years > 0) {
+            const cutoff = new Date();
+            cutoff.setFullYear(cutoff.getFullYear() - years);
+            query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
+          }
+
+          const { data: result, error: qErr } = await query;
+          if (qErr) throw qErr;
+
+          if (result && result.length > 0) {
+            data = result;
+            usedYears = years;
+            break;
+          }
+        }
+      }
+
       if (!data || data.length === 0) {
         toast.error("No sales found in the price tracker for this category");
         setCalculating(false);
@@ -119,12 +163,13 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
       await saveValue(avg);
       setMenuOpen(false);
 
+      const fallbackNote = usedFallback ? " (matched by era)" : "";
       if (usedYears === 0) {
-        toast.warning(`No sales within 3 years. Used all-time avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
+        toast.warning(`No sales within 3 years. Used all-time avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
       } else if (usedYears > 1) {
-        toast.warning(`No sales within 1 year. Used ${usedYears}-year avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
+        toast.warning(`No sales within 1 year. Used ${usedYears}-year avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
       } else {
-        toast.success(`1-year avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`);
+        toast.success(`1-year avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`);
       }
     } catch (e: any) {
       toast.error("Calculation failed: " + e.message);
