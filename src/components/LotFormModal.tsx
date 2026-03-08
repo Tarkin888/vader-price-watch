@@ -100,6 +100,8 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
         source: form.source as any,
         lot_ref: form.lot_ref,
         lot_url: form.lot_url,
+        era: form.era as any,
+        cardback_code: form.cardback_code,
         variant_code: form.variant_code as any,
         grade_tier_code: form.grade_tier_code as any,
         hammer_price_gbp: parseFloat(form.hammer_price_gbp) || 0,
