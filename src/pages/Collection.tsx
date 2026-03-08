@@ -167,6 +167,19 @@ const Collection = () => {
         >
           MY COLLECTION
         </button>
+        <span className="text-muted-foreground/30 mx-2">|</span>
+        <button
+          onClick={() => setSubTab("inventory")}
+          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+        >
+          INVENTORY
+        </button>
+        <button
+          onClick={() => setSubTab("analytics")}
+          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+        >
+          ANALYTICS
+        </button>
       </div>
 
       {/* Filters */}
