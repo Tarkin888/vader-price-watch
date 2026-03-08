@@ -1,14 +1,30 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-const VARIANTS = [
-  { code: "12A", desc: "Standard 12-back cardback, first release", value: "Baseline" },
-  { code: "12B", desc: "Second wave 12-back cardback", value: "Slightly lower" },
-  { code: "12C", desc: "Third wave 12-back cardback", value: "Lower" },
-  { code: "12A-DT", desc: "12A with double-telescoping lightsaber", value: "Highest premium" },
-  { code: "12B-DT", desc: "12B with double-telescoping lightsaber", value: "Very high premium" },
-  { code: "CAN", desc: "Canadian release variant", value: "Regional premium" },
-  { code: "PAL", desc: "Palitoy (UK) release variant", value: "Regional premium" },
+const CARDBACK_VARIANTS = [
+  { era: "SW", code: "SW-12", desc: "Standard 12-back cardback (generic)", value: "Baseline" },
+  { era: "SW", code: "SW-12A", desc: "12-back A, first release", value: "Baseline" },
+  { era: "SW", code: "SW-12A-DT", desc: "12A with double-telescoping lightsaber", value: "Highest premium" },
+  { era: "SW", code: "SW-12B", desc: "Second wave 12-back cardback", value: "Slightly lower" },
+  { era: "SW", code: "SW-12B-DT", desc: "12B with double-telescoping lightsaber", value: "Very high premium" },
+  { era: "SW", code: "SW-12C", desc: "Third wave 12-back cardback", value: "Lower" },
+  { era: "SW", code: "SW-20", desc: "20-back cardback", value: "Moderate" },
+  { era: "SW", code: "SW-21", desc: "21-back cardback", value: "Moderate" },
+  { era: "ESB", code: "ESB-31", desc: "Empire Strikes Back 31-back", value: "Mid-range" },
+  { era: "ESB", code: "ESB-32", desc: "Empire Strikes Back 32-back", value: "Mid-range" },
+  { era: "ESB", code: "ESB-41", desc: "Empire Strikes Back 41-back", value: "Mid-range" },
+  { era: "ESB", code: "ESB-45", desc: "Empire Strikes Back 45-back", value: "Mid-range" },
+  { era: "ESB", code: "ESB-47", desc: "Empire Strikes Back 47-back", value: "Mid-range" },
+  { era: "ESB", code: "ESB-48", desc: "Empire Strikes Back 48-back", value: "Mid-range" },
+  { era: "ROTJ", code: "ROTJ-48", desc: "Return of the Jedi 48-back", value: "Mid-range" },
+  { era: "ROTJ", code: "ROTJ-65", desc: "Return of the Jedi 65-back", value: "Common" },
+  { era: "ROTJ", code: "ROTJ-65-VP", desc: "65-back Vader pointing variant", value: "Uncommon" },
+  { era: "ROTJ", code: "ROTJ-77", desc: "Return of the Jedi 77-back", value: "Common" },
+  { era: "ROTJ", code: "ROTJ-79", desc: "Return of the Jedi 79-back", value: "Common" },
+  { era: "POTF", code: "POTF-92", desc: "Power of the Force 92-back", value: "High premium" },
+  { era: "INT", code: "CAN", desc: "Canadian release variant", value: "Regional premium" },
+  { era: "INT", code: "PAL", desc: "Palitoy (UK) release variant", value: "Regional premium" },
+  { era: "INT", code: "MEX", desc: "Lili Ledy (Mexico) release variant", value: "Regional premium" },
 ];
 
 const GRADES = [
@@ -25,8 +41,19 @@ const GRADES = [
   { code: "CAS-80", desc: "CAS graded 80", premium: "+50–90% vs RAW-NM" },
 ];
 
+const ERA_COLORS: Record<string, string> = {
+  SW: "hsl(210, 35%, 47%)",
+  ESB: "hsl(40, 12%, 49%)",
+  ROTJ: "hsl(0, 43%, 44%)",
+  POTF: "hsl(45, 50%, 54%)",
+  INT: "hsl(180, 15%, 45%)",
+};
+
 const ReferencePanel = () => {
   const [open, setOpen] = useState(false);
+
+  // Group variants by era
+  const eras = ["SW", "ESB", "ROTJ", "POTF", "INT"];
 
   return (
     <div className="border-b border-border">
@@ -40,7 +67,9 @@ const ReferencePanel = () => {
       {open && (
         <div className="px-6 pb-4 grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-[10px] text-primary tracking-widest uppercase mb-2">Variant Codes</h3>
+            <h3 className="text-[10px] text-primary tracking-widest uppercase mb-2">
+              Cardback Variant Codes
+            </h3>
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border text-muted-foreground tracking-widest">
@@ -50,18 +79,26 @@ const ReferencePanel = () => {
                 </tr>
               </thead>
               <tbody>
-                {VARIANTS.map((v) => (
-                  <tr key={v.code} className="border-b border-border/30">
-                    <td className="py-1 text-primary font-bold">{v.code}</td>
-                    <td className="py-1">{v.desc}</td>
-                    <td className="py-1 text-muted-foreground">{v.value}</td>
-                  </tr>
-                ))}
+                {eras.map((era) => {
+                  const items = CARDBACK_VARIANTS.filter((v) => v.era === era);
+                  if (items.length === 0) return null;
+                  return items.map((v, i) => (
+                    <tr key={v.code} className="border-b border-border/30">
+                      <td className="py-1 font-bold" style={{ color: ERA_COLORS[era] }}>
+                        {v.code}
+                      </td>
+                      <td className="py-1">{v.desc}</td>
+                      <td className="py-1 text-muted-foreground">{v.value}</td>
+                    </tr>
+                  ));
+                })}
               </tbody>
             </table>
           </div>
           <div>
-            <h3 className="text-[10px] text-primary tracking-widest uppercase mb-2">Grade Tier Codes</h3>
+            <h3 className="text-[10px] text-primary tracking-widest uppercase mb-2">
+              Grade Tier Codes
+            </h3>
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border text-muted-foreground tracking-widest">
