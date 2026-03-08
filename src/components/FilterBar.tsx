@@ -19,6 +19,8 @@ const CARDBACK_GROUPS: { label: string; codes: string[] }[] = [
   { label: "International", codes: ["CAN", "PAL", "MEX"] },
 ];
 
+export type Currency = "GBP" | "USD";
+
 export interface Filters {
   source: string | null;
   era: string | null;
@@ -28,6 +30,7 @@ export interface Filters {
   dateFrom: Date | null;
   dateTo: Date | null;
   search: string;
+  currency: Currency;
 }
 
 interface FilterBarProps {
