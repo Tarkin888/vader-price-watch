@@ -14,6 +14,8 @@ import SessionLog from "@/components/SessionLog";
 import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
 import ComparableSalesPanel from "@/components/ComparableSalesPanel";
+import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
+import { useRef } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
