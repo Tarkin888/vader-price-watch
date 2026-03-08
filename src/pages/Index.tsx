@@ -125,8 +125,17 @@ const Index = () => {
       <ReferencePanel />
       <FilterBar filters={filters} onChange={setFilters} />
       <StatsBar lots={filtered} filters={filters} currency={filters.currency} />
+      <CardbackBenchmarkPanel
+        allLots={lots}
+        currency={filters.currency}
+        onSelectCardback={(code) => {
+          setFilters((f) => ({ ...f, cardbackCode: code }));
+          setActiveTab("table");
+          setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+        }}
+      />
       <PriceTrendChart lots={filtered} />
-      <div className="flex items-center justify-between border-b border-border px-6 py-2">
+      <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
           <button
             onClick={() => setActiveTab("dashboard")}
