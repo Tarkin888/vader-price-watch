@@ -131,7 +131,7 @@ const PriceTrendChart = ({ lots }: Props) => {
               <XAxis dataKey="date" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }} />
               <YAxis stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `£${v.toLocaleString()}`} />
               <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => [`£${value.toLocaleString()}`, undefined]} />
-              <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier New, monospace" }} />
+              <Legend wrapperStyle={{ fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
               {lineVariants.map((v) => (
                 <Line key={v} type="monotone" dataKey={v} stroke={VARIANT_COLORS[v] ?? "hsl(0, 0%, 60%)"} strokeWidth={2} dot={{ r: 3 }} connectNulls />
               ))}
