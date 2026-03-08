@@ -118,6 +118,8 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
                   {col.label}<SortIcon col={col.key} />
                 </th>
               ))}
+              <th className="px-3 py-2">ERA</th>
+              <th className="px-3 py-2">CARDBACK</th>
               <th className="px-3 py-2">SOURCE</th>
               <th className="px-3 py-2">LOT REF</th>
               <th className="px-3 py-2">NOTES</th>
@@ -143,6 +145,8 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
                 <td className="px-3 py-2 text-right">
                   £{Number(l.buyers_premium_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
                 </td>
+                <td className="px-3 py-2 text-muted-foreground">{(l as any).era ?? "—"}</td>
+                <td className="px-3 py-2 text-muted-foreground">{(l as any).cardback_code ?? "—"}</td>
                 <td className="px-3 py-2">{l.source}</td>
                 <td className="px-3 py-2">
                   {l.lot_url ? (

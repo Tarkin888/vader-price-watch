@@ -11,8 +11,19 @@ const SOURCES = Constants.public.Enums.lot_source;
 const VARIANTS = Constants.public.Enums.variant_code;
 const GRADES = Constants.public.Enums.grade_tier_code;
 
+const ERAS = ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"] as const;
+const CARDBACK_CODES = [
+  "SW-12", "SW-20", "SW-21",
+  "ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48",
+  "ROTJ-65", "ROTJ-77", "ROTJ-79",
+  "POTF-92",
+  "UNKNOWN",
+] as const;
+
 export interface Filters {
   source: string | null;
+  era: string | null;
+  cardbackCode: string | null;
   variantCode: string | null;
   gradeTier: string | null;
   dateFrom: Date | null;
@@ -61,6 +72,34 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
       </div>
 
       <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Era</label>
+        <select
+          className={selectClass}
+          value={filters.era ?? ""}
+          onChange={(e) => set("era", e.target.value || null)}
+        >
+          <option value="">ALL</option>
+          {ERAS.map((e) => (
+            <option key={e} value={e}>{e}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Cardback</label>
+        <select
+          className={selectClass}
+          value={filters.cardbackCode ?? ""}
+          onChange={(e) => set("cardbackCode", e.target.value || null)}
+        >
+          <option value="">ALL</option>
+          {CARDBACK_CODES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Variant</label>
         <select
           className={selectClass}
@@ -95,7 +134,7 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
         variant="ghost"
         size="sm"
         className="text-xs text-muted-foreground hover:text-primary tracking-wider"
-        onClick={() => onChange({ source: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "" })}
+        onClick={() => onChange({ source: null, era: null, cardbackCode: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "" })}
       >
         <X className="w-3 h-3 mr-1" /> CLEAR
       </Button>

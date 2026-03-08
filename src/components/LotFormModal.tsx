@@ -16,6 +16,14 @@ import { Textarea } from "@/components/ui/textarea";
 const SOURCES = Constants.public.Enums.lot_source;
 const VARIANTS = Constants.public.Enums.variant_code;
 const GRADES = Constants.public.Enums.grade_tier_code;
+const ERAS = ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"] as const;
+const CARDBACK_CODES = [
+  "SW-12", "SW-20", "SW-21",
+  "ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48",
+  "ROTJ-65", "ROTJ-77", "ROTJ-79",
+  "POTF-92",
+  "UNKNOWN",
+] as const;
 
 interface Props {
   open: boolean;
@@ -31,6 +39,8 @@ function lotToForm(lot: Lot) {
     source: lot.source,
     lot_ref: lot.lot_ref,
     lot_url: lot.lot_url,
+    era: lot.era ?? "UNKNOWN",
+    cardback_code: lot.cardback_code ?? "UNKNOWN",
     variant_code: lot.variant_code,
     grade_tier_code: lot.grade_tier_code,
     hammer_price_gbp: String(lot.hammer_price_gbp),
@@ -51,6 +61,8 @@ const defaultForm = () => {
     source: SOURCES[0] as string,
     lot_ref: "",
     lot_url: "",
+    era: "UNKNOWN" as string,
+    cardback_code: "UNKNOWN" as string,
     variant_code: VARIANTS[0] as string,
     grade_tier_code: GRADES[0] as string,
     hammer_price_gbp: "",
@@ -88,6 +100,8 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
         source: form.source as any,
         lot_ref: form.lot_ref,
         lot_url: form.lot_url,
+        era: form.era as any,
+        cardback_code: form.cardback_code,
         variant_code: form.variant_code as any,
         grade_tier_code: form.grade_tier_code as any,
         hammer_price_gbp: parseFloat(form.hammer_price_gbp) || 0,
@@ -136,6 +150,16 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
           <Field label="Source">
             <select className={selectClass} value={form.source} onChange={(e) => set("source", e.target.value)}>
               {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </Field>
+          <Field label="Era">
+            <select className={selectClass} value={form.era} onChange={(e) => set("era", e.target.value)}>
+              {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
+            </select>
+          </Field>
+          <Field label="Cardback Code">
+            <select className={selectClass} value={form.cardback_code} onChange={(e) => set("cardback_code", e.target.value)}>
+              {CARDBACK_CODES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </Field>
           <Field label="Variant Code">

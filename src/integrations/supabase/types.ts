@@ -66,8 +66,10 @@ export type Database = {
         Row: {
           buyers_premium_gbp: number
           capture_date: string
+          cardback_code: string
           condition_notes: string
           created_at: string
+          era: Database["public"]["Enums"]["lot_era"]
           grade_subgrades: string
           grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
           hammer_price_gbp: number
@@ -86,8 +88,10 @@ export type Database = {
         Insert: {
           buyers_premium_gbp?: number
           capture_date: string
+          cardback_code?: string
           condition_notes?: string
           created_at?: string
+          era?: Database["public"]["Enums"]["lot_era"]
           grade_subgrades?: string
           grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
           hammer_price_gbp?: number
@@ -106,8 +110,10 @@ export type Database = {
         Update: {
           buyers_premium_gbp?: number
           capture_date?: string
+          cardback_code?: string
           condition_notes?: string
           created_at?: string
+          era?: Database["public"]["Enums"]["lot_era"]
           grade_subgrades?: string
           grade_tier_code?: Database["public"]["Enums"]["grade_tier_code"]
           hammer_price_gbp?: number
@@ -165,6 +171,7 @@ export type Database = {
         | "UKG-80"
         | "UKG-85"
         | "CAS-80"
+      lot_era: "SW" | "ESB" | "ROTJ" | "POTF" | "UNKNOWN"
       lot_source: "Heritage" | "Hakes" | "Vectis" | "LCG"
       variant_code: "12A" | "12B" | "12C" | "12A-DT" | "12B-DT" | "CAN" | "PAL"
     }
@@ -329,6 +336,7 @@ export const Constants = {
         "UKG-85",
         "CAS-80",
       ],
+      lot_era: ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"],
       lot_source: ["Heritage", "Hakes", "Vectis", "LCG"],
       variant_code: ["12A", "12B", "12C", "12A-DT", "12B-DT", "CAN", "PAL"],
     },
