@@ -33,7 +33,9 @@ const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
   { key: "buyers_premium_gbp", label: "BP", align: "text-right" },
 ];
 
-const LotsTable = ({ lots, onChanged, onCopyRow }: LotsTableProps) => {
+const NOTABLE_THRESHOLD = 5000;
+
+const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("sale_date");
