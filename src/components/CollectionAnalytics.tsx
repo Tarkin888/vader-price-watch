@@ -449,8 +449,8 @@ export default function CollectionAnalytics({ items }: Props) {
               <ResponsiveContainer width="100%" height={Math.max(200, twelveBackBars.length * 40)}>
                 <BarChart data={twelveBackBars} layout="vertical" margin={{ left: 120, right: 30 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                  <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                  <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 9, fontFamily: "Courier New" }} width={115} />
+                  <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                  <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} width={115} />
                   <Tooltip contentStyle={customTooltipStyle}
                     formatter={(value: number, _: string, entry: any) => [`${fmt(value)} — ${entry.payload.grade}`, entry.payload.item_id]} />
                   <ReferenceLine x={twelveBackAvg} stroke={MUTED} strokeDasharray="5 5"
