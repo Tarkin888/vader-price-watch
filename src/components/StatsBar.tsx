@@ -100,7 +100,7 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
             </thead>
             <tbody>
               {cardbackEntries.map(([code, codeLots]) => {
-                const s = calcStats(codeLots);
+                const s = calcStats(codeLots, isUSD);
                 return (
                   <tr key={code}>
                     <td className="text-left pr-6 py-0.5 text-foreground font-mono">{code}</td>
