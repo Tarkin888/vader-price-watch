@@ -26,6 +26,7 @@ const Collection = () => {
   const [editItem, setEditItem] = useState<CollectionItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState<CollectionItem | null>(null);
+  const [subTab, setSubTab] = useState<"inventory" | "analytics">("inventory");
 
   const load = useCallback(async () => {
     try {
