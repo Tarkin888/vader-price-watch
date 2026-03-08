@@ -25,6 +25,19 @@ const CATEGORY_TO_VARIANTS: Record<string, string[]> = {
   "OTHER": [],
 };
 
+/** Fallback: map collection category to a lot_era value for broader matching */
+const CATEGORY_TO_ERA: Record<string, string> = {
+  "12 BACK": "SW",
+  "20 BACK": "SW",
+  "21 BACK": "SW",
+  "ESB": "ESB",
+  "ROTJ": "ROTJ",
+  "SECRET OFFER": "SW",
+  "FETT STICKER": "SW",
+  "TRILOGO": "ROTJ",
+  "OTHER": "",
+};
+
 const EstimatedValueCell = ({ item, onUpdated }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
