@@ -127,7 +127,11 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
           </thead>
           <tbody>
             {sorted.map((l) => (
-              <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+              <tr
+                key={l.id}
+                onClick={() => onSelectLot?.(l)}
+                className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""}`}
+              >
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
                 <td className="px-3 py-2 text-right text-primary font-bold">
