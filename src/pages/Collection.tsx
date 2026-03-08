@@ -4,6 +4,7 @@ import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type
 import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
 import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
