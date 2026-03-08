@@ -72,6 +72,34 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
       </div>
 
       <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Era</label>
+        <select
+          className={selectClass}
+          value={filters.era ?? ""}
+          onChange={(e) => set("era", e.target.value || null)}
+        >
+          <option value="">ALL</option>
+          {ERAS.map((e) => (
+            <option key={e} value={e}>{e}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Cardback</label>
+        <select
+          className={selectClass}
+          value={filters.cardbackCode ?? ""}
+          onChange={(e) => set("cardbackCode", e.target.value || null)}
+        >
+          <option value="">ALL</option>
+          {CARDBACK_CODES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Variant</label>
         <select
           className={selectClass}
