@@ -241,7 +241,7 @@ export default function CollectionAnalytics({ items }: Props) {
     border: `1px solid ${GOLD_DIM}`,
     borderRadius: "2px",
     fontSize: "11px",
-    fontFamily: "'Courier New', monospace",
+    fontFamily: "'Aptos', sans-serif",
     color: WHITE,
   };
 
@@ -290,8 +290,8 @@ export default function CollectionAnalytics({ items }: Props) {
                     formatter={(value: number, name: string, entry: any) => [
                       `${fmt(value)} (${entry.payload.count} items, ${entry.payload.pct}%)`, name
                     ]} />
-                  <text x="50%" y="48%" textAnchor="middle" fill={MUTED} fontSize={9} fontFamily="Courier New">PORTFOLIO</text>
-                  <text x="50%" y="56%" textAnchor="middle" fill={GOLD} fontSize={12} fontFamily="Courier New" fontWeight="bold">{fmt(totalCost)}</text>
+                  <text x="50%" y="48%" textAnchor="middle" fill={MUTED} fontSize={9} fontFamily="Aptos, sans-serif">PORTFOLIO</text>
+                  <text x="50%" y="56%" textAnchor="middle" fill={GOLD} fontSize={12} fontFamily="Aptos, sans-serif" fontWeight="bold">{fmt(totalCost)}</text>
                 </PieChart>
               </ResponsiveContainer>
               <div className="grid grid-cols-2 gap-1 mt-2 text-[10px]">
@@ -314,11 +314,11 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={spendByGrade} layout="vertical" margin={{ left: 80, right: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 10, fontFamily: "Courier New" }} width={75} />
+                <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} width={75} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, _: string, entry: any) => [`${fmt(value)} (${entry.payload.count} items)`, "Spend"]} />
-                <ReferenceLine x={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg`, fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} />
+                <ReferenceLine x={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg`, fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                 <Bar dataKey="spend" radius={[0, 2, 2, 0]}>
                   {spendByGrade.map((entry) => (
                     <Cell key={entry.name} fill={entry.name === "Not Graded" ? "hsl(40, 10%, 30%)" : GOLD} />
@@ -340,9 +340,9 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={annualData} margin={{ top: 20, right: 40, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis dataKey="year" tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                <YAxis yAxisId="left" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                <XAxis dataKey="year" tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                <YAxis yAxisId="left" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, name: string) => [name === "spend" ? fmt(value) : value, name === "spend" ? "Total Spend" : "Items"]}
                   labelFormatter={(label) => {
@@ -363,8 +363,8 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={cumulativeData} margin={{ top: 10, right: 20, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis dataKey="date" tick={{ fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} tickFormatter={(v) => v.slice(0, 7)} />
-                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                <XAxis dataKey="date" tick={{ fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} tickFormatter={(v) => v.slice(0, 7)} />
+                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, name: string, entry: any) => {
                     if (name === "total") return [fmt(value), "Running Total"];
@@ -377,7 +377,7 @@ export default function CollectionAnalytics({ items }: Props) {
                     }
                     return "";
                   }} />
-                <ReferenceLine y={totalCost} stroke={GOLD} strokeDasharray="5 5" label={{ value: fmt(totalCost), fill: GOLD, fontSize: 9, fontFamily: "Courier New" }} />
+                <ReferenceLine y={totalCost} stroke={GOLD} strokeDasharray="5 5" label={{ value: fmt(totalCost), fill: GOLD, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                 <Area type="monotone" dataKey="total" stroke={GOLD} fill={GOLD} fillOpacity={0.2} strokeWidth={2} dot={{ fill: GOLD, r: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
@@ -394,8 +394,8 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={sourceData} margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis dataKey="name" tick={{ fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} angle={-30} textAnchor="end" />
-                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                <XAxis dataKey="name" tick={{ fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} angle={-30} textAnchor="end" />
+                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, name: string, entry: any) => [
                     name === "spend" ? `${fmt(value)} (${entry.payload.count} items, avg ${fmt(entry.payload.avg)})` : value,
@@ -449,12 +449,12 @@ export default function CollectionAnalytics({ items }: Props) {
               <ResponsiveContainer width="100%" height={Math.max(200, twelveBackBars.length * 40)}>
                 <BarChart data={twelveBackBars} layout="vertical" margin={{ left: 120, right: 30 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                  <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                  <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 9, fontFamily: "Courier New" }} width={115} />
+                  <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                  <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} width={115} />
                   <Tooltip contentStyle={customTooltipStyle}
                     formatter={(value: number, _: string, entry: any) => [`${fmt(value)} — ${entry.payload.grade}`, entry.payload.item_id]} />
                   <ReferenceLine x={twelveBackAvg} stroke={MUTED} strokeDasharray="5 5"
-                    label={{ value: `Avg: ${fmt(Math.round(twelveBackAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} />
+                    label={{ value: `Avg: ${fmt(Math.round(twelveBackAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                   <Bar dataKey="price" radius={[0, 2, 2, 0]}>
                     {twelveBackBars.map((entry) => <Cell key={entry.item_id} fill={GRADE_COLORS[entry.grade] || MUTED} />)}
                   </Bar>
@@ -468,8 +468,8 @@ export default function CollectionAnalytics({ items }: Props) {
                 <ResponsiveContainer width="100%" height={280}>
                   <ScatterChart margin={{ top: 10, right: 20, bottom: 5, left: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                    <XAxis type="number" dataKey="year" domain={["dataMin", "dataMax"]} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                    <YAxis type="number" dataKey="price" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                    <XAxis type="number" dataKey="year" domain={["dataMin", "dataMax"]} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                    <YAxis type="number" dataKey="price" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                     <Tooltip contentStyle={customTooltipStyle} content={({ active, payload }) => {
                       if (!active || !payload?.length) return null;
                       const d = payload[0].payload;
@@ -496,15 +496,15 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={300}>
               <ScatterChart margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis type="number" dataKey="x" tick={false} label={{ value: "← Graded | Ungraded →", fill: MUTED, fontSize: 9, fontFamily: "Courier New", position: "bottom" }} />
-                <YAxis type="number" dataKey="price" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                <XAxis type="number" dataKey="x" tick={false} label={{ value: "← Graded | Ungraded →", fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif", position: "bottom" }} />
+                <YAxis type="number" dataKey="price" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                 <Tooltip contentStyle={customTooltipStyle} content={({ active, payload }) => {
                   if (!active || !payload?.length) return null;
                   const d = payload[0].payload;
                   return <div style={customTooltipStyle} className="p-2">{d.item_id}: {d.description}<br />{fmt(d.price)}</div>;
                 }} />
-                <ReferenceLine y={gradedAvg} stroke={GOLD} strokeDasharray="5 5" label={{ value: `Graded avg: ${fmt(Math.round(gradedAvg))}`, fill: GOLD, fontSize: 9, fontFamily: "Courier New" }} />
-                <ReferenceLine y={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg: ${fmt(Math.round(ungradedAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} />
+                <ReferenceLine y={gradedAvg} stroke={GOLD} strokeDasharray="5 5" label={{ value: `Graded avg: ${fmt(Math.round(gradedAvg))}`, fill: GOLD, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
+                <ReferenceLine y={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg: ${fmt(Math.round(ungradedAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                 <Scatter name="Graded" data={dotPlotData.graded} fill={GOLD}>
                   {dotPlotData.graded.map((_, i) => <Cell key={i} fill={GOLD} />)}
                 </Scatter>
@@ -552,8 +552,8 @@ export default function CollectionAnalytics({ items }: Props) {
           <ResponsiveContainer width="100%" height={Math.max(200, pnlItems.length * 35)}>
             <BarChart data={pnlItems} layout="vertical" margin={{ left: 140, right: 30 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-              <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-              <YAxis type="category" dataKey="description" tick={{ fill: WHITE, fontSize: 9, fontFamily: "Courier New" }} width={135} />
+              <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+              <YAxis type="category" dataKey="description" tick={{ fill: WHITE, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} width={135} />
               <Tooltip contentStyle={customTooltipStyle}
                 formatter={(value: number) => [`${value >= 0 ? "+" : ""}${fmt(value)}`, "P&L"]} />
               <ReferenceLine x={0} stroke={WHITE} />
