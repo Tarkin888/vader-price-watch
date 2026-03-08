@@ -11,6 +11,24 @@ export interface ClassifiedFields {
   variant_grade_key: string;
 }
 
+/** Derive era and cardback_code directly from a variant_code string */
+export function deriveFromVariantCode(variantCode: string): { era: string; cardback_code: string } {
+  const vc = variantCode.toUpperCase();
+  // Direct prefix mapping
+  if (vc.startsWith("POTF-")) return { era: "POTF", cardback_code: vc.replace(/-DT$/, "") };
+  if (vc.startsWith("ROTJ-")) return { era: "ROTJ", cardback_code: vc.replace(/-VP$/, "").replace(/-DT$/, "") };
+  if (vc.startsWith("ESB-")) return { era: "ESB", cardback_code: vc.replace(/-DT$/, "") };
+  if (vc.startsWith("SW-")) return { era: "SW", cardback_code: vc.replace(/-DT$/, "") };
+  // Legacy short codes (12A, 12B, 12C, 12A-DT, 12B-DT)
+  if (/^12[ABC]/.test(vc)) return { era: "SW", cardback_code: `SW-${vc.replace(/-DT$/, "")}` };
+  // International
+  if (vc === "CAN") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
+  if (vc === "PAL") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
+  if (vc === "MEX") return { era: "ROTJ", cardback_code: "ROTJ-65" };
+  if (vc === "VP") return { era: "ROTJ", cardback_code: "ROTJ-65" };
+  return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
+}
+
 export function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
   const text = `${title} ${conditionNotes ?? ""}`.toLowerCase();
 

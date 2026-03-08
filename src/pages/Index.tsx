@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getAllLots, seedIfEmpty, type Lot } from "@/lib/db";
+import { getAllLots, seedIfEmpty, fixUnknownEraCardback, type Lot } from "@/lib/db";
 import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import StatsBar from "@/components/StatsBar";
@@ -37,6 +37,7 @@ const Index = () => {
   const loadLots = useCallback(async () => {
     try {
       await seedIfEmpty();
+      await fixUnknownEraCardback();
       const data = await getAllLots();
       setLots(data);
     } catch (e) {
