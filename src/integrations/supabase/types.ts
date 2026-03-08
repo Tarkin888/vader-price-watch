@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      lots: {
+        Row: {
+          buyers_premium_gbp: number
+          capture_date: string
+          condition_notes: string
+          created_at: string
+          grade_subgrades: string
+          grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
+          hammer_price_gbp: number
+          id: string
+          image_urls: string[]
+          lot_ref: string
+          lot_url: string
+          sale_date: string
+          source: Database["public"]["Enums"]["lot_source"]
+          total_paid_gbp: number
+          updated_at: string
+          usd_to_gbp_rate: number
+          variant_code: Database["public"]["Enums"]["variant_code"]
+          variant_grade_key: string
+        }
+        Insert: {
+          buyers_premium_gbp?: number
+          capture_date: string
+          condition_notes?: string
+          created_at?: string
+          grade_subgrades?: string
+          grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
+          hammer_price_gbp?: number
+          id?: string
+          image_urls?: string[]
+          lot_ref?: string
+          lot_url?: string
+          sale_date: string
+          source: Database["public"]["Enums"]["lot_source"]
+          total_paid_gbp?: number
+          updated_at?: string
+          usd_to_gbp_rate?: number
+          variant_code: Database["public"]["Enums"]["variant_code"]
+          variant_grade_key?: string
+        }
+        Update: {
+          buyers_premium_gbp?: number
+          capture_date?: string
+          condition_notes?: string
+          created_at?: string
+          grade_subgrades?: string
+          grade_tier_code?: Database["public"]["Enums"]["grade_tier_code"]
+          hammer_price_gbp?: number
+          id?: string
+          image_urls?: string[]
+          lot_ref?: string
+          lot_url?: string
+          sale_date?: string
+          source?: Database["public"]["Enums"]["lot_source"]
+          total_paid_gbp?: number
+          updated_at?: string
+          usd_to_gbp_rate?: number
+          variant_code?: Database["public"]["Enums"]["variant_code"]
+          variant_grade_key?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +85,20 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      grade_tier_code:
+        | "RAW-NM"
+        | "RAW-EX"
+        | "RAW-VG"
+        | "AFA-70"
+        | "AFA-75"
+        | "AFA-80"
+        | "AFA-85"
+        | "AFA-90+"
+        | "UKG-80"
+        | "UKG-85"
+        | "CAS-80"
+      lot_source: "Heritage" | "Hakes" | "Vectis" | "LCG"
+      variant_code: "12A" | "12B" | "12C" | "12A-DT" | "12B-DT" | "CAN" | "PAL"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +225,22 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      grade_tier_code: [
+        "RAW-NM",
+        "RAW-EX",
+        "RAW-VG",
+        "AFA-70",
+        "AFA-75",
+        "AFA-80",
+        "AFA-85",
+        "AFA-90+",
+        "UKG-80",
+        "UKG-85",
+        "CAS-80",
+      ],
+      lot_source: ["Heritage", "Hakes", "Vectis", "LCG"],
+      variant_code: ["12A", "12B", "12C", "12A-DT", "12B-DT", "CAN", "PAL"],
+    },
   },
 } as const
