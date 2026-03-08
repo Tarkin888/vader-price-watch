@@ -318,7 +318,7 @@ export default function CollectionAnalytics({ items }: Props) {
                 <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} width={75} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, _: string, entry: any) => [`${fmt(value)} (${entry.payload.count} items)`, "Spend"]} />
-                <ReferenceLine x={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg`, fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} />
+                <ReferenceLine x={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg`, fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                 <Bar dataKey="spend" radius={[0, 2, 2, 0]}>
                   {spendByGrade.map((entry) => (
                     <Cell key={entry.name} fill={entry.name === "Not Graded" ? "hsl(40, 10%, 30%)" : GOLD} />
