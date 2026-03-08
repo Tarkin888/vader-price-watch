@@ -454,7 +454,7 @@ export default function CollectionAnalytics({ items }: Props) {
                   <Tooltip contentStyle={customTooltipStyle}
                     formatter={(value: number, _: string, entry: any) => [`${fmt(value)} — ${entry.payload.grade}`, entry.payload.item_id]} />
                   <ReferenceLine x={twelveBackAvg} stroke={MUTED} strokeDasharray="5 5"
-                    label={{ value: `Avg: ${fmt(Math.round(twelveBackAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} />
+                    label={{ value: `Avg: ${fmt(Math.round(twelveBackAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                   <Bar dataKey="price" radius={[0, 2, 2, 0]}>
                     {twelveBackBars.map((entry) => <Cell key={entry.item_id} fill={GRADE_COLORS[entry.grade] || MUTED} />)}
                   </Bar>
