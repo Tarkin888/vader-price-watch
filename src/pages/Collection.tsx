@@ -6,6 +6,7 @@ import CollectionAnalytics from "@/components/CollectionAnalytics";
 import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
+import EstimatedValueCell from "@/components/EstimatedValueCell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -275,9 +276,7 @@ const Collection = () => {
                       <td className="px-3 py-3 whitespace-nowrap align-middle">{item.purchase_date}</td>
                       <td className="px-3 py-3 align-middle">{item.purchase_source}</td>
                       <td className="px-3 py-3 text-right align-middle">
-                        {item.current_estimated_value != null
-                          ? `£${Number(item.current_estimated_value).toLocaleString("en-GB")}`
-                          : <span className="text-muted-foreground">—</span>}
+                        <EstimatedValueCell item={item} onUpdated={load} />
                       </td>
                       <td className={`px-3 py-3 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
                         {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
