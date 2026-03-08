@@ -63,7 +63,9 @@ const Index = () => {
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
       <FilterBar filters={filters} onChange={setFilters} />
       <StatsBar lots={filtered} />
-      <div className="flex justify-end border-b border-border">
+      <PriceTrendChart lots={filtered} />
+      <div className="flex justify-end gap-2 border-b border-border px-6 py-2">
+        <AddLotModal onAdded={loadLots} />
         <ExportCSV lots={filtered} />
       </div>
       <div className="flex-1">
