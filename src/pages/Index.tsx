@@ -1,10 +1,12 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { getAllLots, seedIfEmpty, type Lot } from "@/lib/db";
 import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import StatsBar from "@/components/StatsBar";
+import PriceTrendChart from "@/components/PriceTrendChart";
 import LotsTable from "@/components/LotsTable";
 import ExportCSV from "@/components/ExportCSV";
+import AddLotModal from "@/components/AddLotModal";
 
 const Index = () => {
   const [lots, setLots] = useState<Lot[]>([]);
