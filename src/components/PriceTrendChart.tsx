@@ -162,7 +162,7 @@ const PriceTrendChart = ({ lots }: Props) => {
             <ZAxis range={[60, 60]} />
             <Tooltip content={<ScatterTooltipContent />} />
             <Legend
-              wrapperStyle={{ fontSize: 10, fontFamily: "Courier New, monospace" }}
+              wrapperStyle={{ fontSize: 10, fontFamily: "'Aptos', sans-serif" }}
               payload={scatterVariants.map((v) => ({
                 value: v,
                 type: "circle" as const,

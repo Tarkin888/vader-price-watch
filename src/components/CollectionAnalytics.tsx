@@ -394,8 +394,8 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={sourceData} margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis dataKey="name" tick={{ fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} angle={-30} textAnchor="end" />
-                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                <XAxis dataKey="name" tick={{ fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} angle={-30} textAnchor="end" />
+                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, name: string, entry: any) => [
                     name === "spend" ? `${fmt(value)} (${entry.payload.count} items, avg ${fmt(entry.payload.avg)})` : value,

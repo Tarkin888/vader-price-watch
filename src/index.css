@@ -56,7 +56,8 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Aptos', sans-serif;
+    font-weight: 400;
   }
 }
 
