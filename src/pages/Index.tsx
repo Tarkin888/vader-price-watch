@@ -95,6 +95,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
+      <div className="flex items-center gap-1 border-b border-border px-6 py-2">
+        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary">
+          PRICE TRACKER
+        </button>
+        <button
+          onClick={() => navigate("/collection")}
+          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+        >
+          MY COLLECTION
+        </button>
+      </div>
       <ReferencePanel />
       <FilterBar filters={filters} onChange={setFilters} />
       <StatsBar lots={filtered} />
