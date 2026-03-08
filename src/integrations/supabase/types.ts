@@ -171,9 +171,40 @@ export type Database = {
         | "UKG-80"
         | "UKG-85"
         | "CAS-80"
+        | "UNKNOWN"
       lot_era: "SW" | "ESB" | "ROTJ" | "POTF" | "UNKNOWN"
       lot_source: "Heritage" | "Hakes" | "Vectis" | "LCG"
-      variant_code: "12A" | "12B" | "12C" | "12A-DT" | "12B-DT" | "CAN" | "PAL"
+      variant_code:
+        | "12A"
+        | "12B"
+        | "12C"
+        | "12A-DT"
+        | "12B-DT"
+        | "CAN"
+        | "PAL"
+        | "MEX"
+        | "VP"
+        | "SW-12"
+        | "SW-12A"
+        | "SW-12A-DT"
+        | "SW-12B"
+        | "SW-12B-DT"
+        | "SW-12C"
+        | "SW-20"
+        | "SW-21"
+        | "ESB-31"
+        | "ESB-32"
+        | "ESB-41"
+        | "ESB-45"
+        | "ESB-47"
+        | "ESB-48"
+        | "ROTJ-48"
+        | "ROTJ-65"
+        | "ROTJ-65-VP"
+        | "ROTJ-77"
+        | "ROTJ-79"
+        | "POTF-92"
+        | "UNKNOWN"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -335,10 +366,42 @@ export const Constants = {
         "UKG-80",
         "UKG-85",
         "CAS-80",
+        "UNKNOWN",
       ],
       lot_era: ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"],
       lot_source: ["Heritage", "Hakes", "Vectis", "LCG"],
-      variant_code: ["12A", "12B", "12C", "12A-DT", "12B-DT", "CAN", "PAL"],
+      variant_code: [
+        "12A",
+        "12B",
+        "12C",
+        "12A-DT",
+        "12B-DT",
+        "CAN",
+        "PAL",
+        "MEX",
+        "VP",
+        "SW-12",
+        "SW-12A",
+        "SW-12A-DT",
+        "SW-12B",
+        "SW-12B-DT",
+        "SW-12C",
+        "SW-20",
+        "SW-21",
+        "ESB-31",
+        "ESB-32",
+        "ESB-41",
+        "ESB-45",
+        "ESB-47",
+        "ESB-48",
+        "ROTJ-48",
+        "ROTJ-65",
+        "ROTJ-65-VP",
+        "ROTJ-77",
+        "ROTJ-79",
+        "POTF-92",
+        "UNKNOWN",
+      ],
     },
   },
 } as const
