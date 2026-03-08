@@ -113,7 +113,7 @@ const Index = () => {
       </div>
       <ReferencePanel />
       <FilterBar filters={filters} onChange={setFilters} />
-      <StatsBar lots={filtered} />
+      <StatsBar lots={filtered} filters={filters} />
       <PriceTrendChart lots={filtered} />
       <div className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
