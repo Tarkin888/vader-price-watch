@@ -188,7 +188,8 @@ const PriceTrendChart = ({ lots }: Props) => {
         </ResponsiveContainer>
       )}
     </div>
+      )}
+    </div>
   );
-};
 
 export default PriceTrendChart;
