@@ -3,7 +3,8 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { CalendarIcon, X, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SOURCES = Constants.public.Enums.lot_source;
@@ -16,6 +17,7 @@ export interface Filters {
   gradeTier: string | null;
   dateFrom: Date | null;
   dateTo: Date | null;
+  search: string;
 }
 
 interface FilterBarProps {
@@ -31,6 +33,19 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
 
   return (
     <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Search</label>
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+          <Input
+            value={filters.search}
+            onChange={(e) => set("search", e.target.value)}
+            placeholder="Search lots..."
+            className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-44"
+          />
+        </div>
+      </div>
+
       <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Source</label>
         <select
@@ -80,7 +95,7 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
         variant="ghost"
         size="sm"
         className="text-xs text-muted-foreground hover:text-primary tracking-wider"
-        onClick={() => onChange({ source: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null })}
+        onClick={() => onChange({ source: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "" })}
       >
         <X className="w-3 h-3 mr-1" /> CLEAR
       </Button>
