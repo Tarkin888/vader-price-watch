@@ -126,7 +126,7 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
   return (
     <div className="flex flex-wrap gap-4 px-6 py-3 border-b border-border">
       {eraGroups.map(({ era, lots: eraLots }) => {
-        const stats = calcStats(eraLots);
+        const stats = calcStats(eraLots, isUSD);
         const color = ERA_COLORS[era] ?? "hsl(0, 0%, 33%)";
         return (
           <div

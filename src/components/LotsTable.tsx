@@ -136,13 +136,29 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
     );
   }
 
+  const isUSD = currency === "USD";
+  const sym = isUSD ? "$" : "£";
+
+  const COLS: { key: SortKey; label: string; align?: string }[] = [
+    { key: "sale_date", label: "SALE DATE" },
+    { key: "variant_grade_key", label: "VARIANT-GRADE" },
+    { key: "total_paid_gbp", label: `TOTAL (${sym})${isUSD ? " (USD)" : ""}`, align: "text-right" },
+    { key: "hammer_price_gbp", label: `HAMMER${isUSD ? " (USD)" : ""}`, align: "text-right" },
+    { key: "buyers_premium_gbp", label: `BP${isUSD ? " (USD)" : ""}`, align: "text-right" },
+  ];
+
+  const fmtPrice = (gbp: number, rate: number) => {
+    if (isUSD) return `$${toUsd(gbp, rate).toLocaleString("en-US")}`;
+    return `£${Number(gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}`;
+  };
+
   return (
     <>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-              {SORTABLE_COLS.map((col) => (
+              {COLS.map((col) => (
                 <th
                   key={col.key}
                   className={`px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors ${col.align ?? ""}`}
@@ -169,14 +185,15 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
               >
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
-                <td className="px-3 py-2 text-right text-primary font-bold">
-                  £{Number(l.total_paid_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
+                <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
+                  {fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
+                  {isUSD && <SourceBadge source={l.source} />}
                 </td>
-                <td className="px-3 py-2 text-right">
-                  £{Number(l.hammer_price_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {fmtPrice(Number(l.hammer_price_gbp), Number(l.usd_to_gbp_rate))}
                 </td>
-                <td className="px-3 py-2 text-right">
-                  £{Number(l.buyers_premium_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {fmtPrice(Number(l.buyers_premium_gbp), Number(l.usd_to_gbp_rate))}
                 </td>
                 <td className="px-3 py-2">
                   <EraBadge era={(l as any).era ?? "UNKNOWN"} />
