@@ -68,7 +68,7 @@ function EraBadge({ era }: { era: string }) {
   );
 }
 
-const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) => {
+const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("sale_date");
