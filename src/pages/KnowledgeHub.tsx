@@ -117,7 +117,7 @@ const KnowledgeHub = () => {
 
   /* shared table cell class */
   const thCls = "py-2 px-3 text-left text-[10px] tracking-widest text-primary font-bold border-b border-primary/30 whitespace-nowrap";
-  const tdCls = "py-2 px-3 text-xs border-b border-border/30";
+  const tdCls = "py-2 px-3 text-xs text-foreground border-b border-border/30";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
