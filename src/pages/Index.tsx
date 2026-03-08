@@ -46,6 +46,15 @@ const Index = () => {
 
   useEffect(() => { loadLots(); }, [loadLots]);
 
+  // Cross-reference: read variant from URL params
+  useEffect(() => {
+    const variant = searchParams.get("variant");
+    if (variant) {
+      setFilters((f) => ({ ...f, variantCode: variant }));
+      setActiveTab("table");
+    }
+  }, [searchParams]);
+
   const filtered = useMemo(() => {
     return lots.filter((l) => {
       if (filters.source && l.source !== filters.source) return false;
