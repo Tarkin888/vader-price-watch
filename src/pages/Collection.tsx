@@ -4,6 +4,7 @@ import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type
 import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
 import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -144,13 +145,16 @@ const Collection = () => {
               <span>PORTFOLIO VALUE: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
             </div>
           </div>
-          <Button
-            size="sm"
-            className="text-xs tracking-wider"
-            onClick={() => setAddOpen(true)}
-          >
-            <Plus className="w-3 h-3 mr-1" /> ADD ITEM
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button
+              size="sm"
+              className="text-xs tracking-wider"
+              onClick={() => setAddOpen(true)}
+            >
+              <Plus className="w-3 h-3 mr-1" /> ADD ITEM
+            </Button>
+          </div>
         </div>
       </header>
 

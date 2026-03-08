@@ -7,7 +7,8 @@ All colors MUST be HSL.
 */
 
 @layer base {
-  :root {
+  :root,
+  .theme-dark {
     --background: 50 14% 3%;
     --foreground: 40 30% 82%;
 
@@ -46,6 +47,55 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 40 30% 82%;
     --sidebar-border: 43 20% 18%;
     --sidebar-ring: 43 50% 54%;
+
+    --row-hover: 50 14% 9%;
+    --header-bg: 50 14% 3%;
+    --header-fg: 40 30% 82%;
+  }
+
+  .theme-light {
+    --background: 38 30% 93%;
+    --foreground: 60 14% 7%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 60 14% 7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 60 14% 7%;
+
+    --primary: 40 75% 31%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 38 20% 88%;
+    --secondary-foreground: 60 14% 7%;
+
+    --muted: 38 20% 88%;
+    --muted-foreground: 40 10% 40%;
+
+    --accent: 40 75% 31%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 38 22% 75%;
+    --input: 38 22% 75%;
+    --ring: 40 75% 31%;
+
+    --radius: 0.25rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 60 14% 7%;
+    --sidebar-primary: 40 75% 31%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 38 20% 88%;
+    --sidebar-accent-foreground: 60 14% 7%;
+    --sidebar-border: 38 22% 75%;
+    --sidebar-ring: 40 75% 31%;
+
+    --row-hover: 38 25% 90%;
+    --header-bg: 60 14% 7%;
+    --header-fg: 38 30% 93%;
   }
 }
 
