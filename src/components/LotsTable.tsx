@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { Lot } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
-import { Copy, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";
 import {
@@ -15,14 +15,52 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+type SortKey = "sale_date" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
+type SortDir = "asc" | "desc";
+
 interface LotsTableProps {
   lots: Lot[];
   onChanged: () => void;
+  onCopyRow?: (lot: Lot) => void;
 }
 
-const LotsTable = ({ lots, onChanged }: LotsTableProps) => {
+const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
+  { key: "sale_date", label: "SALE DATE" },
+  { key: "variant_grade_key", label: "VARIANT-GRADE" },
+  { key: "total_paid_gbp", label: "TOTAL (£)", align: "text-right" },
+  { key: "hammer_price_gbp", label: "HAMMER", align: "text-right" },
+  { key: "buyers_premium_gbp", label: "BP", align: "text-right" },
+];
+
+const LotsTable = ({ lots, onChanged, onCopyRow }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>("sale_date");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  const sorted = useMemo(() => {
+    const copy = [...lots];
+    copy.sort((a, b) => {
+      let av: string | number = a[sortKey] as any;
+      let bv: string | number = b[sortKey] as any;
+      if (["total_paid_gbp", "hammer_price_gbp", "buyers_premium_gbp"].includes(sortKey)) {
+        av = Number(av); bv = Number(bv);
+      }
+      if (av < bv) return sortDir === "asc" ? -1 : 1;
+      if (av > bv) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return copy;
+  }, [lots, sortKey, sortDir]);
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("desc");
+    }
+  };
 
   const copyRow = (l: Lot) => {
     const fields = [
@@ -32,6 +70,7 @@ const LotsTable = ({ lots, onChanged }: LotsTableProps) => {
     ];
     navigator.clipboard.writeText(fields.join("\t"));
     toast.success("Row copied to clipboard");
+    onCopyRow?.(l);
   };
 
   const handleDelete = async () => {
@@ -44,6 +83,13 @@ const LotsTable = ({ lots, onChanged }: LotsTableProps) => {
       onChanged();
     }
     setDeleteLot(null);
+  };
+
+  const SortIcon = ({ col }: { col: SortKey }) => {
+    if (sortKey !== col) return <ArrowDown className="w-2.5 h-2.5 opacity-20 inline ml-1" />;
+    return sortDir === "asc"
+      ? <ArrowUp className="w-2.5 h-2.5 text-primary inline ml-1" />
+      : <ArrowDown className="w-2.5 h-2.5 text-primary inline ml-1" />;
   };
 
   if (lots.length === 0) {
@@ -60,12 +106,16 @@ const LotsTable = ({ lots, onChanged }: LotsTableProps) => {
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-              <th className="px-3 py-2">SALE DATE</th>
+              {SORTABLE_COLS.map((col) => (
+                <th
+                  key={col.key}
+                  className={`px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors ${col.align ?? ""}`}
+                  onClick={() => toggleSort(col.key)}
+                >
+                  {col.label}<SortIcon col={col.key} />
+                </th>
+              ))}
               <th className="px-3 py-2">SOURCE</th>
-              <th className="px-3 py-2">VARIANT-GRADE</th>
-              <th className="px-3 py-2 text-right">TOTAL (£)</th>
-              <th className="px-3 py-2 text-right">HAMMER</th>
-              <th className="px-3 py-2 text-right">BP</th>
               <th className="px-3 py-2">LOT REF</th>
               <th className="px-3 py-2">NOTES</th>
               <th className="px-3 py-2">IMG</th>
@@ -73,10 +123,9 @@ const LotsTable = ({ lots, onChanged }: LotsTableProps) => {
             </tr>
           </thead>
           <tbody>
-            {lots.map((l) => (
+            {sorted.map((l) => (
               <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
-                <td className="px-3 py-2">{l.source}</td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
                 <td className="px-3 py-2 text-right text-primary font-bold">
                   £{Number(l.total_paid_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
@@ -87,6 +136,7 @@ const LotsTable = ({ lots, onChanged }: LotsTableProps) => {
                 <td className="px-3 py-2 text-right">
                   £{Number(l.buyers_premium_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
                 </td>
+                <td className="px-3 py-2">{l.source}</td>
                 <td className="px-3 py-2">
                   {l.lot_url ? (
                     <a href={l.lot_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">

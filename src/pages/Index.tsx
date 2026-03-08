@@ -4,19 +4,25 @@ import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import StatsBar from "@/components/StatsBar";
 import PriceTrendChart from "@/components/PriceTrendChart";
+import ReferencePanel from "@/components/ReferencePanel";
 import LotsTable from "@/components/LotsTable";
 import ExportCSV from "@/components/ExportCSV";
+import ImportCSV from "@/components/ImportCSV";
 import AddLotModal from "@/components/AddLotModal";
+import SessionLog from "@/components/SessionLog";
 
 const Index = () => {
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"table" | "session">("table");
+  const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [filters, setFilters] = useState<Filters>({
     source: null,
     variantCode: null,
     gradeTier: null,
     dateFrom: null,
     dateTo: null,
+    search: "",
   });
 
   const loadLots = useCallback(async () => {
@@ -40,6 +46,14 @@ const Index = () => {
       if (filters.gradeTier && l.grade_tier_code !== filters.gradeTier) return false;
       if (filters.dateFrom && new Date(l.sale_date) < filters.dateFrom) return false;
       if (filters.dateTo && new Date(l.sale_date) > filters.dateTo) return false;
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        const searchable = [
+          l.lot_ref, l.condition_notes, l.variant_code, l.grade_tier_code,
+          l.variant_grade_key, l.source, l.grade_subgrades,
+        ].join(" ").toLowerCase();
+        if (!searchable.includes(q)) return false;
+      }
       return true;
     });
   }, [lots, filters]);
@@ -47,6 +61,10 @@ const Index = () => {
   const lastScrape = lots.length > 0
     ? lots.reduce((latest, l) => (l.capture_date > latest ? l.capture_date : latest), lots[0].capture_date)
     : null;
+
+  const handleCopyRow = (lot: Lot) => {
+    setCopiedRows((prev) => [...prev, lot]);
+  };
 
   if (loading) {
     return (
@@ -61,15 +79,37 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
+      <ReferencePanel />
       <FilterBar filters={filters} onChange={setFilters} />
       <StatsBar lots={filtered} />
       <PriceTrendChart lots={filtered} />
-      <div className="flex justify-end gap-2 border-b border-border px-6 py-2">
-        <AddLotModal onAdded={loadLots} />
-        <ExportCSV lots={filtered} />
+      <div className="flex items-center justify-between border-b border-border px-6 py-2">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab("table")}
+            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+          >
+            RESULTS
+          </button>
+          <button
+            onClick={() => setActiveTab("session")}
+            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+          >
+            SESSION LOG {copiedRows.length > 0 && `(${copiedRows.length})`}
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <AddLotModal onAdded={loadLots} />
+          <ImportCSV onImported={loadLots} />
+          <ExportCSV lots={filtered} />
+        </div>
       </div>
       <div className="flex-1">
-        <LotsTable lots={filtered} onChanged={loadLots} />
+        {activeTab === "table" ? (
+          <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} />
+        ) : (
+          <SessionLog copiedRows={copiedRows} onClear={() => setCopiedRows([])} />
+        )}
       </div>
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
         IMPERIAL PRICE TERMINAL v3.0 • GALACTIC EMPIRE • CLASSIFIED
