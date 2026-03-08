@@ -11,8 +11,19 @@ const SOURCES = Constants.public.Enums.lot_source;
 const VARIANTS = Constants.public.Enums.variant_code;
 const GRADES = Constants.public.Enums.grade_tier_code;
 
+const ERAS = ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"] as const;
+const CARDBACK_CODES = [
+  "SW-12", "SW-20", "SW-21",
+  "ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48",
+  "ROTJ-65", "ROTJ-77", "ROTJ-79",
+  "POTF-92",
+  "UNKNOWN",
+] as const;
+
 export interface Filters {
   source: string | null;
+  era: string | null;
+  cardbackCode: string | null;
   variantCode: string | null;
   gradeTier: string | null;
   dateFrom: Date | null;
