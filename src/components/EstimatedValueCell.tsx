@@ -82,28 +82,50 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
         return;
       }
 
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-      const cutoff = oneYearAgo.toISOString().slice(0, 10);
+      // Progressively widen the window: 1 year, 2 years, 3 years, then all-time
+      const windows = [1, 2, 3, 0]; // 0 = no cutoff
+      let data: any[] | null = null;
+      let usedYears = 1;
 
-      const { data, error } = await supabase
-        .from("lots")
-        .select("total_paid_gbp")
-        .in("variant_code", variants as any)
-        .gte("sale_date", cutoff);
+      for (const years of windows) {
+        let query = supabase
+          .from("lots")
+          .select("total_paid_gbp, sale_date")
+          .in("variant_code", variants as any);
 
-      if (error) throw error;
+        if (years > 0) {
+          const cutoff = new Date();
+          cutoff.setFullYear(cutoff.getFullYear() - years);
+          query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
+        }
+
+        const { data: result, error: qErr } = await query;
+        if (qErr) throw qErr;
+
+        if (result && result.length > 0) {
+          data = result;
+          usedYears = years;
+          break;
+        }
+      }
 
       if (!data || data.length === 0) {
-        toast.error("No sales found in the last 12 months for this category");
+        toast.error("No sales found in the price tracker for this category");
         setCalculating(false);
         return;
       }
 
-      const avg = Math.round(data.reduce((s, r) => s + Number(r.total_paid_gbp), 0) / data.length);
+      const avg = Math.round(data.reduce((s: number, r: any) => s + Number(r.total_paid_gbp), 0) / data.length);
       await saveValue(avg);
       setMenuOpen(false);
-      toast.success(`1-year avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`);
+
+      if (usedYears === 0) {
+        toast.warning(`No sales within 3 years. Used all-time avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
+      } else if (usedYears > 1) {
+        toast.warning(`No sales within 1 year. Used ${usedYears}-year avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
+      } else {
+        toast.success(`1-year avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`);
+      }
     } catch (e: any) {
       toast.error("Calculation failed: " + e.message);
     } finally {
