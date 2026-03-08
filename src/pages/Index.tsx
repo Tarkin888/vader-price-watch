@@ -16,6 +16,8 @@ import NotableSalesBanner from "@/components/NotableSalesBanner";
 import ComparableSalesPanel from "@/components/ComparableSalesPanel";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "session">("dashboard");
