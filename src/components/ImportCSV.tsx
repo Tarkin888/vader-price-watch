@@ -30,14 +30,24 @@ const ImportCSV = ({ onImported }: Props) => {
       const titleText = [cols[3], cols[4], cols[5], cols[11]].join(" ");
       const classified = classifyLot(titleText);
 
+      // If classifyLot couldn't determine era/cardback, derive from variant_code
+      let era = classified.era;
+      let cardback_code = classified.cardback_code;
+      const variantCode = classified.variant_code;
+      if (era === "UNKNOWN" || cardback_code === "UNKNOWN") {
+        const derived = deriveFromVariantCode(variantCode);
+        if (era === "UNKNOWN" && derived.era !== "UNKNOWN") era = derived.era;
+        if (cardback_code === "UNKNOWN" && derived.cardback_code !== "UNKNOWN") cardback_code = derived.cardback_code;
+      }
+
       rows.push({
         capture_date: cols[0],
         sale_date: cols[1],
         source: cols[2] as any,
         lot_ref: cols[3],
-        era: classified.era as any,
-        cardback_code: classified.cardback_code,
-        variant_code: classified.variant_code as any,
+        era: era as any,
+        cardback_code: cardback_code,
+        variant_code: variantCode as any,
         grade_tier_code: classified.grade_tier_code as any,
         hammer_price_gbp: parseFloat(cols[7]) || 0,
         buyers_premium_gbp: parseFloat(cols[8]) || 0,
