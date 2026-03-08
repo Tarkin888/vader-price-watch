@@ -205,6 +205,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
               ))}
               <th className="px-3 py-2">ERA</th>
               <th className="px-3 py-2">CARDBACK</th>
+              <th className="px-3 py-2">POP</th>
               <th className="px-3 py-2">SOURCE</th>
               <th className="px-3 py-2">LOT REF</th>
               <th className="px-3 py-2">NOTES</th>
