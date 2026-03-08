@@ -133,9 +133,9 @@ const SummaryDashboard = ({ lots }: Props) => {
           <tbody>
             {recentSales.map((l) => (
               <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                <td className="px-3 py-1.5">{l.sale_date}</td>
+                <td className="px-3 py-1.5 text-foreground">{l.sale_date}</td>
                 <td className="px-3 py-1.5 text-primary font-bold">{l.variant_grade_key}</td>
-                <td className="px-3 py-1.5">{l.source}</td>
+                <td className="px-3 py-1.5 text-foreground">{l.source}</td>
                 <td className="px-3 py-1.5 text-right text-primary font-bold">{fmt(Number(l.total_paid_gbp))}</td>
               </tr>
             ))}
