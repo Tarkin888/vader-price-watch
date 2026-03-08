@@ -8,14 +8,14 @@ interface ExportCSVProps {
 const ExportCSV = ({ lots }: ExportCSVProps) => {
   const exportCsv = () => {
     const headers = [
-      "captureDate", "saleDate", "source", "lotRef", "variantCode",
-      "gradeTierCode", "variantGradeKey", "hammerPriceGBP",
+      "captureDate", "saleDate", "source", "era", "cardbackCode", "lotRef",
+      "variantCode", "gradeTierCode", "variantGradeKey", "hammerPriceGBP",
       "buyersPremiumGBP", "totalPaidGBP", "usdToGbpRate", "conditionNotes",
     ];
     const rows = lots.map((l) => [
-      l.capture_date, l.sale_date, l.source, l.lot_ref, l.variant_code,
-      l.grade_tier_code, l.variant_grade_key, l.hammer_price_gbp,
-      l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate,
+      l.capture_date, l.sale_date, l.source, (l as any).era ?? "", (l as any).cardback_code ?? "",
+      l.lot_ref, l.variant_code, l.grade_tier_code, l.variant_grade_key,
+      l.hammer_price_gbp, l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate,
       `"${(l.condition_notes ?? "").replace(/"/g, '""')}"`,
     ].join(","));
 

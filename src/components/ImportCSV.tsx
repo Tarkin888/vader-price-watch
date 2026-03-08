@@ -1,18 +1,13 @@
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { LotInsert } from "@/lib/db";
+import { classifyLot } from "@/lib/classify-lot";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
   onImported: () => void;
 }
-
-const CSV_HEADERS = [
-  "captureDate", "saleDate", "source", "lotRef", "variantCode",
-  "gradeTierCode", "variantGradeKey", "hammerPriceGBP",
-  "buyersPremiumGBP", "totalPaidGBP", "usdToGbpRate", "conditionNotes",
-];
 
 const ImportCSV = ({ onImported }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -21,7 +16,6 @@ const ImportCSV = ({ onImported }: Props) => {
     const text = await file.text();
     const lines = text.trim().split("\n");
 
-    // Skip header if present
     let start = 0;
     if (lines[0]?.toLowerCase().includes("capturedate") || lines[0]?.toLowerCase().includes("capture_date")) {
       start = 1;
@@ -32,14 +26,19 @@ const ImportCSV = ({ onImported }: Props) => {
       const cols = parseCSVLine(lines[i]);
       if (cols.length < 12) continue;
 
+      // Build a title string from available fields for classification
+      const titleText = [cols[3], cols[4], cols[5], cols[11]].join(" ");
+      const classified = classifyLot(titleText);
+
       rows.push({
         capture_date: cols[0],
         sale_date: cols[1],
         source: cols[2] as any,
         lot_ref: cols[3],
-        variant_code: cols[4] as any,
-        grade_tier_code: cols[5] as any,
-        // variantGradeKey (cols[6]) is auto-computed by trigger
+        era: classified.era as any,
+        cardback_code: classified.cardback_code,
+        variant_code: classified.variant_code as any,
+        grade_tier_code: classified.grade_tier_code as any,
         hammer_price_gbp: parseFloat(cols[7]) || 0,
         buyers_premium_gbp: parseFloat(cols[8]) || 0,
         total_paid_gbp: parseFloat(cols[9]) || 0,
@@ -53,7 +52,6 @@ const ImportCSV = ({ onImported }: Props) => {
       return;
     }
 
-    // Fetch existing lot_ref+source combos to skip duplicates
     const { data: existing } = await supabase
       .from("lots")
       .select("lot_ref, source");
