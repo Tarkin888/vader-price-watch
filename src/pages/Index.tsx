@@ -134,7 +134,6 @@ const Index = () => {
           setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         }}
       />
-      <PriceTrendChart lots={filtered} />
       <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
           <button
@@ -148,6 +147,12 @@ const Index = () => {
             className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             RESULTS
+          </button>
+          <button
+            onClick={() => setActiveTab("chart")}
+            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+          >
+            PRICE CHART
           </button>
           <button
             onClick={() => setActiveTab("session")}
@@ -170,6 +175,8 @@ const Index = () => {
             <NotableSalesBanner lots={filtered} />
             <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} />
           </>
+        ) : activeTab === "chart" ? (
+          <ScatterChartPanel lots={lots} currency={filters.currency} />
         ) : (
           <SessionLog copiedRows={copiedRows} onClear={() => setCopiedRows([])} />
         )}
