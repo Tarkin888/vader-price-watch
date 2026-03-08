@@ -89,7 +89,9 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
     setCalculating(true);
     try {
       const variants = CATEGORY_TO_VARIANTS[item.category] || [];
-      if (variants.length === 0) {
+      const fallbackEra = CATEGORY_TO_ERA[item.category] || "";
+
+      if (variants.length === 0 && !fallbackEra) {
         toast.error("No price tracker mapping for category: " + item.category);
         setCalculating(false);
         return;
@@ -99,8 +101,11 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
       const windows = [1, 2, 3, 0]; // 0 = no cutoff
       let data: any[] | null = null;
       let usedYears = 1;
+      let usedFallback = false;
 
+      // Try variant_code matching first
       for (const years of windows) {
+        if (variants.length === 0) break;
         let query = supabase
           .from("lots")
           .select("total_paid_gbp, sale_date")
@@ -119,6 +124,32 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
           data = result;
           usedYears = years;
           break;
+        }
+      }
+
+      // Fallback: query by era if no variant matches found
+      if ((!data || data.length === 0) && fallbackEra) {
+        usedFallback = true;
+        for (const years of windows) {
+          let query = supabase
+            .from("lots")
+            .select("total_paid_gbp, sale_date")
+            .eq("era", fallbackEra as any);
+
+          if (years > 0) {
+            const cutoff = new Date();
+            cutoff.setFullYear(cutoff.getFullYear() - years);
+            query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
+          }
+
+          const { data: result, error: qErr } = await query;
+          if (qErr) throw qErr;
+
+          if (result && result.length > 0) {
+            data = result;
+            usedYears = years;
+            break;
+          }
         }
       }
 
