@@ -163,6 +163,12 @@ const Collection = () => {
           PRICE TRACKER
         </button>
         <button
+          onClick={() => navigate("/knowledge")}
+          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+        >
+          KNOWLEDGE HUB
+        </button>
+        <button
           className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary"
         >
           MY COLLECTION

@@ -105,6 +105,12 @@ const Index = () => {
           PRICE TRACKER
         </button>
         <button
+          onClick={() => navigate("/knowledge")}
+          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+        >
+          KNOWLEDGE HUB
+        </button>
+        <button
           onClick={() => navigate("/collection")}
           className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
