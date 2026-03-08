@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";
+import popCounts, { type PopEntry } from "@/data/popCounts";
 import {
   AlertDialog,
   AlertDialogAction,
