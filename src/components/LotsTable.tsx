@@ -22,6 +22,7 @@ interface LotsTableProps {
   lots: Lot[];
   onChanged: () => void;
   onCopyRow?: (lot: Lot) => void;
+  onSelectLot?: (lot: Lot) => void;
 }
 
 const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
@@ -32,7 +33,9 @@ const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
   { key: "buyers_premium_gbp", label: "BP", align: "text-right" },
 ];
 
-const LotsTable = ({ lots, onChanged, onCopyRow }: LotsTableProps) => {
+const NOTABLE_THRESHOLD = 5000;
+
+const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("sale_date");
@@ -124,7 +127,11 @@ const LotsTable = ({ lots, onChanged, onCopyRow }: LotsTableProps) => {
           </thead>
           <tbody>
             {sorted.map((l) => (
-              <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+              <tr
+                key={l.id}
+                onClick={() => onSelectLot?.(l)}
+                className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""}`}
+              >
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
                 <td className="px-3 py-2 text-right text-primary font-bold">

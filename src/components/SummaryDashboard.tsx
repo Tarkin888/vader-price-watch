@@ -1,0 +1,149 @@
+import { useMemo } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import type { Lot } from "@/lib/db";
+
+const TOOLTIP_STYLE = {
+  backgroundColor: "hsl(50, 14%, 6%)",
+  border: "1px solid hsl(43, 20%, 18%)",
+  color: "hsl(40, 30%, 82%)",
+  fontSize: 11,
+  fontFamily: "Courier New, monospace",
+};
+
+interface Props {
+  lots: Lot[];
+}
+
+const SummaryDashboard = ({ lots }: Props) => {
+  const bySource = useMemo(() => {
+    const map: Record<string, number> = {};
+    lots.forEach((l) => { map[l.source] = (map[l.source] || 0) + 1; });
+    return Object.entries(map).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  }, [lots]);
+
+  const byVariant = useMemo(() => {
+    const map: Record<string, number> = {};
+    lots.forEach((l) => { map[l.variant_code] = (map[l.variant_code] || 0) + 1; });
+    return Object.entries(map).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  }, [lots]);
+
+  const avgByGrade = useMemo(() => {
+    const map: Record<string, { sum: number; count: number }> = {};
+    lots.forEach((l) => {
+      if (!map[l.grade_tier_code]) map[l.grade_tier_code] = { sum: 0, count: 0 };
+      map[l.grade_tier_code].sum += Number(l.total_paid_gbp);
+      map[l.grade_tier_code].count += 1;
+    });
+    return Object.entries(map)
+      .map(([name, { sum, count }]) => ({ name, avg: Math.round(sum / count) }))
+      .sort((a, b) => b.avg - a.avg);
+  }, [lots]);
+
+  const recentSales = useMemo(() => {
+    return [...lots].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).slice(0, 5);
+  }, [lots]);
+
+  const fmt = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 0 })}`;
+
+  return (
+    <div className="px-6 py-4 space-y-6">
+      {/* Stats row */}
+      <div className="flex gap-6 text-xs tracking-wider">
+        <div>
+          <span className="text-muted-foreground">TOTAL RECORDS: </span>
+          <span className="text-primary font-bold">{lots.length}</span>
+        </div>
+        <div>
+          <span className="text-muted-foreground">SOURCES: </span>
+          <span className="text-primary font-bold">{bySource.length}</span>
+        </div>
+        <div>
+          <span className="text-muted-foreground">VARIANTS: </span>
+          <span className="text-primary font-bold">{byVariant.length}</span>
+        </div>
+      </div>
+
+      {/* Charts grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* By Source */}
+        <div className="border border-border p-3">
+          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY SOURCE</div>
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart data={bySource} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+              <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} />
+              <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={60} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Bar dataKey="count" fill="hsl(43, 50%, 54%)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* By Variant */}
+        <div className="border border-border p-3">
+          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY VARIANT</div>
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart data={byVariant} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+              <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} />
+              <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={50} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Bar dataKey="count" fill="hsl(20, 60%, 55%)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Avg by Grade */}
+        <div className="border border-border p-3">
+          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">AVG PRICE BY GRADE</div>
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart data={avgByGrade} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+              <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `£${v.toLocaleString()}`} />
+              <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={60} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [fmt(v), "Avg"]} />
+              <Bar dataKey="avg" fill="hsl(140, 45%, 50%)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Recent Sales */}
+      <div className="border border-border">
+        <div className="text-[10px] text-muted-foreground tracking-widest px-3 py-2 border-b border-border">
+          5 MOST RECENT SALES
+        </div>
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
+              <th className="px-3 py-1.5">DATE</th>
+              <th className="px-3 py-1.5">VARIANT-GRADE</th>
+              <th className="px-3 py-1.5">SOURCE</th>
+              <th className="px-3 py-1.5 text-right">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentSales.map((l) => (
+              <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                <td className="px-3 py-1.5">{l.sale_date}</td>
+                <td className="px-3 py-1.5 text-primary font-bold">{l.variant_grade_key}</td>
+                <td className="px-3 py-1.5">{l.source}</td>
+                <td className="px-3 py-1.5 text-right text-primary font-bold">{fmt(Number(l.total_paid_gbp))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default SummaryDashboard;

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -8,6 +8,10 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ScatterChart,
+  Scatter,
+  ZAxis,
+  Cell,
 } from "recharts";
 import type { Lot } from "@/lib/db";
 
@@ -21,27 +25,47 @@ const VARIANT_COLORS: Record<string, string> = {
   PAL: "hsl(60, 50%, 55%)",
 };
 
+const TOOLTIP_STYLE = {
+  backgroundColor: "hsl(50, 14%, 6%)",
+  border: "1px solid hsl(43, 20%, 18%)",
+  color: "hsl(40, 30%, 82%)",
+  fontSize: 11,
+  fontFamily: "Courier New, monospace",
+};
+
 interface Props {
   lots: Lot[];
 }
 
+type ChartMode = "line" | "scatter";
+
+const ScatterTooltipContent = ({ active, payload }: any) => {
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div style={TOOLTIP_STYLE} className="p-2 rounded text-xs space-y-0.5">
+      <div className="text-primary font-bold">{d.variant_grade_key}</div>
+      <div>Source: {d.source}</div>
+      <div>Lot: {d.lot_ref}</div>
+      <div>Date: {d.sale_date}</div>
+      <div>Total: £{Number(d.total_paid_gbp).toLocaleString()}</div>
+    </div>
+  );
+};
+
 const PriceTrendChart = ({ lots }: Props) => {
-  const { chartData, variants } = useMemo(() => {
-    // Group by variant, filter to those with 2+ data points
+  const [mode, setMode] = useState<ChartMode>("line");
+
+  const { lineData, lineVariants } = useMemo(() => {
     const byVariant: Record<string, Lot[]> = {};
     lots.forEach((l) => {
       const v = l.variant_code;
       if (!byVariant[v]) byVariant[v] = [];
       byVariant[v].push(l);
     });
+    const validVariants = Object.keys(byVariant).filter((v) => byVariant[v].length >= 2);
+    if (validVariants.length === 0) return { lineData: [], lineVariants: [] };
 
-    const validVariants = Object.keys(byVariant).filter(
-      (v) => byVariant[v].length >= 2
-    );
-
-    if (validVariants.length === 0) return { chartData: [], variants: [] };
-
-    // Build date-indexed map
     const dateMap: Record<string, Record<string, number>> = {};
     validVariants.forEach((v) => {
       byVariant[v].forEach((l) => {
@@ -49,65 +73,110 @@ const PriceTrendChart = ({ lots }: Props) => {
         dateMap[l.sale_date][v] = Number(l.total_paid_gbp);
       });
     });
-
     const sorted = Object.keys(dateMap).sort();
-    const data = sorted.map((d) => ({ date: d, ...dateMap[d] }));
-
-    return { chartData: data, variants: validVariants };
+    return { lineData: sorted.map((d) => ({ date: d, ...dateMap[d] })), lineVariants: validVariants };
   }, [lots]);
 
-  if (variants.length === 0) {
+  const scatterData = useMemo(() => {
+    return lots.map((l) => ({
+      ...l,
+      dateNum: new Date(l.sale_date).getTime(),
+      price: Number(l.total_paid_gbp),
+    }));
+  }, [lots]);
+
+  const scatterVariants = useMemo(() => {
+    return [...new Set(lots.map((l) => l.variant_code))];
+  }, [lots]);
+
+  if (lots.length === 0) {
     return (
       <div className="px-6 py-4 text-center text-muted-foreground text-[10px] tracking-widest border-b border-border">
-        PRICE TREND CHART REQUIRES 2+ DATA POINTS PER VARIANT
+        NO DATA FOR CHART
       </div>
     );
   }
 
   return (
     <div className="border-b border-border px-6 py-4">
-      <div className="text-[10px] text-muted-foreground tracking-widest uppercase mb-2">
-        Price Trend by Variant
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-[10px] text-muted-foreground tracking-widest uppercase">
+          {mode === "line" ? "Price Trend by Variant" : "Scatter Plot — All Lots"}
+        </div>
+        <div className="flex gap-1">
+          <button
+            onClick={() => setMode("line")}
+            className={`text-[10px] tracking-widest px-2 py-0.5 transition-colors ${mode === "line" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+          >
+            LINE
+          </button>
+          <button
+            onClick={() => setMode("scatter")}
+            className={`text-[10px] tracking-widest px-2 py-0.5 transition-colors ${mode === "scatter" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+          >
+            SCATTER
+          </button>
+        </div>
       </div>
-      <ResponsiveContainer width="100%" height={260}>
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
-          <XAxis
-            dataKey="date"
-            stroke="hsl(40, 15%, 50%)"
-            tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }}
-          />
-          <YAxis
-            stroke="hsl(40, 15%, 50%)"
-            tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }}
-            tickFormatter={(v) => `£${v.toLocaleString()}`}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "hsl(50, 14%, 6%)",
-              border: "1px solid hsl(43, 20%, 18%)",
-              color: "hsl(40, 30%, 82%)",
-              fontSize: 11,
-              fontFamily: "Courier New, monospace",
-            }}
-            formatter={(value: number) => [`£${value.toLocaleString()}`, undefined]}
-          />
-          <Legend
-            wrapperStyle={{ fontSize: 10, fontFamily: "Courier New, monospace" }}
-          />
-          {variants.map((v) => (
-            <Line
-              key={v}
-              type="monotone"
-              dataKey={v}
-              stroke={VARIANT_COLORS[v] ?? "hsl(0, 0%, 60%)"}
-              strokeWidth={2}
-              dot={{ r: 3 }}
-              connectNulls
+
+      {mode === "line" ? (
+        lineVariants.length === 0 ? (
+          <div className="py-8 text-center text-muted-foreground text-[10px] tracking-widest">
+            LINE CHART REQUIRES 2+ DATA POINTS PER VARIANT
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={lineData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+              <XAxis dataKey="date" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }} />
+              <YAxis stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `£${v.toLocaleString()}`} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => [`£${value.toLocaleString()}`, undefined]} />
+              <Legend wrapperStyle={{ fontSize: 10, fontFamily: "Courier New, monospace" }} />
+              {lineVariants.map((v) => (
+                <Line key={v} type="monotone" dataKey={v} stroke={VARIANT_COLORS[v] ?? "hsl(0, 0%, 60%)"} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        )
+      ) : (
+        <ResponsiveContainer width="100%" height={260}>
+          <ScatterChart>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+            <XAxis
+              dataKey="dateNum"
+              type="number"
+              domain={["dataMin", "dataMax"]}
+              stroke="hsl(40, 15%, 50%)"
+              tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }}
+              tickFormatter={(v) => new Date(v).toLocaleDateString("en-GB", { month: "short", year: "2-digit" })}
+              name="Date"
             />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
+            <YAxis
+              dataKey="price"
+              type="number"
+              stroke="hsl(40, 15%, 50%)"
+              tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }}
+              tickFormatter={(v) => `£${v.toLocaleString()}`}
+              name="Total Paid"
+            />
+            <ZAxis range={[60, 60]} />
+            <Tooltip content={<ScatterTooltipContent />} />
+            <Legend
+              wrapperStyle={{ fontSize: 10, fontFamily: "Courier New, monospace" }}
+              payload={scatterVariants.map((v) => ({
+                value: v,
+                type: "circle" as const,
+                color: VARIANT_COLORS[v] ?? "hsl(0, 0%, 60%)",
+              }))}
+            />
+            <Scatter data={scatterData} name="Lots">
+              {scatterData.map((entry, i) => (
+                <Cell key={i} fill={VARIANT_COLORS[entry.variant_code] ?? "hsl(0, 0%, 60%)"} />
+              ))}
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 };
