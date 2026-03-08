@@ -20,6 +20,7 @@ import { useRef } from "react";
 const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "session">("dashboard");
