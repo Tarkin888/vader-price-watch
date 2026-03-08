@@ -89,7 +89,7 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
       const { data, error } = await supabase
         .from("lots")
         .select("total_paid_gbp")
-        .in("variant_code", variants)
+        .in("variant_code", variants as any)
         .gte("sale_date", cutoff);
 
       if (error) throw error;
