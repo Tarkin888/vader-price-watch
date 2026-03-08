@@ -135,6 +135,7 @@ const Index = () => {
           setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         }}
       />
+      <PriceTrendChart lots={filtered} />
       <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
           <button
