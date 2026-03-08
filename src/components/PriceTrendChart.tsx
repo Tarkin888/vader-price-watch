@@ -190,6 +190,7 @@ const PriceTrendChart = ({ lots }: Props) => {
     </div>
       )}
     </div>
+  );
 };
 
 export default PriceTrendChart;
