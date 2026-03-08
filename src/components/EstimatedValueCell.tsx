@@ -163,12 +163,13 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
       await saveValue(avg);
       setMenuOpen(false);
 
+      const fallbackNote = usedFallback ? " (matched by era)" : "";
       if (usedYears === 0) {
-        toast.warning(`No sales within 3 years. Used all-time avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
+        toast.warning(`No sales within 3 years. Used all-time avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
       } else if (usedYears > 1) {
-        toast.warning(`No sales within 1 year. Used ${usedYears}-year avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
+        toast.warning(`No sales within 1 year. Used ${usedYears}-year avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
       } else {
-        toast.success(`1-year avg from ${data.length} sales: £${avg.toLocaleString("en-GB")}`);
+        toast.success(`1-year avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`);
       }
     } catch (e: any) {
       toast.error("Calculation failed: " + e.message);
