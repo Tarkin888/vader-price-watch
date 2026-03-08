@@ -10,12 +10,16 @@ import ExportCSV from "@/components/ExportCSV";
 import ImportCSV from "@/components/ImportCSV";
 import AddLotModal from "@/components/AddLotModal";
 import SessionLog from "@/components/SessionLog";
+import SummaryDashboard from "@/components/SummaryDashboard";
+import NotableSalesBanner from "@/components/NotableSalesBanner";
+import ComparableSalesPanel from "@/components/ComparableSalesPanel";
 
 const Index = () => {
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"table" | "session">("table");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "session">("dashboard");
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
+  const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [filters, setFilters] = useState<Filters>({
     source: null,
     variantCode: null,
@@ -86,6 +90,12 @@ const Index = () => {
       <div className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
           <button
+            onClick={() => setActiveTab("dashboard")}
+            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+          >
+            DASHBOARD
+          </button>
+          <button
             onClick={() => setActiveTab("table")}
             className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
@@ -105,12 +115,26 @@ const Index = () => {
         </div>
       </div>
       <div className="flex-1">
-        {activeTab === "table" ? (
-          <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} />
+        {activeTab === "dashboard" ? (
+          <SummaryDashboard lots={filtered} />
+        ) : activeTab === "table" ? (
+          <>
+            <NotableSalesBanner lots={filtered} />
+            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} />
+          </>
         ) : (
           <SessionLog copiedRows={copiedRows} onClear={() => setCopiedRows([])} />
         )}
       </div>
+
+      {selectedLot && (
+        <ComparableSalesPanel
+          lot={selectedLot}
+          allLots={lots}
+          onClose={() => setSelectedLot(null)}
+        />
+      )}
+
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
         IMPERIAL PRICE TERMINAL v3.0 • GALACTIC EMPIRE • CLASSIFIED
       </footer>
