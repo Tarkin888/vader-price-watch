@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type CollectionItem } from "@/lib/collection-db";
 import CollectionFormModal from "@/components/CollectionFormModal";
+import CollectionAnalytics from "@/components/CollectionAnalytics";
 import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ const Collection = () => {
   const [editItem, setEditItem] = useState<CollectionItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState<CollectionItem | null>(null);
+  const [subTab, setSubTab] = useState<"inventory" | "analytics">("inventory");
 
   const load = useCallback(async () => {
     try {
@@ -165,144 +167,163 @@ const Collection = () => {
         >
           MY COLLECTION
         </button>
+        <span className="text-muted-foreground/30 mx-2">|</span>
+        <button
+          onClick={() => setSubTab("inventory")}
+          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+        >
+          INVENTORY
+        </button>
+        <button
+          onClick={() => setSubTab("analytics")}
+          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+        >
+          ANALYTICS
+        </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
-        <div className="flex flex-col gap-1">
-          <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Search</label>
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
-            <Input
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              placeholder="Search items..."
-              className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-44"
-            />
+      {subTab === "analytics" ? (
+        <CollectionAnalytics items={items} />
+      ) : (
+        <>
+          {/* Filters */}
+          <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Search</label>
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+                <Input
+                  value={filters.search}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                  placeholder="Search items..."
+                  className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-44"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Category</label>
+              <select className={selectClass} value={filters.category ?? ""} onChange={(e) => setFilters({ ...filters, category: e.target.value || null })}>
+                <option value="">ALL</option>
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grading</label>
+              <select className={selectClass} value={filters.grading ?? ""} onChange={(e) => setFilters({ ...filters, grading: e.target.value || null })}>
+                <option value="">ALL</option>
+                {GRADINGS.map((g) => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Category</label>
-          <select className={selectClass} value={filters.category ?? ""} onChange={(e) => setFilters({ ...filters, category: e.target.value || null })}>
-            <option value="">ALL</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grading</label>
-          <select className={selectClass} value={filters.grading ?? ""} onChange={(e) => setFilters({ ...filters, grading: e.target.value || null })}>
-            <option value="">ALL</option>
-            {GRADINGS.map((g) => <option key={g} value={g}>{g}</option>)}
-          </select>
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="flex-1 overflow-x-auto">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-              <th className="px-3 py-2">ITEM ID</th>
-              <th className="px-3 py-2">DESCRIPTION</th>
-              <th className="px-3 py-2">CATEGORY</th>
-              <th className="px-3 py-2">GRADING</th>
-              <th className="px-3 py-2 text-right">PRICE (£)</th>
-              <th className="px-3 py-2">DATE</th>
-              <th className="px-3 py-2">SOURCE</th>
-              <th className="px-3 py-2 text-right">EST. VALUE (£)</th>
-              <th className="px-3 py-2 text-right">P&L (£)</th>
-              <th className="px-3 py-2">ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((item) => {
-              const pnl = getPnl(item);
-              return (
-                <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                  <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{item.item_id}</td>
-                  <td className="px-3 py-2 text-primary font-bold max-w-[250px] truncate" title={item.description}>{item.description}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{item.category}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{item.grading}</td>
-                  <td className="px-3 py-2 text-right">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{item.purchase_date}</td>
-                  <td className="px-3 py-2">{item.purchase_source}</td>
-                  <td className="px-3 py-2 text-right">
-                    {item.current_estimated_value != null
-                      ? `£${Number(item.current_estimated_value).toLocaleString("en-GB")}`
-                      : <span className="text-muted-foreground">—</span>}
-                  </td>
-                  <td className={`px-3 py-2 text-right font-bold ${getPnlColor(pnl, item)}`}>
-                    {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
-                  </td>
-                  <td className="px-3 py-2">
-                    <div className="flex items-center gap-1.5">
-                      <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary transition-colors" title="Edit">
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                      {item.category === "12 BACK" && (
-                        <button onClick={(e) => handleFindComps(item, e)} className="text-muted-foreground hover:text-primary transition-colors" title="Find Comps">
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          {/* Table */}
+          <div className="flex-1 overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
+                  <th className="px-3 py-2">ITEM ID</th>
+                  <th className="px-3 py-2">DESCRIPTION</th>
+                  <th className="px-3 py-2">CATEGORY</th>
+                  <th className="px-3 py-2">GRADING</th>
+                  <th className="px-3 py-2 text-right">PRICE (£)</th>
+                  <th className="px-3 py-2">DATE</th>
+                  <th className="px-3 py-2">SOURCE</th>
+                  <th className="px-3 py-2 text-right">EST. VALUE (£)</th>
+                  <th className="px-3 py-2 text-right">P&L (£)</th>
+                  <th className="px-3 py-2">ACTIONS</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {filtered.length === 0 && (
-          <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">
-            NO ITEMS MATCH CURRENT FILTERS
+              </thead>
+              <tbody>
+                {filtered.map((item) => {
+                  const pnl = getPnl(item);
+                  return (
+                    <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                      <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{item.item_id}</td>
+                      <td className="px-3 py-2 text-primary font-bold max-w-[250px] truncate" title={item.description}>{item.description}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{item.category}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{item.grading}</td>
+                      <td className="px-3 py-2 text-right">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>
+                      <td className="px-3 py-2 whitespace-nowrap">{item.purchase_date}</td>
+                      <td className="px-3 py-2">{item.purchase_source}</td>
+                      <td className="px-3 py-2 text-right">
+                        {item.current_estimated_value != null
+                          ? `£${Number(item.current_estimated_value).toLocaleString("en-GB")}`
+                          : <span className="text-muted-foreground">—</span>}
+                      </td>
+                      <td className={`px-3 py-2 text-right font-bold ${getPnlColor(pnl, item)}`}>
+                        {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary transition-colors" title="Edit">
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                          {item.category === "12 BACK" && (
+                            <button onClick={(e) => handleFindComps(item, e)} className="text-muted-foreground hover:text-primary transition-colors" title="Find Comps">
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {filtered.length === 0 && (
+              <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">
+                NO ITEMS MATCH CURRENT FILTERS
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Stats Panel */}
-      <div className="border-t border-border px-6 py-4">
-        <h2 className="text-[10px] text-muted-foreground tracking-widest uppercase mb-3">COLLECTION STATS</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-          <div>
-            <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY CATEGORY</h3>
-            {categoryBreakdown.map(([cat, count]) => (
-              <div key={cat} className="flex justify-between">
-                <span>{cat}</span>
-                <span className="text-primary">{count}</span>
-              </div>
-            ))}
-          </div>
-          <div>
-            <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY GRADING</h3>
-            {gradingBreakdown.map(([grade, count]) => (
-              <div key={grade} className="flex justify-between">
-                <span>{grade}</span>
-                <span className="text-primary">{count}</span>
-              </div>
-            ))}
-          </div>
-          <div>
-            <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST EXPENSIVE</h3>
-            {mostExpensive && (
+          {/* Stats Panel */}
+          <div className="border-t border-border px-6 py-4">
+            <h2 className="text-[10px] text-muted-foreground tracking-widest uppercase mb-3">COLLECTION STATS</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div>
-                <div className="text-primary font-bold">{mostExpensive.description}</div>
-                <div className="text-muted-foreground">£{Number(mostExpensive.purchase_price).toLocaleString("en-GB")}</div>
+                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY CATEGORY</h3>
+                {categoryBreakdown.map(([cat, count]) => (
+                  <div key={cat} className="flex justify-between">
+                    <span>{cat}</span>
+                    <span className="text-primary">{count}</span>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-          <div>
-            <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST RECENT</h3>
-            {mostRecent && (
               <div>
-                <div className="text-primary font-bold">{mostRecent.description}</div>
-                <div className="text-muted-foreground">{mostRecent.purchase_date}</div>
+                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY GRADING</h3>
+                {gradingBreakdown.map(([grade, count]) => (
+                  <div key={grade} className="flex justify-between">
+                    <span>{grade}</span>
+                    <span className="text-primary">{count}</span>
+                  </div>
+                ))}
               </div>
-            )}
+              <div>
+                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST EXPENSIVE</h3>
+                {mostExpensive && (
+                  <div>
+                    <div className="text-primary font-bold">{mostExpensive.description}</div>
+                    <div className="text-muted-foreground">£{Number(mostExpensive.purchase_price).toLocaleString("en-GB")}</div>
+                  </div>
+                )}
+              </div>
+              <div>
+                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST RECENT</h3>
+                {mostRecent && (
+                  <div>
+                    <div className="text-primary font-bold">{mostRecent.description}</div>
+                    <div className="text-muted-foreground">{mostRecent.purchase_date}</div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
 
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
         IMPERIAL PRICE TERMINAL v3.0 • GALACTIC EMPIRE • CLASSIFIED
