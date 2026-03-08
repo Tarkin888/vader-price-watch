@@ -1,62 +1,70 @@
-import { Lot } from "@/types/lot";
+import { supabase } from "@/integrations/supabase/client";
 
-const DB_KEY = "vader-price-tracker-db";
-
-interface Database {
-  lots: Lot[];
+export interface Lot {
+  id: string;
+  capture_date: string;
+  sale_date: string;
+  source: "Heritage" | "Hakes" | "Vectis" | "LCG";
+  lot_ref: string;
+  lot_url: string;
+  variant_code: "12A" | "12B" | "12C" | "12A-DT" | "12B-DT" | "CAN" | "PAL";
+  grade_tier_code: "RAW-NM" | "RAW-EX" | "RAW-VG" | "AFA-70" | "AFA-75" | "AFA-80" | "AFA-85" | "AFA-90+" | "UKG-80" | "UKG-85" | "CAS-80";
+  variant_grade_key: string;
+  hammer_price_gbp: number;
+  buyers_premium_gbp: number;
+  total_paid_gbp: number;
+  usd_to_gbp_rate: number;
+  image_urls: string[];
+  condition_notes: string;
+  grade_subgrades: string;
+  created_at: string;
+  updated_at: string;
 }
 
-function readDb(): Database {
-  const raw = localStorage.getItem(DB_KEY);
-  if (!raw) {
-    const initial: Database = { lots: [] };
-    localStorage.setItem(DB_KEY, JSON.stringify(initial));
-    return initial;
-  }
-  return JSON.parse(raw);
+export async function getAllLots(): Promise<Lot[]> {
+  const { data, error } = await supabase
+    .from("lots")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as Lot[];
 }
 
-function writeDb(db: Database): void {
-  localStorage.setItem(DB_KEY, JSON.stringify(db));
+export async function getLotById(id: string): Promise<Lot | null> {
+  const { data, error } = await supabase
+    .from("lots")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data as unknown as Lot | null;
 }
 
-export function getAllLots(): Lot[] {
-  return readDb().lots;
+export async function addLot(lot: Omit<Lot, "id" | "variant_grade_key" | "created_at" | "updated_at">): Promise<Lot> {
+  const { data, error } = await supabase
+    .from("lots")
+    .insert(lot as any)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as unknown as Lot;
 }
 
-export function getLotById(id: string): Lot | undefined {
-  return readDb().lots.find((lot) => lot.id === id);
+export async function updateLot(id: string, updates: Partial<Omit<Lot, "id" | "variant_grade_key" | "created_at" | "updated_at">>): Promise<Lot> {
+  const { data, error } = await supabase
+    .from("lots")
+    .update(updates as any)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as unknown as Lot;
 }
 
-export function addLot(lot: Omit<Lot, "id" | "variantGradeKey">): Lot {
-  const db = readDb();
-  const newLot: Lot = {
-    ...lot,
-    id: crypto.randomUUID(),
-    variantGradeKey: `${lot.variantCode}-${lot.gradeTierCode}`,
-  };
-  db.lots.push(newLot);
-  writeDb(db);
-  return newLot;
-}
-
-export function updateLot(id: string, updates: Partial<Omit<Lot, "id">>): Lot | null {
-  const db = readDb();
-  const index = db.lots.findIndex((lot) => lot.id === id);
-  if (index === -1) return null;
-  const updated = { ...db.lots[index], ...updates };
-  if (updates.variantCode || updates.gradeTierCode) {
-    updated.variantGradeKey = `${updated.variantCode}-${updated.gradeTierCode}`;
-  }
-  db.lots[index] = updated;
-  writeDb(db);
-  return updated;
-}
-
-export function deleteLot(id: string): boolean {
-  const db = readDb();
-  const before = db.lots.length;
-  db.lots = db.lots.filter((lot) => lot.id !== id);
-  writeDb(db);
-  return db.lots.length < before;
+export async function deleteLot(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("lots")
+    .delete()
+    .eq("id", id);
+  if (error) throw error;
 }
