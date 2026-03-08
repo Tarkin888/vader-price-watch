@@ -8,17 +8,16 @@ import { CalendarIcon, X, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SOURCES = Constants.public.Enums.lot_source;
-const VARIANTS = Constants.public.Enums.variant_code;
 const GRADES = Constants.public.Enums.grade_tier_code;
+const ERAS = ["SW", "ESB", "ROTJ", "POTF"] as const;
 
-const ERAS = ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"] as const;
-const CARDBACK_CODES = [
-  "SW-12", "SW-20", "SW-21",
-  "ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48",
-  "ROTJ-65", "ROTJ-77", "ROTJ-79",
-  "POTF-92",
-  "UNKNOWN",
-] as const;
+const CARDBACK_GROUPS: { label: string; codes: string[] }[] = [
+  { label: "SW", codes: ["SW-12", "SW-12A", "SW-12A-DT", "SW-12B", "SW-12B-DT", "SW-12C", "SW-20", "SW-21"] },
+  { label: "ESB", codes: ["ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48"] },
+  { label: "ROTJ", codes: ["ROTJ-48", "ROTJ-65", "ROTJ-65-VP", "ROTJ-77", "ROTJ-79"] },
+  { label: "POTF", codes: ["POTF-92"] },
+  { label: "International", codes: ["CAN", "PAL", "MEX"] },
+];
 
 export interface Filters {
   source: string | null;
@@ -42,6 +41,11 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
   const selectClass =
     "bg-secondary border border-border text-foreground text-xs px-2 py-1.5 tracking-wider focus:outline-none focus:ring-1 focus:ring-primary";
 
+  // Filter cardback groups by selected era
+  const visibleGroups = filters.era
+    ? CARDBACK_GROUPS.filter((g) => g.label === filters.era || g.label === "International")
+    : CARDBACK_GROUPS;
+
   return (
     <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
       <div className="flex flex-col gap-1">
@@ -59,71 +63,40 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
 
       <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Source</label>
-        <select
-          className={selectClass}
-          value={filters.source ?? ""}
-          onChange={(e) => set("source", e.target.value || null)}
-        >
+        <select className={selectClass} value={filters.source ?? ""} onChange={(e) => set("source", e.target.value || null)}>
           <option value="">ALL</option>
-          {SOURCES.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
+          {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
       <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Era</label>
-        <select
-          className={selectClass}
-          value={filters.era ?? ""}
-          onChange={(e) => set("era", e.target.value || null)}
-        >
+        <select className={selectClass} value={filters.era ?? ""} onChange={(e) => {
+          const era = e.target.value || null;
+          onChange({ ...filters, era, cardbackCode: null });
+        }}>
           <option value="">ALL</option>
-          {ERAS.map((e) => (
-            <option key={e} value={e}>{e}</option>
-          ))}
+          {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
         </select>
       </div>
 
       <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Cardback</label>
-        <select
-          className={selectClass}
-          value={filters.cardbackCode ?? ""}
-          onChange={(e) => set("cardbackCode", e.target.value || null)}
-        >
+        <select className={selectClass} value={filters.cardbackCode ?? ""} onChange={(e) => set("cardbackCode", e.target.value || null)}>
           <option value="">ALL</option>
-          {CARDBACK_CODES.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Variant</label>
-        <select
-          className={selectClass}
-          value={filters.variantCode ?? ""}
-          onChange={(e) => set("variantCode", e.target.value || null)}
-        >
-          <option value="">ALL</option>
-          {VARIANTS.map((v) => (
-            <option key={v} value={v}>{v}</option>
+          {visibleGroups.map((g) => (
+            <optgroup key={g.label} label={g.label}>
+              {g.codes.map((c) => <option key={c} value={c}>{c}</option>)}
+            </optgroup>
           ))}
         </select>
       </div>
 
       <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grade</label>
-        <select
-          className={selectClass}
-          value={filters.gradeTier ?? ""}
-          onChange={(e) => set("gradeTier", e.target.value || null)}
-        >
+        <select className={selectClass} value={filters.gradeTier ?? ""} onChange={(e) => set("gradeTier", e.target.value || null)}>
           <option value="">ALL</option>
-          {GRADES.map((g) => (
-            <option key={g} value={g}>{g}</option>
-          ))}
+          {GRADES.map((g) => <option key={g} value={g}>{g}</option>)}
         </select>
       </div>
 

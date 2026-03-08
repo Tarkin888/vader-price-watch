@@ -35,6 +35,26 @@ const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
 
 const NOTABLE_THRESHOLD = 5000;
 
+const ERA_COLORS: Record<string, string> = {
+  SW: "#4a7fa5",
+  ESB: "#8a7f6e",
+  ROTJ: "#a04040",
+  POTF: "#C9A84C",
+  UNKNOWN: "#555",
+};
+
+function EraBadge({ era }: { era: string }) {
+  const bg = ERA_COLORS[era] ?? ERA_COLORS.UNKNOWN;
+  return (
+    <span
+      className="inline-block px-1.5 py-0.5 text-[9px] tracking-widest font-bold rounded"
+      style={{ backgroundColor: bg, color: "#fff" }}
+    >
+      {era}
+    </span>
+  );
+}
+
 const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
@@ -67,9 +87,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
 
   const copyRow = (l: Lot) => {
     const fields = [
-      l.capture_date, l.sale_date, l.source, l.lot_ref, l.variant_code,
-      l.grade_tier_code, l.variant_grade_key, l.hammer_price_gbp,
-      l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate, l.condition_notes,
+      l.capture_date, l.sale_date, l.source, (l as any).era ?? "", (l as any).cardback_code ?? "",
+      l.lot_ref, l.variant_code, l.grade_tier_code, l.variant_grade_key,
+      l.hammer_price_gbp, l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate, l.condition_notes,
     ];
     navigator.clipboard.writeText(fields.join("\t"));
     toast.success("Row copied to clipboard");
@@ -145,7 +165,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
                 <td className="px-3 py-2 text-right">
                   £{Number(l.buyers_premium_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
                 </td>
-                <td className="px-3 py-2 text-muted-foreground">{(l as any).era ?? "—"}</td>
+                <td className="px-3 py-2">
+                  <EraBadge era={(l as any).era ?? "UNKNOWN"} />
+                </td>
                 <td className="px-3 py-2 text-muted-foreground">{(l as any).cardback_code ?? "—"}</td>
                 <td className="px-3 py-2">{l.source}</td>
                 <td className="px-3 py-2">
