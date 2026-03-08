@@ -14,10 +14,13 @@ import SessionLog from "@/components/SessionLog";
 import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
 import ComparableSalesPanel from "@/components/ComparableSalesPanel";
+import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
+import { useRef } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "session">("dashboard");
@@ -122,8 +125,17 @@ const Index = () => {
       <ReferencePanel />
       <FilterBar filters={filters} onChange={setFilters} />
       <StatsBar lots={filtered} filters={filters} currency={filters.currency} />
+      <CardbackBenchmarkPanel
+        allLots={lots}
+        currency={filters.currency}
+        onSelectCardback={(code) => {
+          setFilters((f) => ({ ...f, cardbackCode: code }));
+          setActiveTab("table");
+          setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+        }}
+      />
       <PriceTrendChart lots={filtered} />
-      <div className="flex items-center justify-between border-b border-border px-6 py-2">
+      <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
           <button
             onClick={() => setActiveTab("dashboard")}
