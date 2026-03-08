@@ -241,7 +241,7 @@ export default function CollectionAnalytics({ items }: Props) {
     border: `1px solid ${GOLD_DIM}`,
     borderRadius: "2px",
     fontSize: "11px",
-    fontFamily: "'Courier New', monospace",
+    fontFamily: "'Aptos', sans-serif",
     color: WHITE,
   };
 
