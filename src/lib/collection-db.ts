@@ -12,6 +12,8 @@ export interface CollectionItem {
   current_estimated_value: number | null;
   notes: string;
   image_urls: string[];
+  front_image_url: string;
+  back_image_url: string;
   created_at: string;
   updated_at: string;
 }

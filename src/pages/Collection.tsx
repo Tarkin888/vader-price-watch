@@ -233,6 +233,8 @@ const Collection = () => {
               <thead>
                 <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
                   <th className="px-3 py-2">ITEM ID</th>
+                  <th className="px-3 py-2">FRONT</th>
+                  <th className="px-3 py-2">BACK</th>
                   <th className="px-3 py-2">DESCRIPTION</th>
                   <th className="px-3 py-2">CATEGORY</th>
                   <th className="px-3 py-2">GRADING</th>
@@ -248,23 +250,39 @@ const Collection = () => {
                 {filtered.map((item) => {
                   const pnl = getPnl(item);
                   return (
-                    <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                      <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{item.item_id}</td>
-                      <td className="px-3 py-2 text-primary font-bold max-w-[250px] truncate" title={item.description}>{item.description}</td>
-                      <td className="px-3 py-2 whitespace-nowrap">{item.category}</td>
-                      <td className="px-3 py-2 whitespace-nowrap">{item.grading}</td>
-                      <td className="px-3 py-2 text-right">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>
-                      <td className="px-3 py-2 whitespace-nowrap">{item.purchase_date}</td>
-                      <td className="px-3 py-2">{item.purchase_source}</td>
-                      <td className="px-3 py-2 text-right">
+                    <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors" style={{ height: "7rem" }}>
+                      <td className="px-3 py-3 text-muted-foreground whitespace-nowrap align-middle">{item.item_id}</td>
+                      <td className="px-3 py-3 align-middle">
+                        <ImageDropCell
+                          imageUrl={item.front_image_url || ""}
+                          itemId={item.id}
+                          field="front_image_url"
+                          onUpdated={load}
+                        />
+                      </td>
+                      <td className="px-3 py-3 align-middle">
+                        <ImageDropCell
+                          imageUrl={item.back_image_url || ""}
+                          itemId={item.id}
+                          field="back_image_url"
+                          onUpdated={load}
+                        />
+                      </td>
+                      <td className="px-3 py-3 text-primary font-bold max-w-[250px] truncate align-middle" title={item.description}>{item.description}</td>
+                      <td className="px-3 py-3 whitespace-nowrap align-middle">{item.category}</td>
+                      <td className="px-3 py-3 whitespace-nowrap align-middle">{item.grading}</td>
+                      <td className="px-3 py-3 text-right align-middle">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>
+                      <td className="px-3 py-3 whitespace-nowrap align-middle">{item.purchase_date}</td>
+                      <td className="px-3 py-3 align-middle">{item.purchase_source}</td>
+                      <td className="px-3 py-3 text-right align-middle">
                         {item.current_estimated_value != null
                           ? `£${Number(item.current_estimated_value).toLocaleString("en-GB")}`
                           : <span className="text-muted-foreground">—</span>}
                       </td>
-                      <td className={`px-3 py-2 text-right font-bold ${getPnlColor(pnl, item)}`}>
+                      <td className={`px-3 py-3 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
                         {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-3 align-middle">
                         <div className="flex items-center gap-1.5">
                           <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary transition-colors" title="Edit">
                             <Pencil className="w-3.5 h-3.5" />
