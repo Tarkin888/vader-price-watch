@@ -86,7 +86,18 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
     }
   }, [open, editLot]);
 
-  const set = (key: string, val: string) => setForm((f) => ({ ...f, [key]: val }));
+  const set = (key: string, val: string) => {
+    setForm((f) => {
+      const next = { ...f, [key]: val };
+      // Auto-derive era + cardback when variant_code changes
+      if (key === "variant_code") {
+        const derived = deriveFromVariantCode(val);
+        next.era = derived.era;
+        next.cardback_code = derived.cardback_code;
+      }
+      return next;
+    });
+  };
 
   const selectClass =
     "w-full bg-secondary border border-border text-foreground text-xs px-2 py-2 tracking-wider focus:outline-none focus:ring-1 focus:ring-primary";

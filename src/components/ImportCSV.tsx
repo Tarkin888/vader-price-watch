@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { LotInsert } from "@/lib/db";
-import { classifyLot } from "@/lib/classify-lot";
+import { classifyLot, deriveFromVariantCode } from "@/lib/classify-lot";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
