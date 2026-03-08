@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import type { Lot } from "@/lib/db";
+import type { Currency } from "@/components/FilterBar";
 import { supabase } from "@/integrations/supabase/client";
 import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
@@ -23,15 +24,27 @@ interface LotsTableProps {
   onChanged: () => void;
   onCopyRow?: (lot: Lot) => void;
   onSelectLot?: (lot: Lot) => void;
+  currency?: Currency;
 }
 
-const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
-  { key: "sale_date", label: "SALE DATE" },
-  { key: "variant_grade_key", label: "VARIANT-GRADE" },
-  { key: "total_paid_gbp", label: "TOTAL (£)", align: "text-right" },
-  { key: "hammer_price_gbp", label: "HAMMER", align: "text-right" },
-  { key: "buyers_premium_gbp", label: "BP", align: "text-right" },
-];
+const USD_SOURCES = ["Heritage", "Hakes"];
+
+function toUsd(gbp: number, rate: number): number {
+  return rate > 0 ? Math.round(gbp / rate) : 0;
+}
+
+function SourceBadge({ source }: { source: string }) {
+  const isOrig = USD_SOURCES.includes(source);
+  return (
+    <span
+      className={`ml-1 text-[8px] tracking-widest font-bold px-1 py-0.5 rounded ${
+        isOrig ? "bg-amber-500/20 text-amber-400" : "bg-muted text-muted-foreground"
+      }`}
+    >
+      {isOrig ? "ORIG USD" : "EST USD"}
+    </span>
+  );
+}
 
 const NOTABLE_THRESHOLD = 5000;
 
