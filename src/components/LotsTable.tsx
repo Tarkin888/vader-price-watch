@@ -22,6 +22,7 @@ interface LotsTableProps {
   lots: Lot[];
   onChanged: () => void;
   onCopyRow?: (lot: Lot) => void;
+  onSelectLot?: (lot: Lot) => void;
 }
 
 const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
