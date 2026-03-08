@@ -13,6 +13,7 @@ interface Props {
 const ImageDropCell = ({ imageUrl, itemId, field, onUpdated }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [hover, setHover] = useState(false);
+  const [lightbox, setLightbox] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const uploadAndSave = useCallback(async (file: File) => {
@@ -22,7 +23,6 @@ const ImageDropCell = ({ imageUrl, itemId, field, onUpdated }: Props) => {
     }
 
     try {
-      // Convert to base64 data URL for storage (simple approach without storage bucket)
       const reader = new FileReader();
       reader.onload = async () => {
         const dataUrl = reader.result as string;
@@ -65,52 +65,71 @@ const ImageDropCell = ({ imageUrl, itemId, field, onUpdated }: Props) => {
   const hasImage = !!imageUrl;
 
   return (
-    <div
-      className={`relative w-16 h-24 border rounded-sm flex items-center justify-center cursor-pointer overflow-hidden transition-colors ${
-        dragging
-          ? "border-primary bg-primary/10"
-          : hasImage
-            ? "border-border"
-            : "border-border/50 border-dashed hover:border-primary/50"
-      }`}
-      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={handleDrop}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onClick={() => !hasImage && inputRef.current?.click()}
-    >
-      {hasImage ? (
-        <>
+    <>
+      <div
+        className={`relative w-16 h-24 border rounded-sm flex items-center justify-center cursor-pointer overflow-hidden transition-colors ${
+          dragging
+            ? "border-primary bg-primary/10"
+            : hasImage
+              ? "border-border"
+              : "border-border/50 border-dashed hover:border-primary/50"
+        }`}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onClick={() => hasImage ? setLightbox(true) : inputRef.current?.click()}
+      >
+        {hasImage ? (
+          <>
+            <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+            {hover && (
+              <button
+                onClick={handleDelete}
+                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-md transition-opacity"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </>
+        ) : (
+          <Plus className="w-4 h-4 text-muted-foreground" />
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) uploadAndSave(file);
+            e.target.value = "";
+          }}
+        />
+      </div>
+
+      {/* Lightbox overlay */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center cursor-zoom-out"
+          onClick={() => setLightbox(false)}
+        >
+          <button
+            onClick={() => setLightbox(false)}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-card/80 text-foreground flex items-center justify-center hover:bg-card transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
           <img
             src={imageUrl}
             alt=""
-            className="w-full h-full object-cover"
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           />
-          {hover && (
-            <button
-              onClick={handleDelete}
-              className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-md transition-opacity"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          )}
-        </>
-      ) : (
-        <Plus className="w-4 h-4 text-muted-foreground" />
+        </div>
       )}
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) uploadAndSave(file);
-          e.target.value = "";
-        }}
-      />
-    </div>
+    </>
   );
 };
 
