@@ -233,18 +233,19 @@ const Collection = () => {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-                  <th className="px-3 py-2">ITEM ID</th>
-                  <th className="px-3 py-2">FRONT</th>
-                  <th className="px-3 py-2">BACK</th>
-                  <th className="px-3 py-2">DESCRIPTION</th>
-                  <th className="px-3 py-2">CATEGORY</th>
-                  <th className="px-3 py-2">GRADING</th>
-                  <th className="px-3 py-2 text-right">PRICE (£)</th>
-                  <th className="px-3 py-2">DATE</th>
-                  <th className="px-3 py-2">SOURCE</th>
-                  <th className="px-3 py-2 text-right">EST. VALUE (£)</th>
-                  <th className="px-3 py-2 text-right">P&L (£)</th>
-                  <th className="px-3 py-2">ACTIONS</th>
+                  <th className="px-1.5 py-2">ITEM ID</th>
+                  <th className="px-1.5 py-2">FRONT</th>
+                  <th className="px-1.5 py-2">BACK</th>
+                  <th className="px-1.5 py-2">DESCRIPTION</th>
+                  <th className="px-1.5 py-2">CATEGORY</th>
+                  <th className="px-1.5 py-2">GRADING</th>
+                  <th className="px-1.5 py-2 text-right">PRICE (£)</th>
+                  <th className="px-1.5 py-2">DATE</th>
+                  <th className="px-1.5 py-2">SOURCE</th>
+                  <th className="px-1.5 py-2 text-right">EST. VALUE (£)</th>
+                  <th className="px-1.5 py-2 text-right">P&L (£)</th>
+                  <th className="px-1.5 py-2">NOTES</th>
+                  <th className="px-1.5 py-2">ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
