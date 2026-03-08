@@ -23,7 +23,7 @@ const Index = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "session">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "chart" | "session">("dashboard");
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [filters, setFilters] = useState<Filters>({
