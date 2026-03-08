@@ -6,6 +6,7 @@ import CollectionAnalytics from "@/components/CollectionAnalytics";
 import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
+import EstimatedValueCell from "@/components/EstimatedValueCell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
