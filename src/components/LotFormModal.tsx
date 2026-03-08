@@ -61,6 +61,8 @@ const defaultForm = () => {
     source: SOURCES[0] as string,
     lot_ref: "",
     lot_url: "",
+    era: "UNKNOWN" as string,
+    cardback_code: "UNKNOWN" as string,
     variant_code: VARIANTS[0] as string,
     grade_tier_code: GRADES[0] as string,
     hammer_price_gbp: "",
