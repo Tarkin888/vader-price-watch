@@ -19,6 +19,8 @@ const CARDBACK_GROUPS: { label: string; codes: string[] }[] = [
   { label: "International", codes: ["CAN", "PAL", "MEX"] },
 ];
 
+export type Currency = "GBP" | "USD";
+
 export interface Filters {
   source: string | null;
   era: string | null;
@@ -28,6 +30,7 @@ export interface Filters {
   dateFrom: Date | null;
   dateTo: Date | null;
   search: string;
+  currency: Currency;
 }
 
 interface FilterBarProps {
@@ -103,11 +106,26 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
       <DateFilter label="From" value={filters.dateFrom} onChange={(d) => set("dateFrom", d)} />
       <DateFilter label="To" value={filters.dateTo} onChange={(d) => set("dateTo", d)} />
 
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Currency</label>
+        <button
+          onClick={() => set("currency", filters.currency === "GBP" ? "USD" : "GBP")}
+          className="text-[10px] font-bold tracking-widest px-3 py-1.5 rounded border transition-colors"
+          style={{
+            backgroundColor: filters.currency === "USD" ? "#C9A84C" : "transparent",
+            borderColor: "#C9A84C",
+            color: filters.currency === "USD" ? "#1a1a1a" : "#C9A84C",
+          }}
+        >
+          {filters.currency}
+        </button>
+      </div>
+
       <Button
         variant="ghost"
         size="sm"
         className="text-xs text-muted-foreground hover:text-primary tracking-wider"
-        onClick={() => onChange({ source: null, era: null, cardbackCode: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "" })}
+        onClick={() => onChange({ source: null, era: null, cardbackCode: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "", currency: "GBP" })}
       >
         <X className="w-3 h-3 mr-1" /> CLEAR
       </Button>

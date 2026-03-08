@@ -1,9 +1,10 @@
 import type { Lot } from "@/lib/db";
-import type { Filters } from "@/components/FilterBar";
+import type { Filters, Currency } from "@/components/FilterBar";
 
 interface StatsBarProps {
   lots: Lot[];
   filters: Filters;
+  currency?: Currency;
 }
 
 const ERA_COLORS: Record<string, string> = {
@@ -15,10 +16,15 @@ const ERA_COLORS: Record<string, string> = {
 
 const ERAS_ORDER = ["SW", "ESB", "ROTJ", "POTF"] as const;
 
-function calcStats(items: Lot[]) {
+function calcStats(items: Lot[], isUSD: boolean) {
   const count = items.length;
   if (count === 0) return { count: 0, avg: 0, max: 0 };
-  const prices = items.map((l) => Number(l.total_paid_gbp));
+  const prices = items.map((l) => {
+    const gbp = Number(l.total_paid_gbp);
+    if (!isUSD) return gbp;
+    const rate = Number(l.usd_to_gbp_rate);
+    return rate > 0 ? Math.round(gbp / rate) : 0;
+  });
   return {
     count,
     avg: prices.reduce((s, p) => s + p, 0) / count,
@@ -26,10 +32,14 @@ function calcStats(items: Lot[]) {
   };
 }
 
-const fmt = (n: number) =>
-  `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmtVal = (n: number, isUSD: boolean) => {
+  if (isUSD) return `$${Math.round(n).toLocaleString("en-US")}`;
+  return `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
 
-const StatsBar = ({ lots, filters }: StatsBarProps) => {
+const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
+  const isUSD = currency === "USD";
+  const fmt = (n: number) => fmtVal(n, isUSD);
   if (lots.length === 0) {
     return (
       <div className="px-6 py-3 border-b border-border text-xs text-muted-foreground tracking-wider">
@@ -43,7 +53,7 @@ const StatsBar = ({ lots, filters }: StatsBarProps) => {
   if (selectedEra) {
     // Single era mode: summary + cardback breakdown
     const eraLots = lots.filter((l) => l.era === selectedEra);
-    const stats = calcStats(eraLots);
+    const stats = calcStats(eraLots, isUSD);
 
     // Group by cardback_code
     const byCardback = new Map<string, Lot[]>();
@@ -90,7 +100,7 @@ const StatsBar = ({ lots, filters }: StatsBarProps) => {
             </thead>
             <tbody>
               {cardbackEntries.map(([code, codeLots]) => {
-                const s = calcStats(codeLots);
+                const s = calcStats(codeLots, isUSD);
                 return (
                   <tr key={code}>
                     <td className="text-left pr-6 py-0.5 text-foreground font-mono">{code}</td>
@@ -116,7 +126,7 @@ const StatsBar = ({ lots, filters }: StatsBarProps) => {
   return (
     <div className="flex flex-wrap gap-4 px-6 py-3 border-b border-border">
       {eraGroups.map(({ era, lots: eraLots }) => {
-        const stats = calcStats(eraLots);
+        const stats = calcStats(eraLots, isUSD);
         const color = ERA_COLORS[era] ?? "hsl(0, 0%, 33%)";
         return (
           <div

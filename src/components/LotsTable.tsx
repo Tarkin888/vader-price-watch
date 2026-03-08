@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import type { Lot } from "@/lib/db";
+import type { Currency } from "@/components/FilterBar";
 import { supabase } from "@/integrations/supabase/client";
 import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
@@ -23,15 +24,27 @@ interface LotsTableProps {
   onChanged: () => void;
   onCopyRow?: (lot: Lot) => void;
   onSelectLot?: (lot: Lot) => void;
+  currency?: Currency;
 }
 
-const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
-  { key: "sale_date", label: "SALE DATE" },
-  { key: "variant_grade_key", label: "VARIANT-GRADE" },
-  { key: "total_paid_gbp", label: "TOTAL (£)", align: "text-right" },
-  { key: "hammer_price_gbp", label: "HAMMER", align: "text-right" },
-  { key: "buyers_premium_gbp", label: "BP", align: "text-right" },
-];
+const USD_SOURCES = ["Heritage", "Hakes"];
+
+function toUsd(gbp: number, rate: number): number {
+  return rate > 0 ? Math.round(gbp / rate) : 0;
+}
+
+function SourceBadge({ source }: { source: string }) {
+  const isOrig = USD_SOURCES.includes(source);
+  return (
+    <span
+      className={`ml-1 text-[8px] tracking-widest font-bold px-1 py-0.5 rounded ${
+        isOrig ? "bg-amber-500/20 text-amber-400" : "bg-muted text-muted-foreground"
+      }`}
+    >
+      {isOrig ? "ORIG USD" : "EST USD"}
+    </span>
+  );
+}
 
 const NOTABLE_THRESHOLD = 5000;
 
@@ -55,7 +68,7 @@ function EraBadge({ era }: { era: string }) {
   );
 }
 
-const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) => {
+const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("sale_date");
@@ -123,13 +136,29 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
     );
   }
 
+  const isUSD = currency === "USD";
+  const sym = isUSD ? "$" : "£";
+
+  const COLS: { key: SortKey; label: string; align?: string }[] = [
+    { key: "sale_date", label: "SALE DATE" },
+    { key: "variant_grade_key", label: "VARIANT-GRADE" },
+    { key: "total_paid_gbp", label: `TOTAL (${sym})${isUSD ? " (USD)" : ""}`, align: "text-right" },
+    { key: "hammer_price_gbp", label: `HAMMER${isUSD ? " (USD)" : ""}`, align: "text-right" },
+    { key: "buyers_premium_gbp", label: `BP${isUSD ? " (USD)" : ""}`, align: "text-right" },
+  ];
+
+  const fmtPrice = (gbp: number, rate: number) => {
+    if (isUSD) return `$${toUsd(gbp, rate).toLocaleString("en-US")}`;
+    return `£${Number(gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}`;
+  };
+
   return (
     <>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-              {SORTABLE_COLS.map((col) => (
+              {COLS.map((col) => (
                 <th
                   key={col.key}
                   className={`px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors ${col.align ?? ""}`}
@@ -156,14 +185,15 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
               >
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
-                <td className="px-3 py-2 text-right text-primary font-bold">
-                  £{Number(l.total_paid_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
+                <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
+                  {fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
+                  {isUSD && <SourceBadge source={l.source} />}
                 </td>
-                <td className="px-3 py-2 text-right">
-                  £{Number(l.hammer_price_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {fmtPrice(Number(l.hammer_price_gbp), Number(l.usd_to_gbp_rate))}
                 </td>
-                <td className="px-3 py-2 text-right">
-                  £{Number(l.buyers_premium_gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {fmtPrice(Number(l.buyers_premium_gbp), Number(l.usd_to_gbp_rate))}
                 </td>
                 <td className="px-3 py-2">
                   <EraBadge era={(l as any).era ?? "UNKNOWN"} />

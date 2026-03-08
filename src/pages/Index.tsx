@@ -32,6 +32,7 @@ const Index = () => {
     dateFrom: null,
     dateTo: null,
     search: "",
+    currency: "GBP" as const,
   });
 
   const loadLots = useCallback(async () => {
@@ -120,7 +121,7 @@ const Index = () => {
       </div>
       <ReferencePanel />
       <FilterBar filters={filters} onChange={setFilters} />
-      <StatsBar lots={filtered} filters={filters} />
+      <StatsBar lots={filtered} filters={filters} currency={filters.currency} />
       <PriceTrendChart lots={filtered} />
       <div className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
@@ -155,7 +156,7 @@ const Index = () => {
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
-            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} />
+            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} />
           </>
         ) : (
           <SessionLog copiedRows={copiedRows} onClear={() => setCopiedRows([])} />
