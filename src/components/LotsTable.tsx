@@ -35,6 +35,26 @@ const SORTABLE_COLS: { key: SortKey; label: string; align?: string }[] = [
 
 const NOTABLE_THRESHOLD = 5000;
 
+const ERA_COLORS: Record<string, string> = {
+  SW: "#4a7fa5",
+  ESB: "#8a7f6e",
+  ROTJ: "#a04040",
+  POTF: "#C9A84C",
+  UNKNOWN: "#555",
+};
+
+function EraBadge({ era }: { era: string }) {
+  const bg = ERA_COLORS[era] ?? ERA_COLORS.UNKNOWN;
+  return (
+    <span
+      className="inline-block px-1.5 py-0.5 text-[9px] tracking-widest font-bold rounded"
+      style={{ backgroundColor: bg, color: "#fff" }}
+    >
+      {era}
+    </span>
+  );
+}
+
 const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
