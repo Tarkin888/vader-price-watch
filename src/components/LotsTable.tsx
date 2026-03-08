@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";
+import popCounts, { type PopEntry } from "@/data/popCounts";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +43,41 @@ function SourceBadge({ source }: { source: string }) {
       }`}
     >
       {isOrig ? "ORIG USD" : "EST USD"}
+    </span>
+  );
+}
+
+function PopBadge({ variantCode }: { variantCode: string }) {
+  const entry: PopEntry | undefined = popCounts[variantCode];
+  if (!entry) return null;
+
+  if (entry.pop !== null && entry.confidence === "HIGH") {
+    return (
+      <span
+        className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-primary/20 text-primary"
+        title={`Population: ${entry.pop} known graded examples — ${entry.source}`}
+      >
+        ★ POP {entry.pop}
+      </span>
+    );
+  }
+  if (entry.confidence === "LOW") {
+    return (
+      <span
+        className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400"
+        title={`Population estimate only — ${entry.source}`}
+      >
+        POP ?
+      </span>
+    );
+  }
+  // APPROX
+  return (
+    <span
+      className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+      title="Population unknown — approximate"
+    >
+      POP ~?
     </span>
   );
 }
@@ -169,6 +205,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
               ))}
               <th className="px-3 py-2">ERA</th>
               <th className="px-3 py-2">CARDBACK</th>
+              <th className="px-3 py-2">POP</th>
               <th className="px-3 py-2">SOURCE</th>
               <th className="px-3 py-2">LOT REF</th>
               <th className="px-3 py-2">NOTES</th>
@@ -199,6 +236,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                   <EraBadge era={(l as any).era ?? "UNKNOWN"} />
                 </td>
                 <td className="px-3 py-2 text-muted-foreground">{(l as any).cardback_code ?? "—"}</td>
+                <td className="px-3 py-2"><PopBadge variantCode={l.variant_code} /></td>
                 <td className="px-3 py-2">{l.source}</td>
                 <td className="px-3 py-2">
                   {l.lot_url ? (
@@ -232,6 +270,12 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-widest flex items-center gap-4">
+        <span><span className="text-primary">★ Gold</span> = confirmed POP</span>
+        <span><span className="text-amber-400">Amber</span> = estimated</span>
+        <span>Grey = unknown</span>
       </div>
 
       <LotFormModal
