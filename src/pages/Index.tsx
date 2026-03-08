@@ -19,20 +19,19 @@ const Index = () => {
     dateTo: null,
   });
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        await seedIfEmpty();
-        const data = await getAllLots();
-        setLots(data);
-      } catch (e) {
-        console.error("Failed to load lots:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
+  const loadLots = useCallback(async () => {
+    try {
+      await seedIfEmpty();
+      const data = await getAllLots();
+      setLots(data);
+    } catch (e) {
+      console.error("Failed to load lots:", e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { loadLots(); }, [loadLots]);
 
   const filtered = useMemo(() => {
     return lots.filter((l) => {
