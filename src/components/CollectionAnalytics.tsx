@@ -314,8 +314,8 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={spendByGrade} layout="vertical" margin={{ left: 80, right: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 10, fontFamily: "Courier New" }} width={75} />
+                <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                <YAxis type="category" dataKey="name" tick={{ fill: WHITE, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} width={75} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, _: string, entry: any) => [`${fmt(value)} (${entry.payload.count} items)`, "Spend"]} />
                 <ReferenceLine x={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg`, fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} />
