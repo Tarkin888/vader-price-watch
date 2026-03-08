@@ -1,10 +1,12 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { getAllLots, seedIfEmpty, type Lot } from "@/lib/db";
 import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import StatsBar from "@/components/StatsBar";
+import PriceTrendChart from "@/components/PriceTrendChart";
 import LotsTable from "@/components/LotsTable";
 import ExportCSV from "@/components/ExportCSV";
+import AddLotModal from "@/components/AddLotModal";
 
 const Index = () => {
   const [lots, setLots] = useState<Lot[]>([]);
@@ -17,20 +19,19 @@ const Index = () => {
     dateTo: null,
   });
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        await seedIfEmpty();
-        const data = await getAllLots();
-        setLots(data);
-      } catch (e) {
-        console.error("Failed to load lots:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
+  const loadLots = useCallback(async () => {
+    try {
+      await seedIfEmpty();
+      const data = await getAllLots();
+      setLots(data);
+    } catch (e) {
+      console.error("Failed to load lots:", e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { loadLots(); }, [loadLots]);
 
   const filtered = useMemo(() => {
     return lots.filter((l) => {
@@ -62,7 +63,9 @@ const Index = () => {
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
       <FilterBar filters={filters} onChange={setFilters} />
       <StatsBar lots={filtered} />
-      <div className="flex justify-end border-b border-border">
+      <PriceTrendChart lots={filtered} />
+      <div className="flex justify-end gap-2 border-b border-border px-6 py-2">
+        <AddLotModal onAdded={loadLots} />
         <ExportCSV lots={filtered} />
       </div>
       <div className="flex-1">
