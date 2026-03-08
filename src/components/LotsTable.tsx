@@ -47,6 +47,41 @@ function SourceBadge({ source }: { source: string }) {
   );
 }
 
+function PopBadge({ variantCode }: { variantCode: string }) {
+  const entry: PopEntry | undefined = popCounts[variantCode];
+  if (!entry) return null;
+
+  if (entry.pop !== null && entry.confidence === "HIGH") {
+    return (
+      <span
+        className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-primary/20 text-primary"
+        title={`Population: ${entry.pop} known graded examples — ${entry.source}`}
+      >
+        ★ POP {entry.pop}
+      </span>
+    );
+  }
+  if (entry.confidence === "LOW") {
+    return (
+      <span
+        className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400"
+        title={`Population estimate only — ${entry.source}`}
+      >
+        POP ?
+      </span>
+    );
+  }
+  // APPROX
+  return (
+    <span
+      className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+      title="Population unknown — approximate"
+    >
+      POP ~?
+    </span>
+  );
+}
+
 const NOTABLE_THRESHOLD = 5000;
 
 const ERA_COLORS: Record<string, string> = {
