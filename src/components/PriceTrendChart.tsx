@@ -55,6 +55,7 @@ const ScatterTooltipContent = ({ active, payload }: any) => {
 
 const PriceTrendChart = ({ lots }: Props) => {
   const [mode, setMode] = useState<ChartMode>("line");
+  const [expanded, setExpanded] = useState(false);
 
   const { lineData, lineVariants } = useMemo(() => {
     const byVariant: Record<string, Lot[]> = {};
@@ -89,16 +90,25 @@ const PriceTrendChart = ({ lots }: Props) => {
     return [...new Set(lots.map((l) => l.variant_code))];
   }, [lots]);
 
-  if (lots.length === 0) {
-    return (
-      <div className="px-6 py-4 text-center text-muted-foreground text-[10px] tracking-widest border-b border-border">
-        NO DATA FOR CHART
-      </div>
-    );
-  }
-
   return (
-    <div className="border-b border-border px-6 py-4">
+    <div className="border-b border-border">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left px-6 py-2 text-[10px] tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+      >
+        <span className="text-primary">{expanded ? "▼" : "▶"}</span>
+        {expanded ? "Hide Price Trend" : "Show Price Trend"}
+        <span className="text-muted-foreground ml-2">({lots.length} lots)</span>
+      </button>
+
+      {lots.length === 0 && expanded && (
+        <div className="px-6 py-4 text-center text-muted-foreground text-[10px] tracking-widest">
+          NO DATA FOR CHART
+        </div>
+      )}
+
+      {expanded && lots.length > 0 && (
+      <div className="px-6 py-4">
       <div className="flex items-center justify-between mb-2">
         <div className="text-[10px] text-muted-foreground tracking-widest uppercase">
           {mode === "line" ? "Price Trend by Variant" : "Scatter Plot — All Lots"}
@@ -176,6 +186,8 @@ const PriceTrendChart = ({ lots }: Props) => {
             </Scatter>
           </ScatterChart>
         </ResponsiveContainer>
+      )}
+    </div>
       )}
     </div>
   );
