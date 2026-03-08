@@ -152,6 +152,16 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
               {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </Field>
+          <Field label="Era">
+            <select className={selectClass} value={form.era} onChange={(e) => set("era", e.target.value)}>
+              {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
+            </select>
+          </Field>
+          <Field label="Cardback Code">
+            <select className={selectClass} value={form.cardback_code} onChange={(e) => set("cardback_code", e.target.value)}>
+              {CARDBACK_CODES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </Field>
           <Field label="Variant Code">
             <select className={selectClass} value={form.variant_code} onChange={(e) => set("variant_code", e.target.value)}>
               {VARIANTS.map((v) => <option key={v} value={v}>{v}</option>)}

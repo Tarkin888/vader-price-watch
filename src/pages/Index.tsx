@@ -60,6 +60,8 @@ const Index = () => {
   const filtered = useMemo(() => {
     return lots.filter((l) => {
       if (filters.source && l.source !== filters.source) return false;
+      if (filters.era && (l as any).era !== filters.era) return false;
+      if (filters.cardbackCode && (l as any).cardback_code !== filters.cardbackCode) return false;
       if (filters.variantCode && l.variant_code !== filters.variantCode) return false;
       if (filters.gradeTier && l.grade_tier_code !== filters.gradeTier) return false;
       if (filters.dateFrom && new Date(l.sale_date) < filters.dateFrom) return false;
