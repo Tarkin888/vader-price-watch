@@ -377,7 +377,7 @@ export default function CollectionAnalytics({ items }: Props) {
                     }
                     return "";
                   }} />
-                <ReferenceLine y={totalCost} stroke={GOLD} strokeDasharray="5 5" label={{ value: fmt(totalCost), fill: GOLD, fontSize: 9, fontFamily: "Courier New" }} />
+                <ReferenceLine y={totalCost} stroke={GOLD} strokeDasharray="5 5" label={{ value: fmt(totalCost), fill: GOLD, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                 <Area type="monotone" dataKey="total" stroke={GOLD} fill={GOLD} fillOpacity={0.2} strokeWidth={2} dot={{ fill: GOLD, r: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
