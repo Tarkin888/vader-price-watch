@@ -340,9 +340,9 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={annualData} margin={{ top: 20, right: 40, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis dataKey="year" tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                <YAxis yAxisId="left" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                <XAxis dataKey="year" tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                <YAxis yAxisId="left" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, name: string) => [name === "spend" ? fmt(value) : value, name === "spend" ? "Total Spend" : "Items"]}
                   labelFormatter={(label) => {
