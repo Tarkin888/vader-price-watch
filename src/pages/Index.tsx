@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getAllLots, seedIfEmpty, type Lot } from "@/lib/db";
+import { getAllLots, seedIfEmpty, fixUnknownEraCardback, type Lot } from "@/lib/db";
 import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import StatsBar from "@/components/StatsBar";
