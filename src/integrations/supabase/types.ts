@@ -16,10 +16,12 @@ export type Database = {
     Tables: {
       collection: {
         Row: {
+          back_image_url: string | null
           category: Database["public"]["Enums"]["collection_category"]
           created_at: string
           current_estimated_value: number | null
           description: string
+          front_image_url: string | null
           grading: Database["public"]["Enums"]["collection_grading"]
           id: string
           image_urls: string[]
@@ -31,10 +33,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          back_image_url?: string | null
           category: Database["public"]["Enums"]["collection_category"]
           created_at?: string
           current_estimated_value?: number | null
           description?: string
+          front_image_url?: string | null
           grading?: Database["public"]["Enums"]["collection_grading"]
           id?: string
           image_urls?: string[]
@@ -46,10 +50,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          back_image_url?: string | null
           category?: Database["public"]["Enums"]["collection_category"]
           created_at?: string
           current_estimated_value?: number | null
           description?: string
+          front_image_url?: string | null
           grading?: Database["public"]["Enums"]["collection_grading"]
           id?: string
           image_urls?: string[]
