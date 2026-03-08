@@ -156,7 +156,7 @@ const Index = () => {
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
-            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} />
+            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} />
           </>
         ) : (
           <SessionLog copiedRows={copiedRows} onClear={() => setCopiedRows([])} />
