@@ -552,8 +552,8 @@ export default function CollectionAnalytics({ items }: Props) {
           <ResponsiveContainer width="100%" height={Math.max(200, pnlItems.length * 35)}>
             <BarChart data={pnlItems} layout="vertical" margin={{ left: 140, right: 30 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-              <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
-              <YAxis type="category" dataKey="description" tick={{ fill: WHITE, fontSize: 9, fontFamily: "Courier New" }} width={135} />
+              <XAxis type="number" tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
+              <YAxis type="category" dataKey="description" tick={{ fill: WHITE, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} width={135} />
               <Tooltip contentStyle={customTooltipStyle}
                 formatter={(value: number) => [`${value >= 0 ? "+" : ""}${fmt(value)}`, "P&L"]} />
               <ReferenceLine x={0} stroke={WHITE} />
