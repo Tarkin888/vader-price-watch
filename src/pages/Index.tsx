@@ -71,6 +71,7 @@ const Index = () => {
         const searchable = [
           l.lot_ref, l.condition_notes, l.variant_code, l.grade_tier_code,
           l.variant_grade_key, l.source, l.grade_subgrades,
+          (l as any).era, (l as any).cardback_code,
         ].join(" ").toLowerCase();
         if (!searchable.includes(q)) return false;
       }
