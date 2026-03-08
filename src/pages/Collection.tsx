@@ -145,13 +145,16 @@ const Collection = () => {
               <span>PORTFOLIO VALUE: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
             </div>
           </div>
-          <Button
-            size="sm"
-            className="text-xs tracking-wider"
-            onClick={() => setAddOpen(true)}
-          >
-            <Plus className="w-3 h-3 mr-1" /> ADD ITEM
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button
+              size="sm"
+              className="text-xs tracking-wider"
+              onClick={() => setAddOpen(true)}
+            >
+              <Plus className="w-3 h-3 mr-1" /> ADD ITEM
+            </Button>
+          </div>
         </div>
       </header>
 
