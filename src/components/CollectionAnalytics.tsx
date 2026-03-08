@@ -503,8 +503,8 @@ export default function CollectionAnalytics({ items }: Props) {
                   const d = payload[0].payload;
                   return <div style={customTooltipStyle} className="p-2">{d.item_id}: {d.description}<br />{fmt(d.price)}</div>;
                 }} />
-                <ReferenceLine y={gradedAvg} stroke={GOLD} strokeDasharray="5 5" label={{ value: `Graded avg: ${fmt(Math.round(gradedAvg))}`, fill: GOLD, fontSize: 9, fontFamily: "Courier New" }} />
-                <ReferenceLine y={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg: ${fmt(Math.round(ungradedAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} />
+                <ReferenceLine y={gradedAvg} stroke={GOLD} strokeDasharray="5 5" label={{ value: `Graded avg: ${fmt(Math.round(gradedAvg))}`, fill: GOLD, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
+                <ReferenceLine y={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg: ${fmt(Math.round(ungradedAvg))}`, fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                 <Scatter name="Graded" data={dotPlotData.graded} fill={GOLD}>
                   {dotPlotData.graded.map((_, i) => <Cell key={i} fill={GOLD} />)}
                 </Scatter>
