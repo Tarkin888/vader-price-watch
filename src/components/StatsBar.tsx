@@ -53,7 +53,7 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
   if (selectedEra) {
     // Single era mode: summary + cardback breakdown
     const eraLots = lots.filter((l) => l.era === selectedEra);
-    const stats = calcStats(eraLots);
+    const stats = calcStats(eraLots, isUSD);
 
     // Group by cardback_code
     const byCardback = new Map<string, Lot[]>();
