@@ -363,8 +363,8 @@ export default function CollectionAnalytics({ items }: Props) {
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={cumulativeData} margin={{ top: 10, right: 20, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 15%)" />
-                <XAxis dataKey="date" tick={{ fill: MUTED, fontSize: 9, fontFamily: "Courier New" }} tickFormatter={(v) => v.slice(0, 7)} />
-                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "Courier New" }} />
+                <XAxis dataKey="date" tick={{ fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} tickFormatter={(v) => v.slice(0, 7)} />
+                <YAxis tickFormatter={fmtK} tick={{ fill: MUTED, fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
                 <Tooltip contentStyle={customTooltipStyle}
                   formatter={(value: number, name: string, entry: any) => {
                     if (name === "total") return [fmt(value), "Running Total"];
