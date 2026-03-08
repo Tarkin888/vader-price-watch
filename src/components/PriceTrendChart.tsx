@@ -30,7 +30,7 @@ const TOOLTIP_STYLE = {
   border: "1px solid hsl(43, 20%, 18%)",
   color: "hsl(40, 30%, 82%)",
   fontSize: 11,
-  fontFamily: "Courier New, monospace",
+  fontFamily: "'Aptos', sans-serif",
 };
 
 interface Props {
