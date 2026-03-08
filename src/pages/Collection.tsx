@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type CollectionItem } from "@/lib/collection-db";
 import CollectionFormModal from "@/components/CollectionFormModal";
+import CollectionAnalytics from "@/components/CollectionAnalytics";
 import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
