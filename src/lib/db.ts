@@ -1,70 +1,76 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 
-export interface Lot {
-  id: string;
-  capture_date: string;
-  sale_date: string;
-  source: "Heritage" | "Hakes" | "Vectis" | "LCG";
-  lot_ref: string;
-  lot_url: string;
-  variant_code: "12A" | "12B" | "12C" | "12A-DT" | "12B-DT" | "CAN" | "PAL";
-  grade_tier_code: "RAW-NM" | "RAW-EX" | "RAW-VG" | "AFA-70" | "AFA-75" | "AFA-80" | "AFA-85" | "AFA-90+" | "UKG-80" | "UKG-85" | "CAS-80";
-  variant_grade_key: string;
-  hammer_price_gbp: number;
-  buyers_premium_gbp: number;
-  total_paid_gbp: number;
-  usd_to_gbp_rate: number;
-  image_urls: string[];
-  condition_notes: string;
-  grade_subgrades: string;
-  created_at: string;
-  updated_at: string;
-}
+export type Lot = Tables<"lots">;
+export type LotInsert = TablesInsert<"lots">;
 
 export async function getAllLots(): Promise<Lot[]> {
   const { data, error } = await supabase
     .from("lots")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("sale_date", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as unknown as Lot[];
+  return data ?? [];
 }
 
-export async function getLotById(id: string): Promise<Lot | null> {
-  const { data, error } = await supabase
+export async function seedIfEmpty(): Promise<void> {
+  const { count, error } = await supabase
     .from("lots")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+    .select("*", { count: "exact", head: true });
   if (error) throw error;
-  return data as unknown as Lot | null;
-}
+  if ((count ?? 0) > 0) return;
 
-export async function addLot(lot: Omit<Lot, "id" | "variant_grade_key" | "created_at" | "updated_at">): Promise<Lot> {
-  const { data, error } = await supabase
-    .from("lots")
-    .insert(lot as any)
-    .select()
-    .single();
-  if (error) throw error;
-  return data as unknown as Lot;
-}
+  const seeds: LotInsert[] = [
+    {
+      capture_date: "2025-03-01",
+      sale_date: "2025-02-15",
+      source: "Heritage",
+      lot_ref: "LOT-4821",
+      lot_url: "https://www.ha.com/example/lot-4821",
+      variant_code: "12A",
+      grade_tier_code: "AFA-80",
+      hammer_price_gbp: 8500,
+      buyers_premium_gbp: 2125,
+      total_paid_gbp: 10625,
+      usd_to_gbp_rate: 0.79,
+      image_urls: ["https://placehold.co/200x300/080806/C9A84C?text=12A+AFA80"],
+      condition_notes: "Minor card yellowing, bubble intact",
+      grade_subgrades: "C80 B85 F80",
+    },
+    {
+      capture_date: "2025-02-20",
+      sale_date: "2025-01-28",
+      source: "Vectis",
+      lot_ref: "VEC-1192",
+      lot_url: "https://www.vectis.co.uk/example/vec-1192",
+      variant_code: "12B",
+      grade_tier_code: "RAW-EX",
+      hammer_price_gbp: 3200,
+      buyers_premium_gbp: 800,
+      total_paid_gbp: 4000,
+      usd_to_gbp_rate: 0.79,
+      image_urls: ["https://placehold.co/200x300/080806/C9A84C?text=12B+RAW"],
+      condition_notes: "Unpunched card, slight crease top right",
+      grade_subgrades: "",
+    },
+    {
+      capture_date: "2025-03-05",
+      sale_date: "2025-02-28",
+      source: "Hakes",
+      lot_ref: "HK-7734",
+      lot_url: "https://hakes.com/example/hk-7734",
+      variant_code: "12A-DT",
+      grade_tier_code: "AFA-85",
+      hammer_price_gbp: 12000,
+      buyers_premium_gbp: 3000,
+      total_paid_gbp: 15000,
+      usd_to_gbp_rate: 0.78,
+      image_urls: ["https://placehold.co/200x300/080806/C9A84C?text=12A-DT+AFA85"],
+      condition_notes: "Double telescoping, near mint card",
+      grade_subgrades: "C85 B90 F85",
+    },
+  ];
 
-export async function updateLot(id: string, updates: Partial<Omit<Lot, "id" | "variant_grade_key" | "created_at" | "updated_at">>): Promise<Lot> {
-  const { data, error } = await supabase
-    .from("lots")
-    .update(updates as any)
-    .eq("id", id)
-    .select()
-    .single();
-  if (error) throw error;
-  return data as unknown as Lot;
-}
-
-export async function deleteLot(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("lots")
-    .delete()
-    .eq("id", id);
-  if (error) throw error;
+  const { error: insertError } = await supabase.from("lots").insert(seeds);
+  if (insertError) throw insertError;
 }

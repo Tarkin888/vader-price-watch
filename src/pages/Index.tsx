@@ -1,44 +1,76 @@
+import { useEffect, useState, useMemo } from "react";
+import { getAllLots, seedIfEmpty, type Lot } from "@/lib/db";
+import Header from "@/components/Header";
+import FilterBar, { type Filters } from "@/components/FilterBar";
+import StatsBar from "@/components/StatsBar";
+import LotsTable from "@/components/LotsTable";
+import ExportCSV from "@/components/ExportCSV";
+
 const Index = () => {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden">
-      {/* Scanline overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 z-10"
-        style={{
-          background:
-            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(201,168,76,0.03) 2px, rgba(201,168,76,0.03) 4px)",
-        }}
-      />
+  const [lots, setLots] = useState<Lot[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<Filters>({
+    source: null,
+    variantCode: null,
+    gradeTier: null,
+    dateFrom: null,
+    dateTo: null,
+  });
 
-      {/* Terminal content */}
-      <div className="z-20 text-center space-y-6">
-        <div className="text-muted-foreground text-xs tracking-[0.5em] uppercase">
-          ━━━ Secure Connection Established ━━━
-        </div>
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await seedIfEmpty();
+        const data = await getAllLots();
+        setLots(data);
+      } catch (e) {
+        console.error("Failed to load lots:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
+  }, []);
 
-        <h1
-          className="text-4xl md:text-6xl font-bold text-primary tracking-wider"
-          style={{ animation: "flicker 4s infinite" }}
-        >
-          IMPERIAL PRICE
-          <br />
-          TERMINAL v3.0
-        </h1>
+  const filtered = useMemo(() => {
+    return lots.filter((l) => {
+      if (filters.source && l.source !== filters.source) return false;
+      if (filters.variantCode && l.variant_code !== filters.variantCode) return false;
+      if (filters.gradeTier && l.grade_tier_code !== filters.gradeTier) return false;
+      if (filters.dateFrom && new Date(l.sale_date) < filters.dateFrom) return false;
+      if (filters.dateTo && new Date(l.sale_date) > filters.dateTo) return false;
+      return true;
+    });
+  }, [lots, filters]);
 
-        <div className="text-muted-foreground text-sm tracking-[0.3em]">
-          VADER PRICE TRACKER
-        </div>
+  const lastScrape = lots.length > 0
+    ? lots.reduce((latest, l) => (l.capture_date > latest ? l.capture_date : latest), lots[0].capture_date)
+    : null;
 
-        <div className="mt-8 border border-border p-4 inline-block">
-          <span className="text-primary text-xs tracking-widest">
-            &gt; AWAITING COMMAND INPUT_
-          </span>
-        </div>
-
-        <div className="text-muted-foreground text-xs mt-4 tracking-wider">
-          GALACTIC EMPIRE • CLASSIFIED • LEVEL 5 CLEARANCE
-        </div>
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <span className="text-primary text-sm tracking-widest" style={{ animation: "flicker 2s infinite" }}>
+          LOADING IMPERIAL DATABASE...
+        </span>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
+      <FilterBar filters={filters} onChange={setFilters} />
+      <StatsBar lots={filtered} />
+      <div className="flex justify-end border-b border-border">
+        <ExportCSV lots={filtered} />
+      </div>
+      <div className="flex-1">
+        <LotsTable lots={filtered} />
+      </div>
+      <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
+        IMPERIAL PRICE TERMINAL v3.0 • GALACTIC EMPIRE • CLASSIFIED
+      </footer>
     </div>
   );
 };

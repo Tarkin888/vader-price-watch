@@ -1,0 +1,122 @@
+import { Constants } from "@/integrations/supabase/types";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const SOURCES = Constants.public.Enums.lot_source;
+const VARIANTS = Constants.public.Enums.variant_code;
+const GRADES = Constants.public.Enums.grade_tier_code;
+
+export interface Filters {
+  source: string | null;
+  variantCode: string | null;
+  gradeTier: string | null;
+  dateFrom: Date | null;
+  dateTo: Date | null;
+}
+
+interface FilterBarProps {
+  filters: Filters;
+  onChange: (f: Filters) => void;
+}
+
+const FilterBar = ({ filters, onChange }: FilterBarProps) => {
+  const set = (key: keyof Filters, val: any) => onChange({ ...filters, [key]: val });
+
+  const selectClass =
+    "bg-secondary border border-border text-foreground text-xs px-2 py-1.5 tracking-wider focus:outline-none focus:ring-1 focus:ring-primary";
+
+  return (
+    <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Source</label>
+        <select
+          className={selectClass}
+          value={filters.source ?? ""}
+          onChange={(e) => set("source", e.target.value || null)}
+        >
+          <option value="">ALL</option>
+          {SOURCES.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Variant</label>
+        <select
+          className={selectClass}
+          value={filters.variantCode ?? ""}
+          onChange={(e) => set("variantCode", e.target.value || null)}
+        >
+          <option value="">ALL</option>
+          {VARIANTS.map((v) => (
+            <option key={v} value={v}>{v}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grade</label>
+        <select
+          className={selectClass}
+          value={filters.gradeTier ?? ""}
+          onChange={(e) => set("gradeTier", e.target.value || null)}
+        >
+          <option value="">ALL</option>
+          {GRADES.map((g) => (
+            <option key={g} value={g}>{g}</option>
+          ))}
+        </select>
+      </div>
+
+      <DateFilter label="From" value={filters.dateFrom} onChange={(d) => set("dateFrom", d)} />
+      <DateFilter label="To" value={filters.dateTo} onChange={(d) => set("dateTo", d)} />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-xs text-muted-foreground hover:text-primary tracking-wider"
+        onClick={() => onChange({ source: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null })}
+      >
+        <X className="w-3 h-3 mr-1" /> CLEAR
+      </Button>
+    </div>
+  );
+};
+
+function DateFilter({ label, value, onChange }: { label: string; value: Date | null; onChange: (d: Date | null) => void }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-[10px] text-muted-foreground tracking-widest uppercase">{label}</label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "text-xs justify-start tracking-wider border-border bg-secondary",
+              !value && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="w-3 h-3 mr-1" />
+            {value ? format(value, "yyyy-MM-dd") : "ANY"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 bg-card border-border" align="start">
+          <Calendar
+            mode="single"
+            selected={value ?? undefined}
+            onSelect={(d) => onChange(d ?? null)}
+            className={cn("p-3 pointer-events-auto")}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+export default FilterBar;
