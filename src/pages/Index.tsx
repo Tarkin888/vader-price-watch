@@ -4,7 +4,7 @@ import { getAllLots, seedIfEmpty, fixUnknownEraCardback, type Lot } from "@/lib/
 import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import StatsBar from "@/components/StatsBar";
-import PriceTrendChart from "@/components/PriceTrendChart";
+import ScatterChartPanel from "@/components/ScatterChartPanel";
 import ReferencePanel from "@/components/ReferencePanel";
 import LotsTable from "@/components/LotsTable";
 import ExportCSV from "@/components/ExportCSV";
