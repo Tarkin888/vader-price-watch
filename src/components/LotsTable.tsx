@@ -67,9 +67,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot }: LotsTableProps) 
 
   const copyRow = (l: Lot) => {
     const fields = [
-      l.capture_date, l.sale_date, l.source, l.lot_ref, l.variant_code,
-      l.grade_tier_code, l.variant_grade_key, l.hammer_price_gbp,
-      l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate, l.condition_notes,
+      l.capture_date, l.sale_date, l.source, (l as any).era ?? "", (l as any).cardback_code ?? "",
+      l.lot_ref, l.variant_code, l.grade_tier_code, l.variant_grade_key,
+      l.hammer_price_gbp, l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate, l.condition_notes,
     ];
     navigator.clipboard.writeText(fields.join("\t"));
     toast.success("Row copied to clipboard");
