@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      collection: {
+        Row: {
+          category: Database["public"]["Enums"]["collection_category"]
+          created_at: string
+          current_estimated_value: number | null
+          description: string
+          grading: Database["public"]["Enums"]["collection_grading"]
+          id: string
+          image_urls: string[]
+          item_id: string
+          notes: string
+          purchase_date: string
+          purchase_price: number
+          purchase_source: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["collection_category"]
+          created_at?: string
+          current_estimated_value?: number | null
+          description?: string
+          grading?: Database["public"]["Enums"]["collection_grading"]
+          id?: string
+          image_urls?: string[]
+          item_id: string
+          notes?: string
+          purchase_date: string
+          purchase_price?: number
+          purchase_source?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["collection_category"]
+          created_at?: string
+          current_estimated_value?: number | null
+          description?: string
+          grading?: Database["public"]["Enums"]["collection_grading"]
+          id?: string
+          image_urls?: string[]
+          item_id?: string
+          notes?: string
+          purchase_date?: string
+          purchase_price?: number
+          purchase_source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lots: {
         Row: {
           buyers_premium_gbp: number
@@ -85,6 +133,26 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      collection_category:
+        | "12 BACK"
+        | "20 BACK"
+        | "21 BACK"
+        | "ESB"
+        | "ROTJ"
+        | "SECRET OFFER"
+        | "FETT STICKER"
+        | "TRILOGO"
+        | "OTHER"
+      collection_grading:
+        | "Not Graded"
+        | "AFA 75"
+        | "AFA 80"
+        | "AFA 85"
+        | "AFA 90+"
+        | "UKG 80"
+        | "UKG 85"
+        | "CAS 80"
+        | "CAS 85"
       grade_tier_code:
         | "RAW-NM"
         | "RAW-EX"
@@ -226,6 +294,28 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      collection_category: [
+        "12 BACK",
+        "20 BACK",
+        "21 BACK",
+        "ESB",
+        "ROTJ",
+        "SECRET OFFER",
+        "FETT STICKER",
+        "TRILOGO",
+        "OTHER",
+      ],
+      collection_grading: [
+        "Not Graded",
+        "AFA 75",
+        "AFA 80",
+        "AFA 85",
+        "AFA 90+",
+        "UKG 80",
+        "UKG 85",
+        "CAS 80",
+        "CAS 85",
+      ],
       grade_tier_code: [
         "RAW-NM",
         "RAW-EX",

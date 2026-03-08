@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getAllLots, seedIfEmpty, type Lot } from "@/lib/db";
 import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
@@ -15,6 +16,8 @@ import NotableSalesBanner from "@/components/NotableSalesBanner";
 import ComparableSalesPanel from "@/components/ComparableSalesPanel";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "session">("dashboard");
@@ -42,6 +45,15 @@ const Index = () => {
   }, []);
 
   useEffect(() => { loadLots(); }, [loadLots]);
+
+  // Cross-reference: read variant from URL params
+  useEffect(() => {
+    const variant = searchParams.get("variant");
+    if (variant) {
+      setFilters((f) => ({ ...f, variantCode: variant }));
+      setActiveTab("table");
+    }
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     return lots.filter((l) => {
@@ -83,6 +95,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
+      <div className="flex items-center gap-1 border-b border-border px-6 py-2">
+        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary">
+          PRICE TRACKER
+        </button>
+        <button
+          onClick={() => navigate("/collection")}
+          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+        >
+          MY COLLECTION
+        </button>
+      </div>
       <ReferencePanel />
       <FilterBar filters={filters} onChange={setFilters} />
       <StatsBar lots={filtered} />
