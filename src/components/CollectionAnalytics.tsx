@@ -290,8 +290,8 @@ export default function CollectionAnalytics({ items }: Props) {
                     formatter={(value: number, name: string, entry: any) => [
                       `${fmt(value)} (${entry.payload.count} items, ${entry.payload.pct}%)`, name
                     ]} />
-                  <text x="50%" y="48%" textAnchor="middle" fill={MUTED} fontSize={9} fontFamily="Courier New">PORTFOLIO</text>
-                  <text x="50%" y="56%" textAnchor="middle" fill={GOLD} fontSize={12} fontFamily="Courier New" fontWeight="bold">{fmt(totalCost)}</text>
+                  <text x="50%" y="48%" textAnchor="middle" fill={MUTED} fontSize={9} fontFamily="Aptos, sans-serif">PORTFOLIO</text>
+                  <text x="50%" y="56%" textAnchor="middle" fill={GOLD} fontSize={12} fontFamily="Aptos, sans-serif" fontWeight="bold">{fmt(totalCost)}</text>
                 </PieChart>
               </ResponsiveContainer>
               <div className="grid grid-cols-2 gap-1 mt-2 text-[10px]">
