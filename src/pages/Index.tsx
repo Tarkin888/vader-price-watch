@@ -25,6 +25,8 @@ const Index = () => {
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [filters, setFilters] = useState<Filters>({
     source: null,
+    era: null,
+    cardbackCode: null,
     variantCode: null,
     gradeTier: null,
     dateFrom: null,
