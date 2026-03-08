@@ -32,6 +32,7 @@ const Index = () => {
     dateFrom: null,
     dateTo: null,
     search: "",
+    currency: "GBP" as const,
   });
 
   const loadLots = useCallback(async () => {
