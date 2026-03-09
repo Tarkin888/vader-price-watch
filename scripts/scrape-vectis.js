@@ -171,61 +171,58 @@ async function scrapeVectis() {
 
       // Extract lot cards from listing
       const cards = await page.evaluate(() => {
-        const results = [];
-        // Try multiple selectors for lot cards
-        const cardSelectors = [
-          ".lot-card",
-          ".catalog-item",
-          "[class*='lot-item']",
-          ".archive-lot",
-          "article[class*='lot']",
-          ".search-result-item",
-        ];
-        
-        let elements = [];
-        for (const sel of cardSelectors) {
-          elements = document.querySelectorAll(sel);
-          if (elements.length > 0) break;
-        }
-        
-        // Fallback: find all links containing /lot/
-        if (elements.length === 0) {
-          const links = document.querySelectorAll('a[href*="/lot/"]');
-          links.forEach((link) => {
-            const card = link.closest("div, article, li");
-            if (card && !results.some((r) => r.url === link.href)) {
-              const heading = card.querySelector("h3, h4, h2, .title, [class*='title']");
-              const img = card.querySelector("img");
-              const lotLabel = card.textContent?.match(/lot\s+(\d+)/i);
-              results.push({
-                title: heading?.textContent?.trim() || link.textContent?.trim() || "",
-                url: link.href,
-                imageUrl: img?.src || "",
-                lotNumber: lotLabel?.[1] || "",
-              });
-            }
-          });
-          return results;
-        }
+        const foundCards = [];
+        const seenLotRefs = new Set();
 
-        elements.forEach((el) => {
-          const heading = el.querySelector("h3, h4, h2, .title, [class*='title']");
-          const link = el.querySelector('a[href*="/lot/"], a[href*="el="]');
-          const img = el.querySelector("img");
-          const lotLabel = el.textContent?.match(/lot\s+(\d+)/i);
-          
-          if (heading && link) {
-            results.push({
-              title: heading.textContent?.trim() || "",
-              url: link.href,
-              imageUrl: img?.src || "",
-              lotNumber: lotLabel?.[1] || "",
+        const findCardContainer = (element) => {
+          let current = element;
+          while (current && current !== document.body) {
+            const hasImg = current.querySelector("img");
+            const hasHeading = current.querySelector("h2, h3, h4");
+            if (hasImg && hasHeading) return current;
+            current = current.parentElement;
+          }
+          return null;
+        };
+
+        const selectors = ['a[href*="-lot-"]', 'a[href*="el="]'];
+        for (const selector of selectors) {
+          const links = Array.from(document.querySelectorAll(selector));
+          for (const link of links) {
+            const href = link.getAttribute("href");
+            if (!href) continue;
+
+            const lotRefMatch = href.match(/el=(\d+)/);
+            if (!lotRefMatch) continue;
+            const lotRef = lotRefMatch[1];
+
+            if (seenLotRefs.has(lotRef)) continue;
+            seenLotRefs.add(lotRef);
+
+            const container = findCardContainer(link);
+            if (!container) continue;
+
+            const heading = container.querySelector("h2, h3, h4");
+            const title = heading ? heading.textContent.trim() : "";
+            const img = container.querySelector("img");
+            const imageUrl = img ? img.getAttribute("src") || "" : "";
+            const lotNumberMatch = container.textContent.match(/lot\s+(\d+)/i);
+
+            foundCards.push({
+              title,
+              url: href.startsWith("http") ? href : `https://www.vectis.co.uk${href}`,
+              imageUrl,
+              lotNumber: lotNumberMatch ? lotNumberMatch[1] : "",
+              lotRef,
             });
           }
-        });
-        return results;
+        }
+        return foundCards;
       });
 
+      if (pageNum === 1 && cards.length > 0) {
+        console.log("First card extracted:", JSON.stringify(cards[0], null, 2));
+      }
       console.log(`Page ${pageNum}: found ${cards.length} lot cards`);
 
       for (const card of cards) {
