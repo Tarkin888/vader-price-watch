@@ -30,7 +30,7 @@ const Collection = () => {
   const [editItem, setEditItem] = useState<CollectionItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState<CollectionItem | null>(null);
-  const [subTab, setSubTab] = useState<"inventory" | "analytics">("inventory");
+  const [subTab, setSubTab] = useState<"inventory" | "analytics" | "gallery">("inventory");
   const [privacyMode, setPrivacyMode] = useState(false);
 
   const load = useCallback(async () => {
