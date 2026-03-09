@@ -231,6 +231,10 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                         –{sym}{isUSD ? toUsd(Number((l as any).estimate_high_gbp ?? 0), Number(l.usd_to_gbp_rate)).toLocaleString() : Number((l as any).estimate_high_gbp ?? 0).toLocaleString("en-GB")}
                       </span>
                     </span>
+                  ) : (l as any).price_status === "UNSOLD" ? (
+                    <span className="flex items-center justify-end">
+                      <span className="text-[8px] tracking-widest font-bold px-1 py-0.5 rounded bg-muted text-muted-foreground">UNSOLD</span>
+                    </span>
                   ) : (
                     <>
                       {fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
