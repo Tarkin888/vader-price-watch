@@ -194,6 +194,12 @@ const Collection = () => {
         >
           ANALYTICS
         </button>
+        <button
+          onClick={() => setSubTab("gallery")}
+          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+        >
+          PHOTO GALLERY
+        </button>
       </div>
 
       {subTab === "analytics" ? (
