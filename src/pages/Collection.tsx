@@ -227,6 +227,15 @@ const Collection = () => {
                 {GRADINGS.map((g) => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
+            <Button
+              variant={privacyMode ? "default" : "outline"}
+              size="sm"
+              className="text-[10px] tracking-wider h-8"
+              onClick={() => setPrivacyMode(!privacyMode)}
+            >
+              {privacyMode ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
+              PRIVACY {privacyMode ? "ON" : "OFF"}
+            </Button>
           </div>
 
           {/* Table */}
