@@ -1,25 +1,31 @@
 /**
- * Vectis Scraper — Standalone Node.js script using Playwright
- *
+ * Vectis Scraper — Phase 1: Estimate Collection
+ * 
+ * Scrapes archived Vectis auction listings for Darth Vader carded figures.
+ * Extracts estimates only (actual hammer prices require login - see Phase 2).
+ * 
  * Prerequisites:
- *   npm install playwright @supabase/supabase-js
+ *   npm install playwright @supabase/supabase-js dotenv
  *   npx playwright install chromium
- *
+ * 
+ * Create a .env file with:
+ *   SUPABASE_URL=https://rdtwgrznjkigghbwstqz.supabase.co
+ *   SUPABASE_ANON_KEY=your-anon-key
+ * 
  * Usage:
- *   SUPABASE_URL=https://rdtwgrznjkigghbwstqz.supabase.co \
- *   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key \
- *   node scripts/scrapers/vectis.mjs
+ *   node scrape-vectis.js
  */
 
-import { chromium } from "playwright";
-import { createClient } from "@supabase/supabase-js";
+const { chromium } = require("playwright");
+const { createClient } = require("@supabase/supabase-js");
+require("dotenv").config();
 
 // ─── Config ────────────────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error("Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars");
+  console.error("ERROR: Set SUPABASE_URL and SUPABASE_ANON_KEY in .env file");
   process.exit(1);
 }
 
@@ -100,7 +106,13 @@ function classifyLot(title, conditionNotes = "") {
   else if (/cas\s*80|cas80/i.test(text)) gradeTierCode = "CAS-80";
   else if (/\bmoc\b/i.test(text)) gradeTierCode = "RAW-NM";
 
-  return { era, cardback_code: cardbackCode, variant_code: variantCode, grade_tier_code: gradeTierCode, variant_grade_key: `${variantCode}-${gradeTierCode}` };
+  return {
+    era,
+    cardback_code: cardbackCode,
+    variant_code: variantCode,
+    grade_tier_code: gradeTierCode,
+    variant_grade_key: `${variantCode}-${gradeTierCode}`,
+  };
 }
 
 // ─── Helpers ───────────────────────────────────────────────────
@@ -112,7 +124,8 @@ function sleep(min, max) {
 function parseDate(dateStr) {
   // e.g. "Wednesday 26 April 2023"
   try {
-    const d = new Date(dateStr.replace(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+/i, ""));
+    const cleaned = dateStr.replace(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+/i, "");
+    const d = new Date(cleaned);
     if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
   } catch {}
   return new Date().toISOString().split("T")[0];
@@ -120,66 +133,118 @@ function parseDate(dateStr) {
 
 function parseEstimate(text) {
   // e.g. "£100 - £200" or "Estimate: £100 - £200"
-  const nums = [...text.matchAll(/£([\d,]+)/g)].map((m) => parseInt(m[1].replace(/,/g, ""), 10));
+  const nums = [...text.matchAll(/£([\d,]+)/g)].map((m) =>
+    parseInt(m[1].replace(/,/g, ""), 10)
+  );
   return { low: nums[0] ?? null, high: nums[1] ?? nums[0] ?? null };
 }
 
 // ─── Main scraper ──────────────────────────────────────────────
-export async function scrapeVectis() {
+async function scrapeVectis() {
+  console.log("Starting Vectis scraper...\n");
+  
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ userAgent: USER_AGENT });
   const page = await context.newPage();
 
   let inserted = 0;
   let skipped = 0;
+  let filtered = 0;
 
   try {
     // Page 1 to get total count
     console.log("Loading search results page 1...");
-    await page.goto(`${BASE_URL}&page=1`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}&page=1`, { waitUntil: "networkidle", timeout: 60000 });
 
     // Get total count from "Showing 96 of N lots"
-    const showingText = await page.textContent("body");
-    const totalMatch = showingText.match(/showing\s+\d+\s+of\s+([\d,]+)\s+lots/i);
+    const bodyText = await page.textContent("body");
+    const totalMatch = bodyText.match(/showing\s+\d+\s+of\s+([\d,]+)\s+lots/i);
     const totalLots = totalMatch ? parseInt(totalMatch[1].replace(/,/g, ""), 10) : 96;
     const totalPages = Math.ceil(totalLots / 96);
-    console.log(`Total: ${totalLots} lots, ${totalPages} pages`);
+    console.log(`Found ${totalLots} lots across ${totalPages} pages\n`);
 
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
       if (pageNum > 1) {
-        console.log(`\nNavigating to page ${pageNum}/${totalPages}...`);
-        await page.goto(`${BASE_URL}&page=${pageNum}`, { waitUntil: "networkidle" });
+        console.log(`\n─── Page ${pageNum}/${totalPages} ───`);
+        await page.goto(`${BASE_URL}&page=${pageNum}`, { waitUntil: "networkidle", timeout: 60000 });
       }
 
       // Extract lot cards from listing
-      const cards = await page.$$eval(".lot-card, .catalog-item, [class*='lot']", (els) => {
-        return els.map((el) => {
-          const heading = el.querySelector("h3, h4, h2");
+      const cards = await page.evaluate(() => {
+        const results = [];
+        // Try multiple selectors for lot cards
+        const cardSelectors = [
+          ".lot-card",
+          ".catalog-item",
+          "[class*='lot-item']",
+          ".archive-lot",
+          "article[class*='lot']",
+          ".search-result-item",
+        ];
+        
+        let elements = [];
+        for (const sel of cardSelectors) {
+          elements = document.querySelectorAll(sel);
+          if (elements.length > 0) break;
+        }
+        
+        // Fallback: find all links containing /lot/
+        if (elements.length === 0) {
+          const links = document.querySelectorAll('a[href*="/lot/"]');
+          links.forEach((link) => {
+            const card = link.closest("div, article, li");
+            if (card && !results.some((r) => r.url === link.href)) {
+              const heading = card.querySelector("h3, h4, h2, .title, [class*='title']");
+              const img = card.querySelector("img");
+              const lotLabel = card.textContent?.match(/lot\s+(\d+)/i);
+              results.push({
+                title: heading?.textContent?.trim() || link.textContent?.trim() || "",
+                url: link.href,
+                imageUrl: img?.src || "",
+                lotNumber: lotLabel?.[1] || "",
+              });
+            }
+          });
+          return results;
+        }
+
+        elements.forEach((el) => {
+          const heading = el.querySelector("h3, h4, h2, .title, [class*='title']");
           const link = el.querySelector('a[href*="/lot/"], a[href*="el="]');
           const img = el.querySelector("img");
           const lotLabel = el.textContent?.match(/lot\s+(\d+)/i);
-          return {
-            title: heading?.textContent?.trim() ?? "",
-            url: link?.href ?? "",
-            imageUrl: img?.src ?? "",
-            lotNumber: lotLabel?.[1] ?? "",
-          };
-        }).filter((c) => c.title && c.url);
+          
+          if (heading && link) {
+            results.push({
+              title: heading.textContent?.trim() || "",
+              url: link.href,
+              imageUrl: img?.src || "",
+              lotNumber: lotLabel?.[1] || "",
+            });
+          }
+        });
+        return results;
       });
 
-      console.log(`Page ${pageNum}: found ${cards.length} cards`);
+      console.log(`Page ${pageNum}: found ${cards.length} lot cards`);
 
       for (const card of cards) {
+        // Apply MOC title filter
         if (!shouldKeep(card.title)) {
-          skipped++;
+          filtered++;
           continue;
         }
 
         // Extract lotRef from URL
-        const urlObj = new URL(card.url, "https://www.vectis.co.uk");
-        const lotRef = urlObj.searchParams.get("el") ?? card.lotNumber ?? card.url;
+        let lotRef;
+        try {
+          const urlObj = new URL(card.url);
+          lotRef = urlObj.searchParams.get("el") || card.lotNumber || urlObj.pathname.split("/").pop();
+        } catch {
+          lotRef = card.lotNumber || card.url;
+        }
 
-        // Check for duplicate
+        // Check for duplicate in Supabase
         const { data: existing } = await supabase
           .from("lots")
           .select("id")
@@ -192,50 +257,67 @@ export async function scrapeVectis() {
           continue;
         }
 
-        // Visit individual lot page
+        // Random delay before visiting lot page
         await sleep(2000, 4000);
-        console.log(`  Visiting: ${card.title.substring(0, 60)}...`);
+        console.log(`  Visiting: ${card.title.substring(0, 55)}...`);
 
         try {
           await page.goto(card.url, { waitUntil: "networkidle", timeout: 30000 });
         } catch (e) {
-          console.warn(`  Failed to load lot page: ${e.message}`);
+          console.warn(`  ⚠ Failed to load: ${e.message}`);
           continue;
         }
 
         // Extract lot details
-        const fullTitle = await page.$eval("h2, h1", (el) => el.textContent?.trim() ?? "").catch(() => card.title);
+        const fullTitle = await page
+          .evaluate(() => {
+            const h = document.querySelector("h1, h2, .lot-title, [class*='lot-title']");
+            return h?.textContent?.trim() || "";
+          })
+          .catch(() => card.title);
 
-        const conditionNotes = await page.$$eval("p, .description, .lot-description", (els) => {
-          const texts = els.map((el) => el.textContent?.trim() ?? "");
-          const disclaimer = "We have endeavoured";
-          const joined = texts.join("\n");
-          const idx = joined.indexOf(disclaimer);
-          return idx > -1 ? joined.substring(0, idx).trim() : joined.trim();
-        }).catch(() => "");
+        const conditionNotes = await page
+          .evaluate(() => {
+            const desc = document.querySelector(".description, .lot-description, [class*='description']");
+            if (!desc) return "";
+            let text = desc.textContent?.trim() || "";
+            // Remove disclaimer text
+            const disclaimerIdx = text.indexOf("We have endeavoured");
+            if (disclaimerIdx > -1) text = text.substring(0, disclaimerIdx).trim();
+            return text;
+          })
+          .catch(() => "");
 
-        const auctionName = await page.$eval(
-          ".sale-name, .auction-title, [class*='auction'], [class*='sale']",
-          (el) => el.textContent?.trim() ?? ""
-        ).catch(() => "");
+        const auctionName = await page
+          .evaluate(() => {
+            const sel = document.querySelector(
+              ".sale-name, .auction-title, [class*='auction'], [class*='sale-info']"
+            );
+            return sel?.textContent?.trim() || "";
+          })
+          .catch(() => "");
 
         // Parse sale date from auction name
         const dateMatch = auctionName.match(/(\d{1,2}\s+\w+\s+\d{4})/);
         const saleDate = dateMatch ? parseDate(dateMatch[1]) : new Date().toISOString().split("T")[0];
 
         // Parse estimates
-        const estimateText = await page.$eval(
-          ".estimate, [class*='estimate'], [class*='price']",
-          (el) => el.textContent?.trim() ?? ""
-        ).catch(() => "");
+        const estimateText = await page
+          .evaluate(() => {
+            const est = document.querySelector(
+              ".estimate, [class*='estimate'], .price-estimate"
+            );
+            return est?.textContent?.trim() || "";
+          })
+          .catch(() => "");
         const { low: estimateLowGBP, high: estimateHighGBP } = parseEstimate(estimateText);
 
-        // Large image URL
+        // Get large image URL
         const imageUrls = card.imageUrl
-          ? [card.imageUrl.replace("/medium/", "/large/")]
+          ? [card.imageUrl.replace("/medium/", "/large/").replace("/thumb/", "/large/")]
           : [];
 
-        // Classify
+        // Auto-classify
         const classification = classifyLot(fullTitle, conditionNotes);
 
         const record = {
@@ -248,12 +330,13 @@ export async function scrapeVectis() {
           grade_tier_code: classification.grade_tier_code,
           era: classification.era,
           cardback_code: classification.cardback_code,
-          hammer_price_gbp: 0,
-          buyers_premium_gbp: 0,
-          total_paid_gbp: 0,
+          hammer_price_gbp: null,
+          buyers_premium_gbp: null,
+          total_paid_gbp: null,
           usd_to_gbp_rate: 1.0,
           image_urls: imageUrls,
           condition_notes: conditionNotes.substring(0, 500),
+          grade_subgrades: "",
           estimate_low_gbp: estimateLowGBP,
           estimate_high_gbp: estimateHighGBP,
           price_status: "ESTIMATE_ONLY",
@@ -261,20 +344,28 @@ export async function scrapeVectis() {
 
         const { error } = await supabase.from("lots").insert(record);
         if (error) {
-          console.warn(`  Insert failed: ${error.message}`);
+          console.warn(`  ✗ Insert failed: ${error.message}`);
         } else {
           inserted++;
           console.log(`  ✓ Inserted: ${classification.variant_code} | ${lotRef}`);
         }
       }
     }
+  } catch (e) {
+    console.error("Scraper error:", e);
   } finally {
     await browser.close();
   }
 
-  console.log(`\nDone. Inserted: ${inserted}, Skipped: ${skipped}`);
-  return { inserted, skipped };
+  console.log(`\n═══════════════════════════════════════`);
+  console.log(`COMPLETE`);
+  console.log(`  Inserted: ${inserted}`);
+  console.log(`  Skipped (duplicates): ${skipped}`);
+  console.log(`  Filtered (non-MOC): ${filtered}`);
+  console.log(`═══════════════════════════════════════\n`);
+  
+  return { inserted, skipped, filtered };
 }
 
-// Run if called directly
+// Run
 scrapeVectis().catch(console.error);
