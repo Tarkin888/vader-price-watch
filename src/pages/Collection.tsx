@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type CollectionItem } from "@/lib/collection-db";
 import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
+import CollectionPhotoGallery from "@/components/CollectionPhotoGallery";
 import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
@@ -29,7 +30,7 @@ const Collection = () => {
   const [editItem, setEditItem] = useState<CollectionItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState<CollectionItem | null>(null);
-  const [subTab, setSubTab] = useState<"inventory" | "analytics">("inventory");
+  const [subTab, setSubTab] = useState<"inventory" | "analytics" | "gallery">("inventory");
   const [privacyMode, setPrivacyMode] = useState(false);
 
   const load = useCallback(async () => {
@@ -193,10 +194,18 @@ const Collection = () => {
         >
           ANALYTICS
         </button>
+        <button
+          onClick={() => setSubTab("gallery")}
+          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+        >
+          PHOTO GALLERY
+        </button>
       </div>
 
       {subTab === "analytics" ? (
         <CollectionAnalytics items={items} />
+      ) : subTab === "gallery" ? (
+        <CollectionPhotoGallery items={items} onUpdated={load} />
       ) : (
         <>
           {/* Filters */}
