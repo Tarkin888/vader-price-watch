@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type CollectionItem } from "@/lib/collection-db";
 import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
-import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
 import EstimatedValueCell from "@/components/EstimatedValueCell";
