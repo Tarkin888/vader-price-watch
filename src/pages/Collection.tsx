@@ -249,11 +249,11 @@ const Collection = () => {
                   <th className="px-1.5 py-2">DESCRIPTION</th>
                   <th className="px-1.5 py-2">CATEGORY</th>
                   <th className="px-1.5 py-2">GRADING</th>
-                  <th className="px-1.5 py-2 text-right">PRICE (£)</th>
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">PRICE (£)</th>}
                   <th className="px-1.5 py-2">DATE</th>
                   <th className="px-1.5 py-2">SOURCE</th>
-                  <th className="px-1.5 py-2 text-right">EST. VALUE (£)</th>
-                  <th className="px-1.5 py-2 text-right">P&L (£)</th>
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">EST. VALUE (£)</th>}
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">P&L (£)</th>}
                   <th className="px-1.5 py-2">NOTES</th>
                   <th className="px-1.5 py-2">ACTIONS</th>
                 </tr>
