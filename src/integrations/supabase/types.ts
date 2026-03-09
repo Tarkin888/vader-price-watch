@@ -76,6 +76,8 @@ export type Database = {
           condition_notes: string
           created_at: string
           era: Database["public"]["Enums"]["lot_era"]
+          estimate_high_gbp: number | null
+          estimate_low_gbp: number | null
           grade_subgrades: string
           grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
           hammer_price_gbp: number
@@ -83,6 +85,7 @@ export type Database = {
           image_urls: string[]
           lot_ref: string
           lot_url: string
+          price_status: string
           sale_date: string
           source: Database["public"]["Enums"]["lot_source"]
           total_paid_gbp: number
@@ -98,6 +101,8 @@ export type Database = {
           condition_notes?: string
           created_at?: string
           era?: Database["public"]["Enums"]["lot_era"]
+          estimate_high_gbp?: number | null
+          estimate_low_gbp?: number | null
           grade_subgrades?: string
           grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
           hammer_price_gbp?: number
@@ -105,6 +110,7 @@ export type Database = {
           image_urls?: string[]
           lot_ref?: string
           lot_url?: string
+          price_status?: string
           sale_date: string
           source: Database["public"]["Enums"]["lot_source"]
           total_paid_gbp?: number
@@ -120,6 +126,8 @@ export type Database = {
           condition_notes?: string
           created_at?: string
           era?: Database["public"]["Enums"]["lot_era"]
+          estimate_high_gbp?: number | null
+          estimate_low_gbp?: number | null
           grade_subgrades?: string
           grade_tier_code?: Database["public"]["Enums"]["grade_tier_code"]
           hammer_price_gbp?: number
@@ -127,6 +135,7 @@ export type Database = {
           image_urls?: string[]
           lot_ref?: string
           lot_url?: string
+          price_status?: string
           sale_date?: string
           source?: Database["public"]["Enums"]["lot_source"]
           total_paid_gbp?: number

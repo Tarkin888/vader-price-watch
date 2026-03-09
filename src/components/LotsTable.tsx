@@ -223,8 +223,20 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
                 <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
-                  {fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
-                  {isUSD && <SourceBadge source={l.source} />}
+                  {(l as any).price_status === "ESTIMATE_ONLY" ? (
+                    <span className="flex items-center justify-end gap-1.5">
+                      <span className="text-[8px] tracking-widest font-bold px-1 py-0.5 rounded bg-amber-500/20 text-amber-400">ESTIMATE ONLY</span>
+                      <span className="text-amber-400">
+                        {sym}{isUSD ? toUsd(Number((l as any).estimate_low_gbp ?? 0), Number(l.usd_to_gbp_rate)).toLocaleString() : Number((l as any).estimate_low_gbp ?? 0).toLocaleString("en-GB")}
+                        –{sym}{isUSD ? toUsd(Number((l as any).estimate_high_gbp ?? 0), Number(l.usd_to_gbp_rate)).toLocaleString() : Number((l as any).estimate_high_gbp ?? 0).toLocaleString("en-GB")}
+                      </span>
+                    </span>
+                  ) : (
+                    <>
+                      {fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
+                      {isUSD && <SourceBadge source={l.source} />}
+                    </>
+                  )}
                 </td>
                 <td className="px-3 py-2 text-right whitespace-nowrap">
                   {fmtPrice(Number(l.hammer_price_gbp), Number(l.usd_to_gbp_rate))}

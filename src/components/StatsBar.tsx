@@ -18,8 +18,10 @@ const ERAS_ORDER = ["SW", "ESB", "ROTJ", "POTF"] as const;
 
 function calcStats(items: Lot[], isUSD: boolean) {
   const count = items.length;
-  if (count === 0) return { count: 0, avg: 0, max: 0 };
-  const prices = items.map((l) => {
+  if (count === 0) return { count: 0, avg: 0, max: 0, pricedCount: 0 };
+  // Exclude ESTIMATE_ONLY records from price calculations
+  const pricedItems = items.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
+  const prices = pricedItems.map((l) => {
     const gbp = Number(l.total_paid_gbp);
     if (!isUSD) return gbp;
     const rate = Number(l.usd_to_gbp_rate);
@@ -27,8 +29,9 @@ function calcStats(items: Lot[], isUSD: boolean) {
   });
   return {
     count,
-    avg: prices.reduce((s, p) => s + p, 0) / count,
-    max: Math.max(...prices),
+    pricedCount: pricedItems.length,
+    avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
+    max: prices.length > 0 ? Math.max(...prices) : 0,
   };
 }
 
