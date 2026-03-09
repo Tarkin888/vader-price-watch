@@ -1,143 +1,125 @@
-import { useState, useRef, useCallback } from "react";
-import { Plus, X, Images } from "lucide-react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Plus, X, Images, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { CollectionItem } from "@/lib/collection-db";
 
-interface Props {
-  items: CollectionItem[];
-  onUpdated: () => void;
-}
+const BUCKET = "gallery";
 
-interface GalleryImage {
+interface GalleryPhoto {
+  name: string;
   url: string;
-  itemId: string;
-  itemDesc: string;
-  index: number;
 }
 
-const THUMB_W = "w-32";   // 2× ImageDropCell's w-16
-const THUMB_H = "h-48";   // 2× ImageDropCell's h-24
+const CollectionPhotoGallery = () => {
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [zoneDragging, setZoneDragging] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<GalleryPhoto | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-const CollectionPhotoGallery = ({ items, onUpdated }: Props) => {
-  const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
-  const [lightbox, setLightbox] = useState<{ url: string; desc: string } | null>(null);
-  const [hovered, setHovered] = useState<string | null>(null); // `${itemId}-${index}`
-  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const loadPhotos = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.storage.from(BUCKET).list("", {
+        sortBy: { column: "created_at", order: "desc" },
+      });
+      if (error) throw error;
+      const mapped: GalleryPhoto[] = (data ?? [])
+        .filter((f) => f.name !== ".emptyFolderPlaceholder")
+        .map((f) => ({
+          name: f.name,
+          url: supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl,
+        }));
+      setPhotos(mapped);
+    } catch (e: any) {
+      toast.error("Failed to load gallery: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // Flatten all gallery images from all items
-  const allImages: GalleryImage[] = items.flatMap((item) =>
-    (item.image_urls ?? []).map((url, index) => ({
-      url,
-      itemId: item.id,
-      itemDesc: item.description,
-      index,
-    }))
-  );
+  useEffect(() => { loadPhotos(); }, [loadPhotos]);
 
-  const uploadImage = useCallback(async (file: File, targetItemId?: string) => {
-    if (!file.type.startsWith("image/")) {
+  const uploadFiles = useCallback(async (files: File[]) => {
+    const imageFiles = files.filter((f) => f.type.startsWith("image/"));
+    if (imageFiles.length === 0) {
       toast.error("Only image files are supported");
       return;
     }
-
-    // Use first item if no specific target (drop on zone)
-    const itemId = targetItemId ?? items[0]?.id;
-    if (!itemId) {
-      toast.error("No collection items found to attach images to");
-      return;
-    }
-
-    const item = items.find((i) => i.id === itemId);
-    if (!item) return;
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const dataUrl = reader.result as string;
-      const currentUrls = item.image_urls ?? [];
-      const { error } = await supabase
-        .from("collection")
-        .update({ image_urls: [...currentUrls, dataUrl] } as any)
-        .eq("id", itemId);
+    setUploading(true);
+    let successCount = 0;
+    for (const file of imageFiles) {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
       if (error) {
-        toast.error("Failed to save image: " + error.message);
+        toast.error(`Failed to upload ${file.name}: ${error.message}`);
       } else {
-        toast.success("Photo added to gallery");
-        onUpdated();
+        successCount++;
       }
-    };
-    reader.readAsDataURL(file);
-  }, [items, onUpdated]);
+    }
+    setUploading(false);
+    if (successCount > 0) {
+      toast.success(`${successCount} photo${successCount > 1 ? "s" : ""} added`);
+      loadPhotos();
+    }
+  }, [loadPhotos]);
 
-  const handleZoneDrop = useCallback(async (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setDraggingItemId(null);
-    const files = Array.from(e.dataTransfer.files);
-    for (const file of files) {
-      await uploadImage(file);
-    }
-  }, [uploadImage]);
+    setZoneDragging(false);
+    uploadFiles(Array.from(e.dataTransfer.files));
+  }, [uploadFiles]);
 
-  const handleThumbnailDrop = useCallback(async (e: React.DragEvent, itemId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDraggingItemId(null);
-    const files = Array.from(e.dataTransfer.files);
-    for (const file of files) {
-      await uploadImage(file, itemId);
-    }
-  }, [uploadImage]);
-
-  const handleDelete = async (e: React.MouseEvent, img: GalleryImage) => {
-    e.stopPropagation();
-    const item = items.find((i) => i.id === img.itemId);
-    if (!item) return;
-    const updated = (item.image_urls ?? []).filter((_, i) => i !== img.index);
-    const { error } = await supabase
-      .from("collection")
-      .update({ image_urls: updated } as any)
-      .eq("id", img.itemId);
-    if (error) {
-      toast.error("Failed to remove image: " + error.message);
-    } else {
-      toast.success("Photo removed");
-      onUpdated();
-    }
-  };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    for (const file of files) {
-      await uploadImage(file);
-    }
+    if (files.length) await uploadFiles(files);
     e.target.value = "";
   };
 
-  const [zoneDragging, setZoneDragging] = useState(false);
+  const handleDelete = async (e: React.MouseEvent, photo: GalleryPhoto) => {
+    e.stopPropagation();
+    const { error } = await supabase.storage.from(BUCKET).remove([photo.name]);
+    if (error) {
+      toast.error("Failed to delete photo: " + error.message);
+    } else {
+      toast.success("Photo deleted");
+      setPhotos((prev) => prev.filter((p) => p.name !== photo.name));
+      if (lightbox?.name === photo.name) setLightbox(null);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col p-6 gap-6">
       {/* Drop zone */}
       <div
-        ref={dropZoneRef}
         onDragOver={(e) => { e.preventDefault(); setZoneDragging(true); }}
         onDragLeave={() => setZoneDragging(false)}
-        onDrop={handleZoneDrop}
-        onClick={() => fileInputRef.current?.click()}
+        onDrop={handleDrop}
+        onClick={() => !uploading && fileInputRef.current?.click()}
         className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg py-8 cursor-pointer transition-colors ${
           zoneDragging
             ? "border-primary bg-primary/10"
             : "border-border/50 hover:border-primary/50 hover:bg-secondary/30"
         }`}
       >
-        <Images className="w-6 h-6 text-muted-foreground" />
-        <p className="text-[11px] tracking-widest text-muted-foreground">
-          DROP PHOTOS HERE OR CLICK TO BROWSE · UNLIMITED
-        </p>
-        <p className="text-[10px] text-muted-foreground/60 tracking-wider">
-          IMAGES ARE ATTACHED TO THE FIRST COLLECTION ITEM IF NOT DROPPED ON A SPECIFIC ONE
-        </p>
+        {uploading ? (
+          <>
+            <Loader2 className="w-6 h-6 text-primary animate-spin" />
+            <p className="text-[11px] tracking-widest text-muted-foreground">UPLOADING...</p>
+          </>
+        ) : (
+          <>
+            <Images className="w-6 h-6 text-muted-foreground" />
+            <p className="text-[11px] tracking-widest text-muted-foreground">
+              DROP PHOTOS HERE OR CLICK TO BROWSE · MULTIPLE FILES SUPPORTED
+            </p>
+          </>
+        )}
         <input
           ref={fileInputRef}
           type="file"
@@ -149,90 +131,56 @@ const CollectionPhotoGallery = ({ items, onUpdated }: Props) => {
       </div>
 
       {/* Gallery grid */}
-      {allImages.length > 0 ? (
-        <div className="flex flex-wrap gap-3">
-          {allImages.map((img) => {
-            const key = `${img.itemId}-${img.index}`;
-            return (
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
+        </div>
+      ) : photos.length > 0 ? (
+        <>
+          <div className="flex flex-wrap gap-3">
+            {photos.map((photo) => (
               <div
-                key={key}
-                className={`relative ${THUMB_W} ${THUMB_H} border rounded-sm overflow-hidden cursor-pointer flex-shrink-0 transition-colors ${
-                  draggingItemId === img.itemId
-                    ? "border-primary"
-                    : "border-border hover:border-primary/50"
-                }`}
-                onDragOver={(e) => { e.preventDefault(); setDraggingItemId(img.itemId); }}
-                onDragLeave={() => setDraggingItemId(null)}
-                onDrop={(e) => handleThumbnailDrop(e, img.itemId)}
-                onMouseEnter={() => setHovered(key)}
+                key={photo.name}
+                className="relative w-32 h-48 border border-border rounded-sm overflow-hidden cursor-pointer flex-shrink-0 transition-colors hover:border-primary/50"
+                onMouseEnter={() => setHovered(photo.name)}
                 onMouseLeave={() => setHovered(null)}
-                onClick={() => setLightbox({ url: img.url, desc: img.itemDesc })}
-                title={img.itemDesc}
+                onClick={() => setLightbox(photo)}
               >
                 <img
-                  src={img.url}
-                  alt={img.itemDesc}
+                  src={photo.url}
+                  alt=""
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
-                {/* Item label */}
-                <div className="absolute bottom-0 inset-x-0 bg-background/70 px-1 py-0.5">
-                  <span className="text-[8px] tracking-wider text-foreground truncate block">{img.itemDesc}</span>
-                </div>
-                {/* Delete on hover */}
-                {hovered === key && (
+                {hovered === photo.name && (
                   <button
-                    onClick={(e) => handleDelete(e, img)}
-                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-md transition-opacity"
+                    onClick={(e) => handleDelete(e, photo)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-md"
                   >
                     <X className="w-3 h-3" />
                   </button>
                 )}
               </div>
-            );
-          })}
+            ))}
 
-          {/* Per-item add slots: show one "add" cell per item */}
-          {items.map((item) => (
+            {/* Inline add button */}
             <div
-              key={`add-${item.id}`}
-              className={`relative ${THUMB_W} ${THUMB_H} border border-dashed border-border/50 rounded-sm overflow-hidden cursor-pointer flex items-center justify-center flex-shrink-0 transition-colors hover:border-primary/50 hover:bg-secondary/30`}
-              onDragOver={(e) => { e.preventDefault(); setDraggingItemId(item.id); }}
-              onDragLeave={() => setDraggingItemId(null)}
-              onDrop={(e) => handleThumbnailDrop(e, item.id)}
-              onClick={() => {
-                const inp = document.createElement("input");
-                inp.type = "file";
-                inp.accept = "image/*";
-                inp.multiple = true;
-                inp.onchange = async () => {
-                  const files = Array.from(inp.files ?? []);
-                  for (const file of files) await uploadImage(file, item.id);
-                };
-                inp.click();
-              }}
-              title={`Add photo to ${item.description}`}
+              className="relative w-32 h-48 border border-dashed border-border/50 rounded-sm overflow-hidden cursor-pointer flex items-center justify-center flex-shrink-0 hover:border-primary/50 hover:bg-secondary/30 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
             >
-              <div className="flex flex-col items-center gap-1">
-                <Plus className="w-4 h-4 text-muted-foreground" />
-                <span className="text-[8px] tracking-wider text-muted-foreground text-center px-1 leading-tight">
-                  {item.item_id}
-                </span>
-              </div>
+              <Plus className="w-5 h-5 text-muted-foreground" />
             </div>
-          ))}
-        </div>
+          </div>
+
+          <p className="text-[10px] tracking-widest text-muted-foreground">
+            {photos.length} PHOTO{photos.length !== 1 ? "S" : ""}
+          </p>
+        </>
       ) : (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
           <Images className="w-10 h-10 opacity-30" />
           <p className="text-xs tracking-widest">NO PHOTOS YET — DROP IMAGES ABOVE TO GET STARTED</p>
         </div>
-      )}
-
-      {/* Count */}
-      {allImages.length > 0 && (
-        <p className="text-[10px] tracking-widest text-muted-foreground">
-          {allImages.length} PHOTO{allImages.length !== 1 ? "S" : ""} ACROSS {items.length} ITEM{items.length !== 1 ? "S" : ""}
-        </p>
       )}
 
       {/* Lightbox */}
@@ -247,15 +195,12 @@ const CollectionPhotoGallery = ({ items, onUpdated }: Props) => {
           >
             <X className="w-5 h-5" />
           </button>
-          <div className="flex flex-col items-center gap-3">
-            <img
-              src={lightbox.url}
-              alt={lightbox.desc}
-              className="max-w-[90vw] max-h-[85vh] object-contain rounded shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <span className="text-xs tracking-wider text-white/70">{lightbox.desc}</span>
-          </div>
+          <img
+            src={lightbox.url}
+            alt=""
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
