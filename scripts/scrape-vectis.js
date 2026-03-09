@@ -167,7 +167,8 @@ async function scrapeVectis() {
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
       if (pageNum > 1) {
         console.log(`\n─── Page ${pageNum}/${totalPages} ───`);
-        await page.goto(`${BASE_URL}&page=${pageNum}`, { waitUntil: "networkidle", timeout: 60000 });
+        await page.goto(`${BASE_URL}&page=${pageNum}`, { waitUntil: "domcontentloaded", timeout: 90000 });
+        await page.waitForTimeout(3000);
       }
 
       // Extract lot cards from listing
