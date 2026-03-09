@@ -283,15 +283,19 @@ const Collection = () => {
                       <td className="px-1.5 py-2 text-primary font-bold max-w-[200px] truncate align-middle" title={item.description}>{item.description}</td>
                       <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.category}</td>
                       <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.grading}</td>
-                      <td className="px-1.5 py-2 text-right align-middle">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>
-                      <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.purchase_date}</td>
-                      <td className="px-1.5 py-2 align-middle">{item.purchase_source}</td>
-                      <td className="px-1.5 py-2 text-right align-middle">
-                        <EstimatedValueCell item={item} onUpdated={load} />
-                      </td>
-                      <td className={`px-1.5 py-2 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
-                        {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
-                      </td>
+                      {!privacyMode && <td className="px-1.5 py-2 text-right align-middle text-foreground">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>}
+                      <td className="px-1.5 py-2 whitespace-nowrap align-middle text-foreground">{item.purchase_date}</td>
+                      <td className="px-1.5 py-2 align-middle text-foreground">{item.purchase_source}</td>
+                      {!privacyMode && (
+                        <td className="px-1.5 py-2 text-right align-middle">
+                          <EstimatedValueCell item={item} onUpdated={load} />
+                        </td>
+                      )}
+                      {!privacyMode && (
+                        <td className={`px-1.5 py-2 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
+                          {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
+                        </td>
+                      )}
                       <td className="px-1.5 py-2 align-middle max-w-[120px] truncate text-muted-foreground" title={item.notes || ""}>
                         {item.notes || <span className="text-muted-foreground/50">—</span>}
                       </td>
