@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type CollectionItem } from "@/lib/collection-db";
 import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
-import { Pencil, Trash2, Plus, Search, ArrowRight } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
 import EstimatedValueCell from "@/components/EstimatedValueCell";
@@ -30,6 +30,7 @@ const Collection = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState<CollectionItem | null>(null);
   const [subTab, setSubTab] = useState<"inventory" | "analytics">("inventory");
+  const [privacyMode, setPrivacyMode] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -226,6 +227,15 @@ const Collection = () => {
                 {GRADINGS.map((g) => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
+            <Button
+              variant={privacyMode ? "default" : "outline"}
+              size="sm"
+              className="text-[10px] tracking-wider h-8"
+              onClick={() => setPrivacyMode(!privacyMode)}
+            >
+              {privacyMode ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
+              PRIVACY {privacyMode ? "ON" : "OFF"}
+            </Button>
           </div>
 
           {/* Table */}
@@ -239,11 +249,11 @@ const Collection = () => {
                   <th className="px-1.5 py-2">DESCRIPTION</th>
                   <th className="px-1.5 py-2">CATEGORY</th>
                   <th className="px-1.5 py-2">GRADING</th>
-                  <th className="px-1.5 py-2 text-right">PRICE (£)</th>
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">PRICE (£)</th>}
                   <th className="px-1.5 py-2">DATE</th>
                   <th className="px-1.5 py-2">SOURCE</th>
-                  <th className="px-1.5 py-2 text-right">EST. VALUE (£)</th>
-                  <th className="px-1.5 py-2 text-right">P&L (£)</th>
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">EST. VALUE (£)</th>}
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">P&L (£)</th>}
                   <th className="px-1.5 py-2">NOTES</th>
                   <th className="px-1.5 py-2">ACTIONS</th>
                 </tr>
@@ -273,15 +283,19 @@ const Collection = () => {
                       <td className="px-1.5 py-2 text-primary font-bold max-w-[200px] truncate align-middle" title={item.description}>{item.description}</td>
                       <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.category}</td>
                       <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.grading}</td>
-                      <td className="px-1.5 py-2 text-right align-middle">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>
-                      <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.purchase_date}</td>
-                      <td className="px-1.5 py-2 align-middle">{item.purchase_source}</td>
-                      <td className="px-1.5 py-2 text-right align-middle">
-                        <EstimatedValueCell item={item} onUpdated={load} />
-                      </td>
-                      <td className={`px-1.5 py-2 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
-                        {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
-                      </td>
+                      {!privacyMode && <td className="px-1.5 py-2 text-right align-middle text-foreground">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>}
+                      <td className="px-1.5 py-2 whitespace-nowrap align-middle text-foreground">{item.purchase_date}</td>
+                      <td className="px-1.5 py-2 align-middle text-foreground">{item.purchase_source}</td>
+                      {!privacyMode && (
+                        <td className="px-1.5 py-2 text-right align-middle">
+                          <EstimatedValueCell item={item} onUpdated={load} />
+                        </td>
+                      )}
+                      {!privacyMode && (
+                        <td className={`px-1.5 py-2 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
+                          {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
+                        </td>
+                      )}
                       <td className="px-1.5 py-2 align-middle max-w-[120px] truncate text-muted-foreground" title={item.notes || ""}>
                         {item.notes || <span className="text-muted-foreground/50">—</span>}
                       </td>
