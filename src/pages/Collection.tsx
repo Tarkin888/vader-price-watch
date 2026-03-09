@@ -205,7 +205,7 @@ const Collection = () => {
       {subTab === "analytics" ? (
         <CollectionAnalytics items={items} />
       ) : subTab === "gallery" ? (
-        <CollectionPhotoGallery items={items} onUpdated={load} />
+        <CollectionPhotoGallery />
       ) : (
         <>
           {/* Filters */}
