@@ -154,7 +154,8 @@ async function scrapeVectis() {
   try {
     // Page 1 to get total count
     console.log("Loading search results page 1...");
-    await page.goto(`${BASE_URL}&page=1`, { waitUntil: "networkidle", timeout: 60000 });
+    await page.goto(`${BASE_URL}&page=1`, { waitUntil: "domcontentloaded", timeout: 90000 });
+    await page.waitForTimeout(3000);
 
     // Get total count from "Showing 96 of N lots"
     const bodyText = await page.textContent("body");
