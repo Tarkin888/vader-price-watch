@@ -232,14 +232,8 @@ async function scrapeVectis() {
           continue;
         }
 
-        // Extract lotRef from URL
-        let lotRef;
-        try {
-          const urlObj = new URL(card.url);
-          lotRef = urlObj.searchParams.get("el") || card.lotNumber || urlObj.pathname.split("/").pop();
-        } catch {
-          lotRef = card.lotNumber || card.url;
-        }
+        // Use pre-extracted lotRef from card
+        const lotRef = card.lotRef;
 
         // Check for duplicate in Supabase
         const { data: existing } = await supabase
