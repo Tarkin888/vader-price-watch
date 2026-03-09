@@ -154,7 +154,8 @@ async function scrapeVectis() {
   try {
     // Page 1 to get total count
     console.log("Loading search results page 1...");
-    await page.goto(`${BASE_URL}&page=1`, { waitUntil: "networkidle", timeout: 60000 });
+    await page.goto(`${BASE_URL}&page=1`, { waitUntil: "domcontentloaded", timeout: 90000 });
+    await page.waitForTimeout(3000);
 
     // Get total count from "Showing 96 of N lots"
     const bodyText = await page.textContent("body");
@@ -166,7 +167,8 @@ async function scrapeVectis() {
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
       if (pageNum > 1) {
         console.log(`\n─── Page ${pageNum}/${totalPages} ───`);
-        await page.goto(`${BASE_URL}&page=${pageNum}`, { waitUntil: "networkidle", timeout: 60000 });
+        await page.goto(`${BASE_URL}&page=${pageNum}`, { waitUntil: "domcontentloaded", timeout: 90000 });
+        await page.waitForTimeout(3000);
       }
 
       // Extract lot cards from listing
@@ -253,7 +255,8 @@ async function scrapeVectis() {
         console.log(`  Visiting: ${card.title.substring(0, 55)}...`);
 
         try {
-          await page.goto(card.url, { waitUntil: "networkidle", timeout: 30000 });
+          await page.goto(card.url, { waitUntil: "domcontentloaded", timeout: 30000 });
+          await page.waitForTimeout(3000);
         } catch (e) {
           console.warn(`  ⚠ Failed to load: ${e.message}`);
           continue;
