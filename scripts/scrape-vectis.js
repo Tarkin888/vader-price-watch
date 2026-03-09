@@ -255,7 +255,8 @@ async function scrapeVectis() {
         console.log(`  Visiting: ${card.title.substring(0, 55)}...`);
 
         try {
-          await page.goto(card.url, { waitUntil: "networkidle", timeout: 30000 });
+          await page.goto(card.url, { waitUntil: "domcontentloaded", timeout: 30000 });
+          await page.waitForTimeout(3000);
         } catch (e) {
           console.warn(`  ⚠ Failed to load: ${e.message}`);
           continue;
