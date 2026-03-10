@@ -1,9 +1,12 @@
-/**
- * Auto-classification for Darth Vader cardback lots.
- * Applied on scrape/import to derive era, cardbackCode, variantCode, gradeTierCode, variantGradeKey.
- */
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-export interface ClassifiedFields {
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+interface ClassifiedFields {
   era: string;
   cardback_code: string;
   variant_code: string;
@@ -11,32 +14,15 @@ export interface ClassifiedFields {
   variant_grade_key: string;
 }
 
-/** Derive era and cardback_code directly from a variant_code string */
-export function deriveFromVariantCode(variantCode: string): { era: string; cardback_code: string } {
-  const vc = variantCode.toUpperCase();
-  if (vc.startsWith("POTF-")) return { era: "POTF", cardback_code: vc.replace(/-DT$/, "") };
-  if (vc.startsWith("ROTJ-")) return { era: "ROTJ", cardback_code: vc.replace(/-VP$/, "").replace(/-DT$/, "") };
-  if (vc.startsWith("ESB-")) return { era: "ESB", cardback_code: vc.replace(/-DT$/, "") };
-  if (vc.startsWith("SW-")) return { era: "SW", cardback_code: vc.replace(/-DT$/, "") };
-  if (/^12[ABC]/.test(vc)) return { era: "SW", cardback_code: `SW-${vc.replace(/-DT$/, "")}` };
-  if (vc === "CAN") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
-  if (vc === "PAL") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
-  if (vc === "MEX") return { era: "ROTJ", cardback_code: "ROTJ-65" };
-  if (vc === "VP") return { era: "ROTJ", cardback_code: "ROTJ-65" };
-  return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
-}
-
-export function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
+function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
   const text = `${title} ${conditionNotes ?? ""}`.toLowerCase();
 
-  // --- ERA ---
   let era = "UNKNOWN";
   if (/power\s*of\s*the\s*force|potf/i.test(text)) era = "POTF";
   else if (/return\s*of\s*the\s*jedi|rotj/i.test(text)) era = "ROTJ";
   else if (/empire\s*strikes\s*back|esb/i.test(text)) era = "ESB";
   else if (/star\s*wars|\bsw\b/i.test(text)) era = "SW";
 
-  // --- CARDBACK CODE ---
   let cardbackCode = "UNKNOWN";
   if (/92[\s-]?back|potf/i.test(text)) cardbackCode = "POTF-92";
   else if (/79[\s-]?a?\s*-?back|79a\b|\brotj[\s-]?79\b/i.test(text)) cardbackCode = "ROTJ-79";
@@ -57,44 +43,99 @@ export function classifyLot(title: string, conditionNotes?: string): ClassifiedF
   else if (/12[\s-]?c[\s-]?back|12-?back\s*c|\b12c\b/i.test(text)) cardbackCode = "SW-12C";
   else if (/12[\s-]?back/i.test(text)) cardbackCode = "SW-12";
 
-  // --- VARIANT SUB-CODE ---
   let variantCode = cardbackCode;
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
-  if (isDT) {
-    variantCode = cardbackCode + "-DT";
-  }
+  if (isDT) variantCode = cardbackCode + "-DT";
   if (/canadian|bilingual/i.test(text)) variantCode = "CAN";
   else if (/palitoy/i.test(text)) variantCode = "PAL";
   else if (/mexico|mexican|lili\s*ledy/i.test(text)) variantCode = "MEX";
   else if (/vader\s*pointing|alternate\s*photo/i.test(text)) variantCode = "VP";
 
-  // --- GRADE TIER ---
   let gradeTierCode = "UNKNOWN";
-  // AFA patterns (including "AFA Graded U90", "AFA U85", "AFA Graded 85", "AFA 90")
   if (/afa\s*(?:graded\s*)?u?9[0-9]|afa\s*9[0-9]|afa\s*(?:graded\s*)?u90/i.test(text)) gradeTierCode = "AFA-90+";
   else if (/afa\s*(?:graded\s*)?u?85|afa\s*85/i.test(text)) gradeTierCode = "AFA-85";
   else if (/afa\s*(?:graded\s*)?u?80|afa\s*80/i.test(text)) gradeTierCode = "AFA-80";
   else if (/afa\s*(?:graded\s*)?75|afa\s*75/i.test(text)) gradeTierCode = "AFA-75";
   else if (/afa\s*(?:graded\s*)?70|afa\s*70/i.test(text)) gradeTierCode = "AFA-70";
-  // UKG patterns (including "UKG Graded 90", "UKG 85%", "UKG Graded 9")
   else if (/ukg\s*(?:graded\s*)?9[0-9]?%?/i.test(text)) gradeTierCode = "UKG-90";
   else if (/ukg\s*(?:graded\s*)?85%?/i.test(text)) gradeTierCode = "UKG-85";
   else if (/ukg\s*(?:graded\s*)?80%?/i.test(text)) gradeTierCode = "UKG-80";
   else if (/ukg\s*(?:graded\s*)?70%?/i.test(text)) gradeTierCode = "UKG-70";
-  // CAS
   else if (/cas\s*80|cas80/i.test(text)) gradeTierCode = "CAS-80";
-  // RAW MOC
   else if (/\bmoc\b/i.test(text)) gradeTierCode = "RAW-NM";
-  // Generic "Graded" with no identifiable score
   else if (/\bgraded\b/i.test(text)) gradeTierCode = "GRADED-UNKNOWN";
 
   const variantGradeKey = `${variantCode}-${gradeTierCode}`;
 
-  return {
-    era,
-    cardback_code: cardbackCode,
-    variant_code: variantCode,
-    grade_tier_code: gradeTierCode,
-    variant_grade_key: variantGradeKey,
-  };
+  return { era, cardback_code: cardbackCode, variant_code: variantCode, grade_tier_code: gradeTierCode, variant_grade_key: variantGradeKey };
 }
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // Fetch Vectis lots with UNKNOWN variant or grade
+    const { data: lots, error: fetchErr } = await supabase
+      .from("lots")
+      .select("id, condition_notes, variant_code, grade_tier_code, era, cardback_code")
+      .eq("source", "Vectis")
+      .or("variant_code.eq.UNKNOWN,grade_tier_code.eq.UNKNOWN");
+
+    if (fetchErr) throw fetchErr;
+    if (!lots || lots.length === 0) {
+      return new Response(JSON.stringify({ updated: 0, total_candidates: 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    let updatedCount = 0;
+
+    for (const lot of lots) {
+      const classified = classifyLot(lot.condition_notes || "");
+      const updates: Record<string, string> = {};
+
+      if (lot.variant_code === "UNKNOWN" && classified.variant_code !== "UNKNOWN") {
+        updates.variant_code = classified.variant_code;
+      }
+      if (lot.grade_tier_code === "UNKNOWN" && classified.grade_tier_code !== "UNKNOWN") {
+        updates.grade_tier_code = classified.grade_tier_code;
+      }
+      if (lot.era === "UNKNOWN" && classified.era !== "UNKNOWN") {
+        updates.era = classified.era;
+      }
+      if (lot.cardback_code === "UNKNOWN" && classified.cardback_code !== "UNKNOWN") {
+        updates.cardback_code = classified.cardback_code;
+      }
+      // Always update variant_grade_key if we changed anything
+      if (Object.keys(updates).length > 0) {
+        const finalVariant = updates.variant_code || lot.variant_code;
+        const finalGrade = updates.grade_tier_code || lot.grade_tier_code;
+        updates.variant_grade_key = `${finalVariant}-${finalGrade}`;
+
+        const { error: updateErr } = await supabase
+          .from("lots")
+          .update(updates)
+          .eq("id", lot.id);
+
+        if (!updateErr) updatedCount++;
+      }
+    }
+
+    return new Response(
+      JSON.stringify({ updated: updatedCount, total_candidates: lots.length }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

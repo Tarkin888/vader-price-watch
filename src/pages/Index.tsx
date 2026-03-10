@@ -17,6 +17,9 @@ import NotableSalesBanner from "@/components/NotableSalesBanner";
 import ComparableSalesPanel from "@/components/ComparableSalesPanel";
 import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
 import { useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { RefreshCw } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -93,6 +96,22 @@ const Index = () => {
     setCopiedRows((prev) => [...prev, lot]);
   };
 
+  const [reclassifying, setReclassifying] = useState(false);
+  const handleReclassify = async () => {
+    setReclassifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("reclassify-unknowns");
+      if (error) throw error;
+      const result = data as { updated: number; total_candidates: number };
+      toast.success(`Re-classified ${result.updated} of ${result.total_candidates} unknown lot(s)`);
+      if (result.updated > 0) loadLots();
+    } catch (e: any) {
+      toast.error("Re-classify failed: " + (e.message || "Unknown error"));
+    } finally {
+      setReclassifying(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -163,7 +182,15 @@ const Index = () => {
             SESSION LOG {copiedRows.length > 0 && `(${copiedRows.length})`}
           </button>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={handleReclassify}
+            disabled={reclassifying}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary tracking-wider transition-colors px-3 py-2 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${reclassifying ? "animate-spin" : ""}`} />
+            {reclassifying ? "RE-CLASSIFYING..." : "RE-CLASSIFY UNKNOWNS"}
+          </button>
           <AddLotModal onAdded={loadLots} />
           <ImportCSV onImported={loadLots} />
           <ExportCSV lots={filtered} />
