@@ -2,10 +2,11 @@ import { useState, useMemo } from "react";
 import type { Lot } from "@/lib/db";
 import type { Currency } from "@/components/FilterBar";
 import { supabase } from "@/integrations/supabase/client";
-import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown, CheckSquare, Square, XSquare } from "lucide-react";
 import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";
 import popCounts, { type PopEntry } from "@/data/popCounts";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+// ... keep existing code (types, helpers, badges — lines 20-105)
 type SortKey = "sale_date" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
 type SortDir = "asc" | "desc";
 
@@ -71,7 +73,6 @@ function PopBadge({ variantCode }: { variantCode: string }) {
       </span>
     );
   }
-  // APPROX
   return (
     <span
       className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
@@ -109,6 +110,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("sale_date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
   const sorted = useMemo(() => {
     const copy = [...lots];
@@ -132,6 +136,38 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
       setSortKey(key);
       setSortDir("desc");
     }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === sorted.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(sorted.map((l) => l.id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setBulkDeleting(true);
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from("lots").delete().in("id", ids);
+    if (error) {
+      toast.error("Bulk delete failed: " + error.message);
+    } else {
+      toast.success(`Deleted ${ids.length} lot(s)`);
+      setSelectedIds(new Set());
+      onChanged();
+    }
+    setBulkDeleting(false);
+    setShowBulkConfirm(false);
   };
 
   const copyRow = (l: Lot) => {
@@ -188,12 +224,42 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
     return `£${Number(gbp).toLocaleString("en-GB", { minimumFractionDigits: 2 })}`;
   };
 
+  const allSelected = selectedIds.size === sorted.length && sorted.length > 0;
+  const someSelected = selectedIds.size > 0;
+
   return (
     <>
+      {someSelected && (
+        <div className="px-6 py-2 border-b border-border bg-secondary/30 flex items-center gap-3">
+          <span className="text-[10px] tracking-widest text-primary font-bold">
+            {selectedIds.size} SELECTED
+          </span>
+          <button
+            onClick={() => setShowBulkConfirm(true)}
+            className="text-[10px] tracking-widest px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors font-bold"
+          >
+            DELETE SELECTED
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          >
+            CLEAR
+          </button>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
+              <th className="px-3 py-2 w-8">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={toggleSelectAll}
+                  className="border-muted-foreground"
+                />
+              </th>
               {COLS.map((col) => (
                 <th
                   key={col.key}
@@ -218,8 +284,15 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
               <tr
                 key={l.id}
                 onClick={() => onSelectLot?.(l)}
-                className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""}`}
+                className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""} ${selectedIds.has(l.id) ? "bg-secondary/40" : ""}`}
               >
+                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selectedIds.has(l.id)}
+                    onCheckedChange={() => toggleSelect(l.id)}
+                    className="border-muted-foreground"
+                  />
+                </td>
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
                 <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
@@ -313,6 +386,23 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
             <AlertDialogCancel className="text-xs tracking-wider">CANCEL</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">
               DELETE
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBulkConfirm} onOpenChange={(o) => { if (!o) setShowBulkConfirm(false); }}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-primary tracking-wider text-sm">CONFIRM BULK DELETION</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
+              Delete <span className="text-primary font-bold">{selectedIds.size}</span> selected lot(s)? This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="text-xs tracking-wider">CANCEL</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} disabled={bulkDeleting} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">
+              {bulkDeleting ? "DELETING..." : `DELETE ${selectedIds.size}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
