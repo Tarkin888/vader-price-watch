@@ -271,13 +271,13 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                 </td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-1.5">
-                    <button onClick={() => copyRow(l)} className="text-muted-foreground hover:text-primary transition-colors" title="Copy row">
+                    <button onClick={(e) => { e.stopPropagation(); copyRow(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Copy row">
                       <Copy className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => setEditLot(l)} className="text-muted-foreground hover:text-primary transition-colors" title="Edit lot">
+                    <button onClick={(e) => { e.stopPropagation(); setEditLot(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Edit lot">
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => setDeleteLot(l)} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete lot">
+                    <button onClick={(e) => { e.stopPropagation(); setDeleteLot(l); }} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete lot">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
