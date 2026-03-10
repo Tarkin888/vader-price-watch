@@ -1,0 +1,4 @@
+
+ALTER TYPE public.grade_tier_code ADD VALUE IF NOT EXISTS 'UKG-90';
+ALTER TYPE public.grade_tier_code ADD VALUE IF NOT EXISTS 'UKG-70';
+ALTER TYPE public.grade_tier_code ADD VALUE IF NOT EXISTS 'GRADED-UNKNOWN';
