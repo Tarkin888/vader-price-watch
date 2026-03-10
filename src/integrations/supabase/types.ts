@@ -70,7 +70,7 @@ export type Database = {
       }
       lots: {
         Row: {
-          buyers_premium_gbp: number
+          buyers_premium_gbp: number | null
           capture_date: string
           cardback_code: string
           condition_notes: string
@@ -80,7 +80,7 @@ export type Database = {
           estimate_low_gbp: number | null
           grade_subgrades: string
           grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
-          hammer_price_gbp: number
+          hammer_price_gbp: number | null
           id: string
           image_urls: string[]
           lot_ref: string
@@ -88,14 +88,14 @@ export type Database = {
           price_status: string
           sale_date: string
           source: Database["public"]["Enums"]["lot_source"]
-          total_paid_gbp: number
+          total_paid_gbp: number | null
           updated_at: string
           usd_to_gbp_rate: number
           variant_code: Database["public"]["Enums"]["variant_code"]
           variant_grade_key: string
         }
         Insert: {
-          buyers_premium_gbp?: number
+          buyers_premium_gbp?: number | null
           capture_date: string
           cardback_code?: string
           condition_notes?: string
@@ -105,7 +105,7 @@ export type Database = {
           estimate_low_gbp?: number | null
           grade_subgrades?: string
           grade_tier_code: Database["public"]["Enums"]["grade_tier_code"]
-          hammer_price_gbp?: number
+          hammer_price_gbp?: number | null
           id?: string
           image_urls?: string[]
           lot_ref?: string
@@ -113,14 +113,14 @@ export type Database = {
           price_status?: string
           sale_date: string
           source: Database["public"]["Enums"]["lot_source"]
-          total_paid_gbp?: number
+          total_paid_gbp?: number | null
           updated_at?: string
           usd_to_gbp_rate?: number
           variant_code: Database["public"]["Enums"]["variant_code"]
           variant_grade_key?: string
         }
         Update: {
-          buyers_premium_gbp?: number
+          buyers_premium_gbp?: number | null
           capture_date?: string
           cardback_code?: string
           condition_notes?: string
@@ -130,7 +130,7 @@ export type Database = {
           estimate_low_gbp?: number | null
           grade_subgrades?: string
           grade_tier_code?: Database["public"]["Enums"]["grade_tier_code"]
-          hammer_price_gbp?: number
+          hammer_price_gbp?: number | null
           id?: string
           image_urls?: string[]
           lot_ref?: string
@@ -138,7 +138,7 @@ export type Database = {
           price_status?: string
           sale_date?: string
           source?: Database["public"]["Enums"]["lot_source"]
-          total_paid_gbp?: number
+          total_paid_gbp?: number | null
           updated_at?: string
           usd_to_gbp_rate?: number
           variant_code?: Database["public"]["Enums"]["variant_code"]

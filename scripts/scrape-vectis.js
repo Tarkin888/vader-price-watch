@@ -40,20 +40,28 @@ const USER_AGENT =
 // ─── Title filter ──────────────────────────────────────────────
 const KEEP_KEYWORDS = [
   "carded", "on card", "moc", "afa", "ukg", "cas",
-  "12 back", "20 back", "21 back",
+  "12 back", "12-back", "20 back", "21 back",
   "31 back", "32 back", "41 back", "45 back", "47 back", "48 back",
   "65 back", "77 back", "79 back", "92 back",
   "potf", "power of the force",
 ];
 
 const DISCARD_KEYWORDS = [
-  '12"', "12 inch", "tie fighter", "collector case", "carry case",
-  "playset", "loose", "inflatable", "transfer sheet",
+  '12"', "12 inch", "tie fighter", "tie-fighter", "collector case",
+  "carry case", "playset", "loose", "inflatable", "transfer sheet",
+  "job lot", "quantity of", "collection of", "group of",
+  "power of the force 2", "potf2", "potf ii",
+  "black series", "vintage collection", "episode i", "episode ii",
+  "episode iii", "modern",
 ];
 
 function shouldKeep(title) {
   const t = title.toLowerCase();
+  // Must contain "Darth Vader"
+  if (!t.includes("darth vader")) return false;
+  // Discard if any exclusion keyword matches
   if (DISCARD_KEYWORDS.some((kw) => t.includes(kw))) return false;
+  // Must contain at least one MOC/cardback keyword
   return KEEP_KEYWORDS.some((kw) => t.includes(kw));
 }
 
