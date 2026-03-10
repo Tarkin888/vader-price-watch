@@ -287,13 +287,39 @@ async function scrapeVectis() {
 
         const conditionNotes = await page
           .evaluate(() => {
-            const desc = document.querySelector(".description, .lot-description, [class*='description']");
-            if (!desc) return "";
-            let text = desc.textContent?.trim() || "";
-            // Remove disclaimer text
-            const disclaimerIdx = text.indexOf("We have endeavoured");
-            if (disclaimerIdx > -1) text = text.substring(0, disclaimerIdx).trim();
-            return text;
+            const DISCLAIMERS = ["We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot"];
+            function stripDisclaimer(t) {
+              for (const d of DISCLAIMERS) {
+                const idx = t.indexOf(d);
+                if (idx > -1) t = t.substring(0, idx).trim();
+              }
+              return t;
+            }
+
+            // Try selectors in priority order
+            const selectors = [
+              ".lot-description p:first-child",
+              ".full-description",
+              "[class*='description'] p:first-child",
+              ".lot-details p:first-child",
+            ];
+            for (const sel of selectors) {
+              const el = document.querySelector(sel);
+              if (el) {
+                const text = stripDisclaimer(el.textContent?.trim() || "");
+                if (text.length > 0) return text;
+              }
+            }
+
+            // Fallback: first substantial <p>
+            const allP = Array.from(document.querySelectorAll("p"));
+            for (const p of allP) {
+              const text = p.textContent?.trim() || "";
+              if (text.length > 30 && !DISCLAIMERS.some(d => text.includes(d))) {
+                return stripDisclaimer(text);
+              }
+            }
+            return "";
           })
           .catch(() => "");
 
