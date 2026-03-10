@@ -32,7 +32,7 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const BASE_URL =
-  "https://www.vectis.co.uk/catalog?query=darth+vader+kenner+carded&timeframe=archived&per_page=96";
+  "https://www.vectis.co.uk/catalog?query=darth+vader+kenner&timeframe=archived&per_page=96";
 
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
