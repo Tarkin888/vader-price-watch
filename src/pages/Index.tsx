@@ -96,6 +96,22 @@ const Index = () => {
     setCopiedRows((prev) => [...prev, lot]);
   };
 
+  const [reclassifying, setReclassifying] = useState(false);
+  const handleReclassify = async () => {
+    setReclassifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("reclassify-unknowns");
+      if (error) throw error;
+      const result = data as { updated: number; total_candidates: number };
+      toast.success(`Re-classified ${result.updated} of ${result.total_candidates} unknown lot(s)`);
+      if (result.updated > 0) loadLots();
+    } catch (e: any) {
+      toast.error("Re-classify failed: " + (e.message || "Unknown error"));
+    } finally {
+      setReclassifying(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
