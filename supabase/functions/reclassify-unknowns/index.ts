@@ -98,7 +98,8 @@ Deno.serve(async (req) => {
     let updatedCount = 0;
 
     for (const lot of lots) {
-      const classified = classifyLot(lot.condition_notes || "");
+      // Run classifier against condition_notes which contains the full description
+      const classified = classifyLot("", lot.condition_notes || "");
       const updates: Record<string, string> = {};
 
       if (lot.variant_code === "UNKNOWN" && classified.variant_code !== "UNKNOWN") {

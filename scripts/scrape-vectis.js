@@ -146,6 +146,19 @@ function parseDate(dateStr) {
   return new Date().toISOString().split("T")[0];
 }
 
+function extractSubgrades(text) {
+  const patterns = [
+    /card\s*\d+\s*bubble\s*\d+\s*figure\s*\d+/i,
+    /figure\s*\d+\s*paint\s*\d+\s*cape\s*\d+/i,
+    /(?:nm\s+)?card\s*\d+\s*bubble\s*\d+\s*figure\s*\d+/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) return m[0];
+  }
+  return "";
+}
+
 function parseEstimate(text) {
   // e.g. "£100 - £200" or "Estimate: £100 - £200"
   const nums = [...text.matchAll(/£([\d,]+)/g)].map((m) =>
@@ -287,13 +300,39 @@ async function scrapeVectis() {
 
         const conditionNotes = await page
           .evaluate(() => {
-            const desc = document.querySelector(".description, .lot-description, [class*='description']");
-            if (!desc) return "";
-            let text = desc.textContent?.trim() || "";
-            // Remove disclaimer text
-            const disclaimerIdx = text.indexOf("We have endeavoured");
-            if (disclaimerIdx > -1) text = text.substring(0, disclaimerIdx).trim();
-            return text;
+            const DISCLAIMERS = ["We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot"];
+            function stripDisclaimer(t) {
+              for (const d of DISCLAIMERS) {
+                const idx = t.indexOf(d);
+                if (idx > -1) t = t.substring(0, idx).trim();
+              }
+              return t;
+            }
+
+            // Try selectors in priority order
+            const selectors = [
+              ".lot-description p:first-child",
+              ".full-description",
+              "[class*='description'] p:first-child",
+              ".lot-details p:first-child",
+            ];
+            for (const sel of selectors) {
+              const el = document.querySelector(sel);
+              if (el) {
+                const text = stripDisclaimer(el.textContent?.trim() || "");
+                if (text.length > 0) return text;
+              }
+            }
+
+            // Fallback: first substantial <p>
+            const allP = Array.from(document.querySelectorAll("p"));
+            for (const p of allP) {
+              const text = p.textContent?.trim() || "";
+              if (text.length > 30 && !DISCLAIMERS.some(d => text.includes(d))) {
+                return stripDisclaimer(text);
+              }
+            }
+            return "";
           })
           .catch(() => "");
 
@@ -344,8 +383,8 @@ async function scrapeVectis() {
           total_paid_gbp: null,
           usd_to_gbp_rate: 1.0,
           image_urls: imageUrls,
-          condition_notes: conditionNotes.substring(0, 500),
-          grade_subgrades: "",
+          condition_notes: conditionNotes.substring(0, 1000),
+          grade_subgrades: extractSubgrades(conditionNotes),
           estimate_low_gbp: estimateLowGBP,
           estimate_high_gbp: estimateHighGBP,
           price_status: "ESTIMATE_ONLY",
