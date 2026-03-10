@@ -336,11 +336,11 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                   ) : l.lot_ref}
                 </td>
                 <td className="px-3 py-2 max-w-[200px] truncate" title={l.condition_notes}>{l.condition_notes}</td>
-                <td className="px-3 py-2">
+                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                   {l.image_urls.length > 0 ? (
-                    <a href={l.image_urls[0]} target="_blank" rel="noopener noreferrer">
+                    <button onClick={() => setLightboxUrl(l.image_urls[0])}>
                       <img src={l.image_urls[0]} alt="lot" className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors" />
-                    </a>
+                    </button>
                   ) : <span className="text-muted-foreground">—</span>}
                 </td>
                 <td className="px-3 py-2">
