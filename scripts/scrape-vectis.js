@@ -146,6 +146,19 @@ function parseDate(dateStr) {
   return new Date().toISOString().split("T")[0];
 }
 
+function extractSubgrades(text) {
+  const patterns = [
+    /card\s*\d+\s*bubble\s*\d+\s*figure\s*\d+/i,
+    /figure\s*\d+\s*paint\s*\d+\s*cape\s*\d+/i,
+    /(?:nm\s+)?card\s*\d+\s*bubble\s*\d+\s*figure\s*\d+/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) return m[0];
+  }
+  return "";
+}
+
 function parseEstimate(text) {
   // e.g. "£100 - £200" or "Estimate: £100 - £200"
   const nums = [...text.matchAll(/£([\d,]+)/g)].map((m) =>
