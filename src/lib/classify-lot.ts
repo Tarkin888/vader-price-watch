@@ -14,14 +14,11 @@ export interface ClassifiedFields {
 /** Derive era and cardback_code directly from a variant_code string */
 export function deriveFromVariantCode(variantCode: string): { era: string; cardback_code: string } {
   const vc = variantCode.toUpperCase();
-  // Direct prefix mapping
   if (vc.startsWith("POTF-")) return { era: "POTF", cardback_code: vc.replace(/-DT$/, "") };
   if (vc.startsWith("ROTJ-")) return { era: "ROTJ", cardback_code: vc.replace(/-VP$/, "").replace(/-DT$/, "") };
   if (vc.startsWith("ESB-")) return { era: "ESB", cardback_code: vc.replace(/-DT$/, "") };
   if (vc.startsWith("SW-")) return { era: "SW", cardback_code: vc.replace(/-DT$/, "") };
-  // Legacy short codes (12A, 12B, 12C, 12A-DT, 12B-DT)
   if (/^12[ABC]/.test(vc)) return { era: "SW", cardback_code: `SW-${vc.replace(/-DT$/, "")}` };
-  // International
   if (vc === "CAN") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
   if (vc === "PAL") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
   if (vc === "MEX") return { era: "ROTJ", cardback_code: "ROTJ-65" };
@@ -42,22 +39,22 @@ export function classifyLot(title: string, conditionNotes?: string): ClassifiedF
   // --- CARDBACK CODE ---
   let cardbackCode = "UNKNOWN";
   if (/92[\s-]?back|potf/i.test(text)) cardbackCode = "POTF-92";
-  else if (/79[\s-]?back/i.test(text)) cardbackCode = "ROTJ-79";
-  else if (/77[\s-]?back/i.test(text)) cardbackCode = "ROTJ-77";
-  else if (/65[\s-]?back/i.test(text)) cardbackCode = "ROTJ-65";
-  else if (/48[\s-]?back/i.test(text) && era === "ROTJ") cardbackCode = "ROTJ-48";
-  else if (/48[\s-]?back/i.test(text) && era === "ESB") cardbackCode = "ESB-48";
-  else if (/48[\s-]?back/i.test(text)) cardbackCode = "ESB-48";
-  else if (/47[\s-]?back/i.test(text)) cardbackCode = "ESB-47";
-  else if (/45[\s-]?back/i.test(text)) cardbackCode = "ESB-45";
-  else if (/41[\s-]?back/i.test(text)) cardbackCode = "ESB-41";
+  else if (/79[\s-]?a?\s*-?back|79a\b|\brotj[\s-]?79\b/i.test(text)) cardbackCode = "ROTJ-79";
+  else if (/77[\s-]?a?\s*-?back|77a\b|\brotj[\s-]?77\b/i.test(text)) cardbackCode = "ROTJ-77";
+  else if (/65[\s-]?a?\s*-?back|65a\b|\brotj[\s-]?65\b/i.test(text)) cardbackCode = "ROTJ-65";
+  else if (/48[\s-]?a?\s*-?back|48a\b/i.test(text) && era === "ROTJ") cardbackCode = "ROTJ-48";
+  else if (/48[\s-]?a?\s*-?back|48a\b/i.test(text) && era === "ESB") cardbackCode = "ESB-48";
+  else if (/48[\s-]?a?\s*-?back|48a\b/i.test(text)) cardbackCode = "ESB-48";
+  else if (/47[\s-]?a?\s*-?back|47a\b|\besb[\s-]?47\b/i.test(text)) cardbackCode = "ESB-47";
+  else if (/45[\s-]?a?\s*-?back|45a\b|\besb[\s-]?45\b/i.test(text)) cardbackCode = "ESB-45";
+  else if (/41[\s-]?a?\s*-?back|41a\b|\besb[\s-]?41\b/i.test(text)) cardbackCode = "ESB-41";
   else if (/32[\s-]?back/i.test(text)) cardbackCode = "ESB-32";
-  else if (/31[\s-]?back/i.test(text)) cardbackCode = "ESB-31";
+  else if (/31[\s-]?back|\besb[\s-]?31\b/i.test(text)) cardbackCode = "ESB-31";
   else if (/21[\s-]?back/i.test(text)) cardbackCode = "SW-21";
   else if (/20[\s-]?back/i.test(text)) cardbackCode = "SW-20";
-  else if (/12[\s-]?back\s*a|12-?back\s*a|\b12a\b/i.test(text)) cardbackCode = "SW-12A";
-  else if (/12[\s-]?back\s*b|12-?back\s*b|\b12b\b/i.test(text)) cardbackCode = "SW-12B";
-  else if (/12[\s-]?back\s*c|12-?back\s*c|\b12c\b/i.test(text)) cardbackCode = "SW-12C";
+  else if (/12[\s-]?a[\s-]?back|12-?back\s*a|\b12a\b/i.test(text)) cardbackCode = "SW-12A";
+  else if (/12[\s-]?b[\s-]?back|12-?back\s*b|\b12b\b/i.test(text)) cardbackCode = "SW-12B";
+  else if (/12[\s-]?c[\s-]?back|12-?back\s*c|\b12c\b/i.test(text)) cardbackCode = "SW-12C";
   else if (/12[\s-]?back/i.test(text)) cardbackCode = "SW-12";
 
   // --- VARIANT SUB-CODE ---
@@ -73,15 +70,23 @@ export function classifyLot(title: string, conditionNotes?: string): ClassifiedF
 
   // --- GRADE TIER ---
   let gradeTierCode = "UNKNOWN";
-  if (/afa\s*9[0-9]|afa9[0-9]/i.test(text)) gradeTierCode = "AFA-90+";
-  else if (/afa\s*85|afa85/i.test(text)) gradeTierCode = "AFA-85";
-  else if (/afa\s*80|afa80/i.test(text)) gradeTierCode = "AFA-80";
-  else if (/afa\s*75|afa75/i.test(text)) gradeTierCode = "AFA-75";
-  else if (/afa\s*70|afa70/i.test(text)) gradeTierCode = "AFA-70";
-  else if (/ukg\s*85|ukg85/i.test(text)) gradeTierCode = "UKG-85";
-  else if (/ukg\s*80|ukg80/i.test(text)) gradeTierCode = "UKG-80";
+  // AFA patterns (including "AFA Graded U90", "AFA U85", "AFA Graded 85", "AFA 90")
+  if (/afa\s*(?:graded\s*)?u?9[0-9]|afa\s*9[0-9]|afa\s*(?:graded\s*)?u90/i.test(text)) gradeTierCode = "AFA-90+";
+  else if (/afa\s*(?:graded\s*)?u?85|afa\s*85/i.test(text)) gradeTierCode = "AFA-85";
+  else if (/afa\s*(?:graded\s*)?u?80|afa\s*80/i.test(text)) gradeTierCode = "AFA-80";
+  else if (/afa\s*(?:graded\s*)?75|afa\s*75/i.test(text)) gradeTierCode = "AFA-75";
+  else if (/afa\s*(?:graded\s*)?70|afa\s*70/i.test(text)) gradeTierCode = "AFA-70";
+  // UKG patterns (including "UKG Graded 90", "UKG 85%", "UKG Graded 9")
+  else if (/ukg\s*(?:graded\s*)?9[0-9]?%?/i.test(text)) gradeTierCode = "UKG-90";
+  else if (/ukg\s*(?:graded\s*)?85%?/i.test(text)) gradeTierCode = "UKG-85";
+  else if (/ukg\s*(?:graded\s*)?80%?/i.test(text)) gradeTierCode = "UKG-80";
+  else if (/ukg\s*(?:graded\s*)?70%?/i.test(text)) gradeTierCode = "UKG-70";
+  // CAS
   else if (/cas\s*80|cas80/i.test(text)) gradeTierCode = "CAS-80";
+  // RAW MOC
   else if (/\bmoc\b/i.test(text)) gradeTierCode = "RAW-NM";
+  // Generic "Graded" with no identifiable score
+  else if (/\bgraded\b/i.test(text)) gradeTierCode = "GRADED-UNKNOWN";
 
   const variantGradeKey = `${variantCode}-${gradeTierCode}`;
 
