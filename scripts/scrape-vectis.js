@@ -49,10 +49,12 @@ const KEEP_KEYWORDS = [
 const DISCARD_KEYWORDS = [
   '12"', "12 inch", "tie fighter", "tie-fighter", "collector case",
   "carry case", "playset", "loose", "inflatable", "transfer sheet",
-  "job lot", "quantity of", "collection of", "group of",
-  "power of the force 2", "potf2", "potf ii",
+  "job lot", "quantity of", "quantity", "collection of", "group of",
+  "power of the force 2", "power of the force ii", "potf2", "potf ii",
   "black series", "vintage collection", "episode i", "episode ii",
   "episode iii", "modern",
+  "carded pair", "figures a carded",
+  "takara", "hasbro", "kenner/hasbro",
 ];
 
 function shouldKeep(title) {
