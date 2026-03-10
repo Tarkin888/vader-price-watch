@@ -44,6 +44,8 @@ const KEEP_KEYWORDS = [
   "31 back", "32 back", "41 back", "45 back", "47 back", "48 back",
   "65 back", "77 back", "79 back", "92 back",
   "potf", "power of the force",
+  "punched", "unpunched", "sealed", "mint on card",
+  "on original card", "original card", "blister",
 ];
 
 const DISCARD_KEYWORDS = [
@@ -55,6 +57,9 @@ const DISCARD_KEYWORDS = [
   "episode iii", "modern",
   "carded pair", "figures a carded",
   "takara", "hasbro", "kenner/hasbro",
+  "cinema cast", "cinemacast", "collectors case", "collector case",
+  "action figure case", "die-cast", "diecast", "landspeeder",
+  "signed", "insert proof", "2-pack", "diorama", "statue",
 ];
 
 function shouldKeep(title) {
