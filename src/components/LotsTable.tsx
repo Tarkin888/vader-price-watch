@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import type { Lot } from "@/lib/db";
 import type { Currency } from "@/components/FilterBar";
 import { supabase } from "@/integrations/supabase/client";
