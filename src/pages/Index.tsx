@@ -17,6 +17,9 @@ import NotableSalesBanner from "@/components/NotableSalesBanner";
 import ComparableSalesPanel from "@/components/ComparableSalesPanel";
 import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
 import { useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { RefreshCw } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
