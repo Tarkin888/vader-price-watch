@@ -60,7 +60,12 @@ const DISCARD_KEYWORDS = [
   "cinema cast", "cinemacast", "collectors case", "collector case",
   "action figure case", "die-cast", "diecast", "landspeeder",
   "signed", "insert proof", "2-pack", "diorama", "statue",
+  "no coo", "loose figure",
 ];
+
+// Keywords that trigger discard ONLY when no grading keyword is present
+const CONDITIONAL_DISCARD = ["hong kong", "taiwan"];
+const GRADING_OVERRIDE = ["afa", "ukg", "graded"];
 
 function shouldKeep(title) {
   const t = title.toLowerCase();
@@ -68,6 +73,9 @@ function shouldKeep(title) {
   if (!t.includes("darth vader")) return false;
   // Discard if any exclusion keyword matches
   if (DISCARD_KEYWORDS.some((kw) => t.includes(kw))) return false;
+  // Conditional discard: "hong kong" / "taiwan" unless graded
+  const hasGrading = GRADING_OVERRIDE.some((kw) => t.includes(kw));
+  if (!hasGrading && CONDITIONAL_DISCARD.some((kw) => t.includes(kw))) return false;
   // Must contain at least one MOC/cardback keyword
   return KEEP_KEYWORDS.some((kw) => t.includes(kw));
 }
