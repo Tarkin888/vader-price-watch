@@ -113,9 +113,9 @@ function classifyLot(title, conditionNotes = "") {
   let variantCode = cardbackCode;
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
   if (isDT) variantCode = cardbackCode + "-DT";
-  if (/canadian|bilingual/i.test(text)) variantCode = "CAN";
-  else if (/palitoy/i.test(text)) variantCode = "PAL";
-  else if (/mexico|mexican|lili\s*ledy/i.test(text)) variantCode = "MEX";
+  if (/\bcanadian\b|\bbilingual\b/i.test(text)) variantCode = "CAN";
+  else if (/\bpalitoy\b/i.test(text)) variantCode = "PAL";
+  else if (/\bmexico\b|\bmexican\b|\blili\s*ledy\b/i.test(text)) variantCode = "MEX";
   else if (/vader\s*pointing|alternate\s*photo/i.test(text)) variantCode = "VP";
 
   let gradeTierCode = "UNKNOWN";
