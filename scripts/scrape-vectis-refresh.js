@@ -159,7 +159,7 @@ async function refreshVectis() {
     .from("lots")
     .select("id, lot_ref, lot_url, condition_notes")
     .eq("source", "Vectis")
-    .or("condition_notes.ilike.%cookie%,condition_notes.eq.,condition_notes.is.null");
+    .or("condition_notes.ilike.%cookies%,condition_notes.ilike.%Payment for lots%,condition_notes.ilike.%Payment for lot%,condition_notes.ilike.%Credit or Debit%,condition_notes.ilike.%Bank Transfer%,condition_notes.ilike.%Buyer's Premium%,condition_notes.ilike.%endeavoured%,condition_notes.ilike.%SOLD AS IS%,condition_notes.ilike.%bidding on any lot%,condition_notes.eq.,condition_notes.is.null");
 
   if (error) {
     console.error("Query error:", error.message);
