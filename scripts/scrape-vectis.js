@@ -308,8 +308,16 @@ async function scrapeVectis() {
 
         const conditionNotes = await page
           .evaluate(() => {
-            const DISCLAIMERS = ["We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot"];
+            const REJECT = [
+              "cookies", "cookie", "we use", "privacy policy", "consent", "privacy",
+              "We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot",
+            ];
+            const REQUIRE_ONE = [
+              "kenner", "figure", "afa", "ukg", "graded", "card", "back", "vintage", "star wars",
+            ];
+
             function stripDisclaimer(t) {
+              const DISCLAIMERS = ["We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot"];
               for (const d of DISCLAIMERS) {
                 const idx = t.indexOf(d);
                 if (idx > -1) t = t.substring(0, idx).trim();
@@ -317,28 +325,27 @@ async function scrapeVectis() {
               return t;
             }
 
-            // Try selectors in priority order
-            const selectors = [
-              ".lot-description p:first-child",
-              ".full-description",
-              "[class*='description'] p:first-child",
-              ".lot-details p:first-child",
-            ];
-            for (const sel of selectors) {
-              const el = document.querySelector(sel);
-              if (el) {
-                const text = stripDisclaimer(el.textContent?.trim() || "");
-                if (text.length > 0) return text;
-              }
+            function isValid(text) {
+              const lower = text.toLowerCase();
+              if (text.length < 40) return false;
+              if (REJECT.some((r) => lower.includes(r.toLowerCase()))) return false;
+              if (!REQUIRE_ONE.some((kw) => lower.includes(kw))) return false;
+              return true;
             }
 
-            // Fallback: first substantial <p>
+            // Scan all <p> elements for a valid description
             const allP = Array.from(document.querySelectorAll("p"));
             for (const p of allP) {
-              const text = p.textContent?.trim() || "";
-              if (text.length > 30 && !DISCLAIMERS.some(d => text.includes(d))) {
-                return stripDisclaimer(text);
-              }
+              const raw = p.textContent?.trim() || "";
+              const text = stripDisclaimer(raw);
+              if (isValid(text)) return text;
+            }
+
+            // Fallback: try h1/h2 text
+            const heading = document.querySelector("h1, h2");
+            if (heading) {
+              const text = heading.textContent?.trim() || "";
+              if (text.length > 10) return text;
             }
             return "";
           })
