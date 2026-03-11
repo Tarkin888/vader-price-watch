@@ -154,19 +154,31 @@ async function extractConditionNotes(page) {
 async function refreshVectis() {
   console.log("Fetching Vectis records with bad/missing condition_notes...\n");
 
-  // Fetch records needing refresh
-  const { data: records, error } = await supabase
+  // Fetch ALL Vectis records
+  const { data: allRecords, error } = await supabase
     .from("lots")
-    .select("id, lot_ref, lot_url, condition_notes")
-    .eq("source", "Vectis")
-    .or("condition_notes.ilike.%cookies%,condition_notes.ilike.%Payment for lots%,condition_notes.ilike.%Payment for lot%,condition_notes.ilike.%Credit or Debit%,condition_notes.ilike.%Bank Transfer%,condition_notes.ilike.%Buyer's Premium%,condition_notes.ilike.%endeavoured%,condition_notes.ilike.%SOLD AS IS%,condition_notes.ilike.%bidding on any lot%,condition_notes.eq.,condition_notes.is.null");
+    .select("id, lot_ref, lot_url, variant_code, condition_notes")
+    .eq("source", "Vectis");
 
   if (error) {
     console.error("Query error:", error.message);
     process.exit(1);
   }
 
-  console.log(`Found ${records.length} records to refresh\n`);
+  // Filter in JS for bad condition_notes
+  const BAD_STRINGS = [
+    "cookies", "payment for lots", "credit or debit", "bank transfer",
+    "buyer's premium", "endeavoured", "sold as is", "bidding on any lot", "privacy",
+  ];
+
+  const records = allRecords.filter((r) => {
+    if (!r.condition_notes) return true;
+    const lower = r.condition_notes.toLowerCase();
+    if (lower.trim() === "") return true;
+    return BAD_STRINGS.some((s) => lower.includes(s));
+  });
+
+  console.log(`Found ${records.length} records with bad condition_notes (out of ${allRecords.length} total Vectis)\n`);
   if (records.length === 0) return;
 
   const browser = await chromium.launch({ headless: true });
