@@ -309,11 +309,8 @@ async function scrapeVectis() {
         const conditionNotes = await page
           .evaluate(() => {
             const REJECT = [
-              "cookies", "cookie", "we use", "privacy policy", "consent", "privacy",
-              "We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot",
-            ];
-            const REQUIRE_ONE = [
-              "kenner", "figure", "afa", "ukg", "graded", "card", "back", "vintage", "star wars",
+              "cookies", "payment", "buyer", "endeavoured", "sold as is",
+              "bidding", "privacy", "credit or debit", "bank transfer", "consent",
             ];
 
             function stripDisclaimer(t) {
@@ -325,28 +322,31 @@ async function scrapeVectis() {
               return t;
             }
 
-            function isValid(text) {
-              const lower = text.toLowerCase();
-              if (text.length < 40) return false;
-              if (REJECT.some((r) => lower.includes(r.toLowerCase()))) return false;
-              if (!REQUIRE_ONE.some((kw) => lower.includes(kw))) return false;
-              return true;
+            // Step 1: Find "Full Lot Description" heading and take next sibling
+            const allHeadings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, strong, b"));
+            for (const h of allHeadings) {
+              if (/full\s*lot\s*description/i.test(h.textContent || "")) {
+                let sibling = h.nextElementSibling;
+                if (!sibling && h.parentElement) sibling = h.parentElement.nextElementSibling;
+                if (sibling) {
+                  const text = stripDisclaimer(sibling.textContent?.trim() || "");
+                  if (text.length > 10) return text;
+                }
+              }
             }
 
-            // Scan all <p> elements for a valid description
+            // Step 2: Fallback — first <p> starting with known keywords
             const allP = Array.from(document.querySelectorAll("p"));
             for (const p of allP) {
               const raw = p.textContent?.trim() || "";
               const text = stripDisclaimer(raw);
-              if (isValid(text)) return text;
+              if (text.length < 40) continue;
+              const lower = text.toLowerCase();
+              if (REJECT.some((r) => lower.includes(r))) continue;
+              if (/^(kenner|palitoy|star wars)/i.test(text)) return text;
             }
 
-            // Fallback: try h1/h2 text
-            const heading = document.querySelector("h1, h2");
-            if (heading) {
-              const text = heading.textContent?.trim() || "";
-              if (text.length > 10) return text;
-            }
+            // Step 3: Empty — do not store garbage
             return "";
           })
           .catch(() => "");
