@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 // ... keep existing code (types, helpers, badges — lines 20-105)
-type SortKey = "sale_date" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
+type SortKey = "sale_date" | "created_at" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
 type SortDir = "asc" | "desc";
 
 interface LotsTableProps {
@@ -214,6 +214,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
 
   const COLS: { key: SortKey; label: string; align?: string }[] = [
     { key: "sale_date", label: "SALE DATE" },
+    { key: "created_at", label: "DATE/TIME ADDED" },
     { key: "variant_grade_key", label: "VARIANT-GRADE" },
     { key: "total_paid_gbp", label: `TOTAL (${sym})${isUSD ? " (USD)" : ""}`, align: "text-right" },
     { key: "hammer_price_gbp", label: `HAMMER${isUSD ? " (USD)" : ""}`, align: "text-right" },
@@ -295,6 +296,10 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                   />
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
+                  {new Date(l.created_at).toLocaleDateString("en-GB")}{" "}
+                  <span className="text-[9px]">{new Date(l.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+                </td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
                 <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
                   {(l as any).price_status === "ESTIMATE_ONLY" ? (
