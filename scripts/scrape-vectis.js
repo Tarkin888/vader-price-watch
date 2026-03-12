@@ -90,6 +90,11 @@ function shouldKeep(title) {
   if (!hasGrading && CONDITIONAL_DISCARD.some((kw) => t.includes(kw))) return false;
   // Graded lots must also have a carded indicator — otherwise it's a graded loose figure
   if (hasGrading && !CARDED_INDICATORS.some((kw) => t.includes(kw))) return false;
+  // Discard ungraded loose figures: "3 3/4" or "vintage figure" with no cardback keyword
+  const hasCardback = CARDED_INDICATORS.some((kw) => t.includes(kw));
+  if (!hasGrading && !hasCardback) {
+    if (/darth\s+vader\s+\d/.test(t) || t.includes("vintage figure")) return false;
+  }
   // Must contain at least one MOC/cardback keyword
   return KEEP_KEYWORDS.some((kw) => t.includes(kw));
 }
