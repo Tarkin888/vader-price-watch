@@ -417,6 +417,14 @@ async function scrapeVectis() {
           price_status: "ESTIMATE_ONLY",
         };
 
+        // Discard lots with zero/null estimates (failed page load or non-standard lot)
+        if ((!record.estimate_low_gbp || record.estimate_low_gbp === 0) &&
+            (!record.estimate_high_gbp || record.estimate_high_gbp === 0)) {
+          filtered++;
+          console.log(`  ✗ Skipped (no estimate): ${card.title.substring(0, 55)}...`);
+          continue;
+        }
+
         const { error } = await supabase.from("lots").insert(record);
         if (error) {
           console.warn(`  ✗ Insert failed: ${error.message}`);
