@@ -296,6 +296,10 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                   />
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
+                  {new Date(l.created_at).toLocaleDateString("en-GB")}{" "}
+                  <span className="text-[9px]">{new Date(l.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+                </td>
                 <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
                 <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
                   {(l as any).price_status === "ESTIMATE_ONLY" ? (
