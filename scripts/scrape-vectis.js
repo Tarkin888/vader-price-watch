@@ -62,6 +62,8 @@ const DISCARD_KEYWORDS = [
   "landspeeder", "signed", "insert proof", "2-pack", "diorama", "statue",
   "no coo", "loose figure",
   "baggie", "in baggie", "ssp", "van",
+  "sote", "x twenty", "x ten", "x 20", "x 10",
+  "figures x", "vehicles x",
 ];
 
 // Keywords that trigger discard ONLY when no grading keyword is present
