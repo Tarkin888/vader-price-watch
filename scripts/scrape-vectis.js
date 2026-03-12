@@ -65,7 +65,16 @@ const DISCARD_KEYWORDS = [
 
 // Keywords that trigger discard ONLY when no grading keyword is present
 const CONDITIONAL_DISCARD = ["hong kong", "taiwan"];
-const GRADING_OVERRIDE = ["afa", "ukg", "graded"];
+const GRADING_KEYWORDS = ["afa", "ukg", "cas"];
+
+// Graded lots must also contain one of these to confirm carded
+const CARDED_INDICATORS = [
+  "on card", "on original card", "carded", "back card",
+  "back", "moc", "sealed", "unpunched", "punched",
+  "12 b-back", "12 a-back", "12 c-back",
+  "31back", "41back", "47back", "65back", "77back",
+  "79back", "92back", "potf",
+];
 
 function shouldKeep(title) {
   const t = title.toLowerCase();
@@ -74,8 +83,10 @@ function shouldKeep(title) {
   // Discard if any exclusion keyword matches
   if (DISCARD_KEYWORDS.some((kw) => t.includes(kw))) return false;
   // Conditional discard: "hong kong" / "taiwan" unless graded
-  const hasGrading = GRADING_OVERRIDE.some((kw) => t.includes(kw));
+  const hasGrading = GRADING_KEYWORDS.some((kw) => t.includes(kw));
   if (!hasGrading && CONDITIONAL_DISCARD.some((kw) => t.includes(kw))) return false;
+  // Graded lots must also have a carded indicator — otherwise it's a graded loose figure
+  if (hasGrading && !CARDED_INDICATORS.some((kw) => t.includes(kw))) return false;
   // Must contain at least one MOC/cardback keyword
   return KEEP_KEYWORDS.some((kw) => t.includes(kw));
 }
@@ -405,6 +416,14 @@ async function scrapeVectis() {
           estimate_high_gbp: estimateHighGBP,
           price_status: "ESTIMATE_ONLY",
         };
+
+        // Discard lots with zero/null estimates (failed page load or non-standard lot)
+        if ((!record.estimate_low_gbp || record.estimate_low_gbp === 0) &&
+            (!record.estimate_high_gbp || record.estimate_high_gbp === 0)) {
+          filtered++;
+          console.log(`  ✗ Skipped (no estimate): ${card.title.substring(0, 55)}...`);
+          continue;
+        }
 
         const { error } = await supabase.from("lots").insert(record);
         if (error) {
