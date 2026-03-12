@@ -166,19 +166,15 @@ async function refreshVectis() {
   }
 
   // Filter in JS for bad condition_notes
-  const BAD_STRINGS = [
-    "cookies", "payment for lots", "credit or debit", "bank transfer",
-    "buyer's premium", "endeavoured", "sold as is", "bidding on any lot", "privacy",
-  ];
+  const BAD_STRING = "Payment for lots can be made";
 
-  const records = allRecords.filter((r) => {
-    if (!r.condition_notes) return true;
-    const lower = r.condition_notes.toLowerCase();
-    if (lower.trim() === "") return true;
-    return BAD_STRINGS.some((s) => lower.includes(s));
-  });
+  const records = allRecords.filter((r) =>
+    !r.condition_notes ||
+    r.condition_notes.trim() === "" ||
+    r.condition_notes.includes(BAD_STRING)
+  );
 
-  console.log(`Found ${records.length} records with bad condition_notes (out of ${allRecords.length} total Vectis)\n`);
+  console.log(`Found ${records.length} records to refresh (out of ${allRecords.length} total Vectis)\n`);
   if (records.length === 0) return;
 
   const browser = await chromium.launch({ headless: true });
