@@ -59,9 +59,10 @@ function classifyLot(title, conditionNotes = "") {
   let variantCode = cardbackCode;
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
   if (isDT) variantCode = cardbackCode + "-DT";
-  if (/\bcanadian\b|\bbilingual\b/i.test(text)) variantCode = "CAN";
-  else if (/\bpalitoy\b/i.test(text)) variantCode = "PAL";
-  else if (/\bmexico\b|\bmexican\b|\blili\s*ledy\b/i.test(text)) variantCode = "MEX";
+  const isMex = /\bmexico\b|\bmexican\b|\blili\s*ledy\b/i.test(text);
+  if (/\bcanadian\b|\bbilingual\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "CAN";
+  else if (/\bpalitoy\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "PAL";
+  else if (isMex && cardbackCode === "UNKNOWN") variantCode = "MEX";
   else if (/vader\s*pointing|alternate\s*photo/i.test(text)) variantCode = "VP";
 
   let gradeTierCode = "UNKNOWN";
@@ -166,19 +167,15 @@ async function refreshVectis() {
   }
 
   // Filter in JS for bad condition_notes
-  const BAD_STRINGS = [
-    "cookies", "payment for lots", "credit or debit", "bank transfer",
-    "buyer's premium", "endeavoured", "sold as is", "bidding on any lot", "privacy",
-  ];
+  const BAD_STRING = "Payment for lots can be made";
 
-  const records = allRecords.filter((r) => {
-    if (!r.condition_notes) return true;
-    const lower = r.condition_notes.toLowerCase();
-    if (lower.trim() === "") return true;
-    return BAD_STRINGS.some((s) => lower.includes(s));
-  });
+  const records = allRecords.filter((r) =>
+    !r.condition_notes ||
+    r.condition_notes.trim() === "" ||
+    r.condition_notes.includes(BAD_STRING)
+  );
 
-  console.log(`Found ${records.length} records with bad condition_notes (out of ${allRecords.length} total Vectis)\n`);
+  console.log(`Found ${records.length} records to refresh (out of ${allRecords.length} total Vectis)\n`);
   if (records.length === 0) return;
 
   const browser = await chromium.launch({ headless: true });
