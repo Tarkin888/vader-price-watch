@@ -58,9 +58,10 @@ const DISCARD_KEYWORDS = [
   "carded pair", "figures a carded",
   "takara", "hasbro", "kenner/hasbro",
   "cinema cast", "cinemacast", "collectors case", "collector case",
-  "action figure case", "die-cast", "diecast", "landspeeder",
-  "signed", "insert proof", "2-pack", "diorama", "statue",
+  "collector's case", "action figure case", "die-cast", "diecast",
+  "landspeeder", "signed", "insert proof", "2-pack", "diorama", "statue",
   "no coo", "loose figure",
+  "baggie", "in baggie", "ssp", "van",
 ];
 
 // Keywords that trigger discard ONLY when no grading keyword is present
@@ -70,7 +71,7 @@ const GRADING_KEYWORDS = ["afa", "ukg", "cas"];
 // Graded lots must also contain one of these to confirm carded
 const CARDED_INDICATORS = [
   "on card", "on original card", "carded", "back card",
-  "back", "moc", "sealed", "unpunched", "punched",
+  "back", "moc", "sealed card", "unpunched", "punched",
   "12 b-back", "12 a-back", "12 c-back",
   "31back", "41back", "47back", "65back", "77back",
   "79back", "92back", "potf",
