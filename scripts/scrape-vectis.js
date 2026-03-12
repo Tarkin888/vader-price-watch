@@ -70,13 +70,25 @@ const DISCARD_KEYWORDS = [
 const CONDITIONAL_DISCARD = ["hong kong", "taiwan"];
 const GRADING_KEYWORDS = ["afa", "ukg", "cas"];
 
-// Graded lots must also contain one of these to confirm carded
+// Graded lots are assumed carded UNLESS they contain a loose indicator
+const LOOSE_INDICATORS = [
+  "loose", "unpackaged", "removed from card",
+  "out of packaging", "baggie", "in baggie",
+];
+
+// Carded indicators — used for ungraded lot filtering
 const CARDED_INDICATORS = [
   "on card", "on original card", "carded", "back card",
   "back", "moc", "sealed card", "unpunched", "punched",
   "12 b-back", "12 a-back", "12 c-back",
   "31back", "41back", "47back", "65back", "77back",
   "79back", "92back", "potf",
+  "blister", "blister pack", "backing card", "backing",
+  "original backing", "within good", "within fair",
+  "within excellent", "within near mint", "within mint",
+  "card back", "cardback",
+  "return of the jedi", "empire strikes back",
+  "power of the force", "star wars card",
 ];
 
 function shouldKeep(title) {
