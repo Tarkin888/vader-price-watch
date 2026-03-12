@@ -214,6 +214,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
 
   const COLS: { key: SortKey; label: string; align?: string }[] = [
     { key: "sale_date", label: "SALE DATE" },
+    { key: "created_at", label: "DATE/TIME ADDED" },
     { key: "variant_grade_key", label: "VARIANT-GRADE" },
     { key: "total_paid_gbp", label: `TOTAL (${sym})${isUSD ? " (USD)" : ""}`, align: "text-right" },
     { key: "hammer_price_gbp", label: `HAMMER${isUSD ? " (USD)" : ""}`, align: "text-right" },
