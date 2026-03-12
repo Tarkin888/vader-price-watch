@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 // ... keep existing code (types, helpers, badges — lines 20-105)
-type SortKey = "sale_date" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
+type SortKey = "sale_date" | "created_at" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
 type SortDir = "asc" | "desc";
 
 interface LotsTableProps {
