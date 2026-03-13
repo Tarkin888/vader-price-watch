@@ -178,18 +178,19 @@ async function scrapeVectisAuth() {
       page.click('button[type="submit"], input[type="submit"], .login-button, [class*="login"]'),
     ]);
 
-    // Verify login succeeded
-    await sleep(2000, 3000);
-    const pageContent = await page.content();
-    if (pageContent.includes("Invalid") || pageContent.includes("incorrect") || pageContent.includes("Login")) {
-      const currentUrl = page.url();
-      if (currentUrl.includes("login")) {
-        console.error("Login failed. Check credentials.");
-        await browser.close();
-        process.exit(1);
-      }
+    // Verify login by checking URL changed away from login page
+    await page.waitForTimeout(3000);
+    const currentUrl = page.url();
+    const isStillOnLogin = currentUrl.includes('view=login') ||
+                           currentUrl.includes('com_user');
+
+    if (isStillOnLogin) {
+      console.error('Login failed - still on login page. Check credentials.');
+      await browser.close();
+      process.exit(1);
     }
-    console.log("Login successful!\n");
+
+    console.log('Login successful!\n');
 
     // ─── Process each record ───────────────────────────────────
     for (const record of records) {
