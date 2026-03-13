@@ -87,7 +87,7 @@ async function scrapeVectisAuth() {
 
   console.log(`Found ${records.length} ESTIMATE_ONLY records to update\n`);
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext({ userAgent: USER_AGENT });
   const page = await context.newPage();
 
@@ -99,29 +99,82 @@ async function scrapeVectisAuth() {
     console.log("Logging into Vectis...");
     await page.goto(LOGIN_URL, { waitUntil: "domcontentloaded", timeout: 60000 });
 
-    // Dismiss cookie consent banner if present
-    try {
-      const cookieBtn = page.locator(
-        'button:has-text("Accept"), button:has-text("Accept All"), ' +
-        'button:has-text("OK"), button:has-text("I Accept"), ' +
-        'button:has-text("Agree"), .cookie-accept, ' +
-        '#cookie-accept, [class*="cookie"] button'
-      ).first();
-      if (await cookieBtn.isVisible({ timeout: 5000 })) {
-        await cookieBtn.click();
-        await page.waitForTimeout(2000);
-        console.log("  Cookie banner dismissed.");
-      }
-    } catch (e) {
-      // No cookie banner found, continue
+    // Wait for page to fully render
+    await page.waitForTimeout(5000);
+
+    // Strategy 1: click cookie consent by role/text
+    for (const text of ['Accept All', 'Accept', 'I Accept', 'OK', 'Agree', 'Allow All', 'Allow']) {
+      try {
+        const btn = page.getByRole('button', { name: text, exact: false });
+        if (await btn.isVisible({ timeout: 1000 })) {
+          await btn.click();
+          await page.waitForTimeout(2000);
+          console.log(`  Cookie banner dismissed via: ${text}`);
+          break;
+        }
+      } catch (e) {}
     }
 
-    // Scroll email input into view and fill login form
-    await page.locator('#user-email-address').scrollIntoViewIfNeeded();
+    // Strategy 2: press Escape to dismiss any overlay
+    await page.keyboard.press('Escape');
     await page.waitForTimeout(1000);
 
-    await page.fill('#user-email-address', VECTIS_EMAIL);
-    await page.fill('input[type="password"]', VECTIS_PASSWORD);
+    // Wait before finding form fields
+    await page.waitForTimeout(3000);
+
+    // Try multiple selectors for the email field
+    const emailSelectors = [
+      '#user-email-address',
+      'input[name="email"]',
+      'input[type="email"]',
+      'input[placeholder*="email" i]',
+      'input[placeholder*="Email" i]',
+    ];
+
+    let emailFilled = false;
+    for (const sel of emailSelectors) {
+      try {
+        const el = page.locator(sel).first();
+        if (await el.isVisible({ timeout: 2000 })) {
+          await el.fill(VECTIS_EMAIL);
+          emailFilled = true;
+          console.log(`  Email filled using: ${sel}`);
+          break;
+        }
+      } catch (e) {}
+    }
+
+    if (!emailFilled) {
+      console.error('Could not find email field. Check browser window.');
+      await page.waitForTimeout(30000); // pause so you can see the page
+      throw new Error('Email field not found');
+    }
+
+    // Try multiple selectors for the password field
+    const passwordSelectors = [
+      '#password',
+      'input[type="password"]',
+      'input[name="password"]',
+    ];
+
+    let passwordFilled = false;
+    for (const sel of passwordSelectors) {
+      try {
+        const el = page.locator(sel).first();
+        if (await el.isVisible({ timeout: 2000 })) {
+          await el.fill(VECTIS_PASSWORD);
+          passwordFilled = true;
+          console.log(`  Password filled using: ${sel}`);
+          break;
+        }
+      } catch (e) {}
+    }
+
+    if (!passwordFilled) {
+      console.error('Could not find password field. Check browser window.');
+      await page.waitForTimeout(30000);
+      throw new Error('Password field not found');
+    }
     
     // Submit login
     await Promise.all([
