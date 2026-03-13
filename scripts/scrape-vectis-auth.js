@@ -97,15 +97,35 @@ async function scrapeVectisAuth() {
   try {
     // ─── Login ─────────────────────────────────────────────────
     console.log("Logging into Vectis...");
-    await page.goto(LOGIN_URL, { waitUntil: "networkidle", timeout: 60000 });
+    await page.goto(LOGIN_URL, { waitUntil: "domcontentloaded", timeout: 60000 });
 
-    // Find and fill login form
-    await page.fill('input[type="email"], input[name="email"], #email', VECTIS_EMAIL);
-    await page.fill('input[type="password"], input[name="password"], #password', VECTIS_PASSWORD);
+    // Dismiss cookie consent banner if present
+    try {
+      const cookieBtn = page.locator(
+        'button:has-text("Accept"), button:has-text("Accept All"), ' +
+        'button:has-text("OK"), button:has-text("I Accept"), ' +
+        'button:has-text("Agree"), .cookie-accept, ' +
+        '#cookie-accept, [class*="cookie"] button'
+      ).first();
+      if (await cookieBtn.isVisible({ timeout: 5000 })) {
+        await cookieBtn.click();
+        await page.waitForTimeout(2000);
+        console.log("  Cookie banner dismissed.");
+      }
+    } catch (e) {
+      // No cookie banner found, continue
+    }
+
+    // Scroll email input into view and fill login form
+    await page.locator('#user-email-address').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1000);
+
+    await page.fill('#user-email-address', VECTIS_EMAIL);
+    await page.fill('input[type="password"]', VECTIS_PASSWORD);
     
     // Submit login
     await Promise.all([
-      page.waitForNavigation({ waitUntil: "networkidle", timeout: 30000 }).catch(() => {}),
+      page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }).catch(() => {}),
       page.click('button[type="submit"], input[type="submit"], .login-button, [class*="login"]'),
     ]);
 
@@ -113,7 +133,6 @@ async function scrapeVectisAuth() {
     await sleep(2000, 3000);
     const pageContent = await page.content();
     if (pageContent.includes("Invalid") || pageContent.includes("incorrect") || pageContent.includes("Login")) {
-      // Check if still on login page
       const currentUrl = page.url();
       if (currentUrl.includes("login")) {
         console.error("Login failed. Check credentials.");
