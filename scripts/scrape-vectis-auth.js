@@ -1,7 +1,8 @@
 /**
  * Vectis Scraper — Phase 2: Price Confirmation (Authenticated)
  *
- * Logs into Vectis to retrieve actual hammer prices for ESTIMATE_ONLY records.
+ * Opens a browser for manual Vectis login, then retrieves
+ * actual hammer prices for ESTIMATE_ONLY records.
  * Updates Supabase with confirmed prices or marks as UNSOLD.
  *
  * Prerequisites:
@@ -11,14 +12,9 @@
  * Create a .env file with:
  *   SUPABASE_URL=https://rdtwgrznjkigghbwstqz.supabase.co
  *   SUPABASE_ANON_KEY=your-anon-key
- *   VECTIS_EMAIL=zrezvi@gmail.com
- *   VECTIS_PASSWORD=Martine889!
  *
  * Usage:
  *   node scrape-vectis-auth.js
- *
- * IMPORTANT: Credentials are read from environment variables only.
- *            Never log or store credentials anywhere.
  */
 
 const { chromium } = require("playwright");
@@ -28,16 +24,9 @@ require("dotenv").config();
 // ─── Config ────────────────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
-const VECTIS_EMAIL = process.env.VECTIS_EMAIL;
-const VECTIS_PASSWORD = process.env.VECTIS_PASSWORD;
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error("ERROR: Set SUPABASE_URL and SUPABASE_ANON_KEY in .env file");
-  process.exit(1);
-}
-
-if (!VECTIS_EMAIL || !VECTIS_PASSWORD) {
-  console.error("ERROR: Set VECTIS_EMAIL and VECTIS_PASSWORD in .env file");
   process.exit(1);
 }
 
