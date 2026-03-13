@@ -84,93 +84,25 @@ async function scrapeVectisAuth() {
   let unsold = 0;
 
   try {
-    // ─── Login ─────────────────────────────────────────────────
-    console.log("Logging into Vectis...");
+    // ─── Manual Login ──────────────────────────────────────────
     await page.goto(LOGIN_URL, { waitUntil: "domcontentloaded", timeout: 60000 });
 
-    // Wait for page to fully render
-    await page.waitForTimeout(5000);
+    console.log('==============================================');
+    console.log('MANUAL LOGIN REQUIRED');
+    console.log('Please log into Vectis in the browser window.');
+    console.log('Once logged in, come back here and press Enter.');
+    console.log('==============================================');
 
-    // Strategy 1: click cookie consent by role/text
-    for (const text of ["Accept All", "Accept", "I Accept", "OK", "Agree", "Allow All", "Allow"]) {
-      try {
-        const btn = page.getByRole("button", { name: text, exact: false });
-        if (await btn.isVisible({ timeout: 1000 })) {
-          await btn.click();
-          await page.waitForTimeout(2000);
-          console.log(`  Cookie banner dismissed via: ${text}`);
-          break;
-        }
-      } catch (e) {}
+    await new Promise(resolve => {
+      process.stdin.once('data', resolve);
+    });
+
+    const currentUrl = page.url();
+    if (currentUrl.includes('login')) {
+      console.warn('⚠ URL still contains "login" — continuing anyway...');
     }
 
-    // Strategy 2: press Escape to dismiss any overlay
-    await page.keyboard.press("Escape");
-    await page.waitForTimeout(1000);
-
-    // Wait before finding form fields
-    await page.waitForTimeout(3000);
-
-    // Try multiple selectors for the email field
-    const emailSelectors = [
-      "#user-email-address",
-      'input[name="email"]',
-      'input[type="email"]',
-      'input[placeholder*="email" i]',
-      'input[placeholder*="Email" i]',
-    ];
-
-    let emailFilled = false;
-    for (const sel of emailSelectors) {
-      try {
-        const el = page.locator(sel).first();
-        if (await el.isVisible({ timeout: 2000 })) {
-          await el.fill(VECTIS_EMAIL);
-          emailFilled = true;
-          console.log(`  Email filled using: ${sel}`);
-          break;
-        }
-      } catch (e) {}
-    }
-
-    if (!emailFilled) {
-      console.error("Could not find email field. Check browser window.");
-      await page.waitForTimeout(30000); // pause so you can see the page
-      throw new Error("Email field not found");
-    }
-
-    // Try multiple selectors for the password field
-    const passwordSelectors = ["#password", 'input[type="password"]', 'input[name="password"]'];
-
-    let passwordFilled = false;
-    for (const sel of passwordSelectors) {
-      try {
-        const el = page.locator(sel).first();
-        if (await el.isVisible({ timeout: 2000 })) {
-          await el.fill(VECTIS_PASSWORD);
-          passwordFilled = true;
-          console.log(`  Password filled using: ${sel}`);
-          break;
-        }
-      } catch (e) {}
-    }
-
-    if (!passwordFilled) {
-      console.error("Could not find password field. Check browser window.");
-      await page.waitForTimeout(30000);
-      throw new Error("Password field not found");
-    }
-
-    // Submit login
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }).catch(() => {}),
-      page.click('button[type="submit"], input[type="submit"], .login-button, [class*="login"]'),
-    ]);
-
-    console.log('Post-login URL:', page.url());
-
-    await page.waitForTimeout(4000);
-    console.log('Proceeding after login attempt...\n');
+    console.log('Continuing with current session...\n');
 
     // ─── Process each record ───────────────────────────────────
     for (const record of records) {
