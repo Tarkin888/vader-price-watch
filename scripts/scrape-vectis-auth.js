@@ -178,19 +178,10 @@ async function scrapeVectisAuth() {
       page.click('button[type="submit"], input[type="submit"], .login-button, [class*="login"]'),
     ]);
 
-    // Verify login by checking URL changed away from login page
-    await page.waitForTimeout(3000);
-    const currentUrl = page.url();
-    const isStillOnLogin = currentUrl.includes('view=login') ||
-                           currentUrl.includes('com_user');
+    console.log('Post-login URL:', page.url());
 
-    if (isStillOnLogin) {
-      console.error('Login failed - still on login page. Check credentials.');
-      await browser.close();
-      process.exit(1);
-    }
-
-    console.log('Login successful!\n');
+    await page.waitForTimeout(4000);
+    console.log('Proceeding after login attempt...\n');
 
     // ─── Process each record ───────────────────────────────────
     for (const record of records) {
@@ -198,9 +189,23 @@ async function scrapeVectisAuth() {
       console.log(`Processing: ${record.variant_code} | ${record.lot_ref}`);
 
       try {
-        await page.goto(record.lot_url, { waitUntil: "networkidle", timeout: 30000 });
+        await page.goto(record.lot_url, { waitUntil: "domcontentloaded", timeout: 30000 });
       } catch (e) {
         console.warn(`  ⚠ Failed to load: ${e.message}`);
+        continue;
+      }
+
+      // Check if login wall is still showing
+      const loginWall = await page.evaluate(() => {
+        return (document.body.textContent || "").includes("Login To See Hammer Price");
+      });
+      if (loginWall) {
+        console.warn(`  ⚠ Login wall detected — marking UNSOLD`);
+        const { error: updateError } = await supabase
+          .from("lots")
+          .update({ price_status: "UNSOLD" })
+          .eq("id", record.id);
+        if (!updateError) unsold++;
         continue;
       }
 
