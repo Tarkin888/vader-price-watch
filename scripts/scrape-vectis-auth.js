@@ -1,22 +1,22 @@
 /**
  * Vectis Scraper — Phase 2: Price Confirmation (Authenticated)
- * 
+ *
  * Logs into Vectis to retrieve actual hammer prices for ESTIMATE_ONLY records.
  * Updates Supabase with confirmed prices or marks as UNSOLD.
- * 
+ *
  * Prerequisites:
  *   npm install playwright @supabase/supabase-js dotenv
  *   npx playwright install chromium
- * 
+ *
  * Create a .env file with:
  *   SUPABASE_URL=https://rdtwgrznjkigghbwstqz.supabase.co
  *   SUPABASE_ANON_KEY=your-anon-key
- *   VECTIS_EMAIL=your-vectis-email
- *   VECTIS_PASSWORD=your-vectis-password
- * 
+ *   VECTIS_EMAIL=zrezvi@gmail.com
+ *   VECTIS_PASSWORD=Martine889!
+ *
  * Usage:
  *   node scrape-vectis-auth.js
- * 
+ *
  * IMPORTANT: Credentials are read from environment variables only.
  *            Never log or store credentials anywhere.
  */
@@ -103,9 +103,9 @@ async function scrapeVectisAuth() {
     await page.waitForTimeout(5000);
 
     // Strategy 1: click cookie consent by role/text
-    for (const text of ['Accept All', 'Accept', 'I Accept', 'OK', 'Agree', 'Allow All', 'Allow']) {
+    for (const text of ["Accept All", "Accept", "I Accept", "OK", "Agree", "Allow All", "Allow"]) {
       try {
-        const btn = page.getByRole('button', { name: text, exact: false });
+        const btn = page.getByRole("button", { name: text, exact: false });
         if (await btn.isVisible({ timeout: 1000 })) {
           await btn.click();
           await page.waitForTimeout(2000);
@@ -116,7 +116,7 @@ async function scrapeVectisAuth() {
     }
 
     // Strategy 2: press Escape to dismiss any overlay
-    await page.keyboard.press('Escape');
+    await page.keyboard.press("Escape");
     await page.waitForTimeout(1000);
 
     // Wait before finding form fields
@@ -124,7 +124,7 @@ async function scrapeVectisAuth() {
 
     // Try multiple selectors for the email field
     const emailSelectors = [
-      '#user-email-address',
+      "#user-email-address",
       'input[name="email"]',
       'input[type="email"]',
       'input[placeholder*="email" i]',
@@ -145,17 +145,13 @@ async function scrapeVectisAuth() {
     }
 
     if (!emailFilled) {
-      console.error('Could not find email field. Check browser window.');
+      console.error("Could not find email field. Check browser window.");
       await page.waitForTimeout(30000); // pause so you can see the page
-      throw new Error('Email field not found');
+      throw new Error("Email field not found");
     }
 
     // Try multiple selectors for the password field
-    const passwordSelectors = [
-      '#password',
-      'input[type="password"]',
-      'input[name="password"]',
-    ];
+    const passwordSelectors = ["#password", 'input[type="password"]', 'input[name="password"]'];
 
     let passwordFilled = false;
     for (const sel of passwordSelectors) {
@@ -171,11 +167,11 @@ async function scrapeVectisAuth() {
     }
 
     if (!passwordFilled) {
-      console.error('Could not find password field. Check browser window.');
+      console.error("Could not find password field. Check browser window.");
       await page.waitForTimeout(30000);
-      throw new Error('Password field not found');
+      throw new Error("Password field not found");
     }
-    
+
     // Submit login
     await Promise.all([
       page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }).catch(() => {}),
@@ -236,7 +232,7 @@ async function scrapeVectisAuth() {
         const body = document.body.textContent || "";
         const hammerMatch = body.match(/hammer\s*(?:price)?[:\s]*£[\d,]+/i);
         if (hammerMatch) return hammerMatch[0];
-        
+
         const soldMatch = body.match(/sold\s*(?:for)?[:\s]*£[\d,]+/i);
         if (soldMatch) return soldMatch[0];
 
