@@ -68,8 +68,6 @@ const DISCARD_KEYWORDS = [
   "figures x", "vehicles x",
 ];
 
-// Keywords that trigger discard ONLY when no grading keyword is present
-const CONDITIONAL_DISCARD = ["hong kong", "taiwan"];
 const GRADING_KEYWORDS = ["afa", "ukg", "cas"];
 
 // Graded lots are assumed carded UNLESS they contain a loose indicator
