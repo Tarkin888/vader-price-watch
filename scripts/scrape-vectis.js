@@ -97,13 +97,12 @@ function shouldKeep(title) {
   if (!t.includes("darth vader")) return false;
   // Discard if any exclusion keyword matches
   if (DISCARD_KEYWORDS.some((kw) => t.includes(kw))) return false;
-  // Conditional discard: "hong kong" / "taiwan" unless graded
   const hasGrading = GRADING_KEYWORDS.some((kw) => t.includes(kw));
-  if (!hasGrading && CONDITIONAL_DISCARD.some((kw) => t.includes(kw))) return false;
+  const hasCardback = CARDED_INDICATORS.some((kw) => t.includes(kw));
   // Graded lots: assume carded UNLESS explicitly loose
   if (hasGrading && LOOSE_INDICATORS.some((kw) => t.includes(kw))) return false;
-  // Discard ungraded loose figures: "3 3/4" or "vintage figure" with no cardback keyword
-  const hasCardback = CARDED_INDICATORS.some((kw) => t.includes(kw));
+  // Discard graded figures with no cardback reference in title
+  if (hasGrading && !hasCardback) return false;
   if (!hasGrading && !hasCardback) {
     if (/darth\s+vader\s+\d/.test(t) || t.includes("vintage figure")) return false;
   }
