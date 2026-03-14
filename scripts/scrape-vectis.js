@@ -66,6 +66,7 @@ const DISCARD_KEYWORDS = [
   "baggie", "in baggie", "ssp", "van",
   "sote", "x twenty", "x ten", "x 20", "x 10",
   "figures x", "vehicles x",
+  "hong kong", "taiwan",
 ];
 
 const GRADING_KEYWORDS = ["afa", "ukg", "cas"];
