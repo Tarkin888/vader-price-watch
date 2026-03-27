@@ -318,7 +318,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                   ) : (
                     <>
                       {fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
-                      {isUSD && <SourceBadge source={l.source} />}
+                      {isUSD && <CurrencyBadge source={l.source} />}
                     </>
                   )}
                 </td>
