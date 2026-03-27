@@ -37,7 +37,7 @@ function toUsd(gbp: number, rate: number): number {
   return rate > 0 ? Math.round(gbp / rate) : 0;
 }
 
-function SourceBadge({ source }: { source: string }) {
+function CurrencyBadge({ source }: { source: string }) {
   const isOrig = USD_SOURCES.includes(source);
   return (
     <span
