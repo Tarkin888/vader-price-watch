@@ -43,17 +43,39 @@ const Index = () => {
   }, [setSearchParams]);
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
-  const [filters, setFilters] = useState<Filters>({
-    source: null,
-    era: null,
-    cardbackCode: null,
-    variantCode: null,
-    gradeTier: null,
-    dateFrom: null,
-    dateTo: null,
-    search: "",
-    currency: "GBP" as const,
-  });
+  const [filters, setFilters] = useState<Filters>(() => ({
+    source: searchParams.get("source") || null,
+    era: searchParams.get("era") || null,
+    cardbackCode: searchParams.get("cardback") || null,
+    variantCode: searchParams.get("variant") || null,
+    gradeTier: searchParams.get("grade") || null,
+    dateFrom: searchParams.get("dateFrom") ? new Date(searchParams.get("dateFrom")!) : null,
+    dateTo: searchParams.get("dateTo") ? new Date(searchParams.get("dateTo")!) : null,
+    search: searchParams.get("q") || "",
+    currency: (searchParams.get("currency") as "GBP" | "USD") || "GBP",
+  }));
+
+  const updateFilters = useCallback((f: Filters) => {
+    setFilters(f);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const map: [string, string | null][] = [
+        ["source", f.source],
+        ["era", f.era],
+        ["cardback", f.cardbackCode],
+        ["variant", f.variantCode],
+        ["grade", f.gradeTier],
+        ["dateFrom", f.dateFrom ? f.dateFrom.toISOString().slice(0, 10) : null],
+        ["dateTo", f.dateTo ? f.dateTo.toISOString().slice(0, 10) : null],
+        ["q", f.search || null],
+        ["currency", f.currency === "GBP" ? null : f.currency],
+      ];
+      for (const [key, val] of map) {
+        if (val) next.set(key, val); else next.delete(key);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const loadLots = useCallback(async () => {
     try {
@@ -70,14 +92,7 @@ const Index = () => {
 
   useEffect(() => { loadLots(); }, [loadLots]);
 
-  // Cross-reference: read variant from URL params
-  useEffect(() => {
-    const variant = searchParams.get("variant");
-    if (variant) {
-      setFilters((f) => ({ ...f, variantCode: variant }));
-      changeTab("table");
-    }
-  }, [searchParams]);
+  // Cross-reference: read variant from URL params handled by initial state
 
   const filtered = useMemo(() => {
     return lots.filter((l) => {
@@ -156,13 +171,13 @@ const Index = () => {
         </button>
       </div>
       <ReferencePanel />
-      <FilterBar filters={filters} onChange={setFilters} />
+      <FilterBar filters={filters} onChange={updateFilters} />
       <StatsBar lots={filtered} filters={filters} currency={filters.currency} />
       <CardbackBenchmarkPanel
         allLots={lots}
         currency={filters.currency}
         onSelectCardback={(code) => {
-          setFilters((f) => ({ ...f, cardbackCode: code }));
+          updateFilters({ ...filters, cardbackCode: code });
           changeTab("table");
           setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         }}
