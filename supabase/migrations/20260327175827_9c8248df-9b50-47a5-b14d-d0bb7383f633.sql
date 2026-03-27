@@ -1,0 +1,1 @@
+DELETE FROM public.lots WHERE lot_ref IN ('LOT-4821', 'VEC-1192', 'HK-7734');
