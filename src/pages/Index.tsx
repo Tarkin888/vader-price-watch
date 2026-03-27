@@ -177,7 +177,7 @@ const Index = () => {
         allLots={lots}
         currency={filters.currency}
         onSelectCardback={(code) => {
-          setFilters((f) => ({ ...f, cardbackCode: code }));
+          updateFilters({ ...filters, cardbackCode: code });
           changeTab("table");
           setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         }}
