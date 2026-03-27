@@ -44,7 +44,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         className="fill-primary"
         fontFamily="Georgia, serif"
         fontWeight="bold"
-        fontSize={isSm ? 10 : 16}
+        fontSize={isSm ? 20 : 16}
         letterSpacing="0.5"
       >
         {config.monogram}
@@ -67,7 +67,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         className="fill-foreground"
         fontFamily="system-ui, sans-serif"
         fontWeight="600"
-        fontSize={isSm ? 7 : 10}
+        fontSize={isSm ? 14 : 10}
         letterSpacing="1"
       >
         {config.label}
@@ -80,7 +80,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         textAnchor="end"
         className="fill-muted-foreground"
         fontFamily="system-ui, sans-serif"
-        fontSize={isSm ? 5 : 7}
+        fontSize={isSm ? 10 : 7}
         letterSpacing="0.5"
         opacity="0.7"
       >
@@ -101,29 +101,29 @@ const BADGE_CONFIG: Record<string, {
     monogram: "HA",
     label: "HERITAGE",
     currency: "USD",
-    dividerX: [20, 32],
-    nameX: [23, 36],
+    dividerX: [38, 32],
+    nameX: [42, 36],
   },
   Hakes: {
     monogram: "H",
     label: "HAKE'S",
     currency: "USD",
-    dividerX: [14, 22],
-    nameX: [17, 26],
+    dividerX: [26, 22],
+    nameX: [30, 26],
   },
   Vectis: {
     monogram: "V",
     label: "VECTIS",
     currency: "GBP",
-    dividerX: [14, 22],
-    nameX: [17, 26],
+    dividerX: [26, 22],
+    nameX: [30, 26],
   },
   LCG: {
     monogram: "LCG",
     label: "LCG",
     currency: "GBP",
-    dividerX: [22, 36],
-    nameX: [25, 40],
+    dividerX: [44, 36],
+    nameX: [48, 40],
   },
 };
 
