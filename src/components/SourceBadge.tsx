@@ -38,7 +38,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
       />
       {/* Monogram */}
       <text
-        x={isSm ? 6 : 10}
+        x={config.monoX ?? (isSm ? 6 : 10)}
         y={h / 2}
         dominantBaseline="central"
         className="fill-primary"
