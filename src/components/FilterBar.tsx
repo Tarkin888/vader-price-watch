@@ -1,4 +1,5 @@
 import { Constants } from "@/integrations/supabase/types";
+import SourceBadge from "@/components/SourceBadge";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -66,10 +67,27 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
 
       <div className="flex flex-col gap-1">
         <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Source</label>
-        <select className={selectClass} value={filters.source ?? ""} onChange={(e) => set("source", e.target.value || null)}>
-          <option value="">ALL</option>
-          {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
+        <div className="flex gap-1 items-center">
+          <button
+            onClick={() => set("source", null)}
+            className={`text-[10px] tracking-widest px-2 py-1 rounded border transition-colors ${
+              !filters.source ? "border-primary text-primary" : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            ALL
+          </button>
+          {SOURCES.map((s) => (
+            <button
+              key={s}
+              onClick={() => set("source", filters.source === s ? null : s)}
+              className={`rounded border transition-colors px-1 py-0.5 ${
+                filters.source === s ? "border-primary" : "border-border hover:border-primary/50"
+              }`}
+            >
+              <SourceBadge source={s} size="sm" />
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col gap-1">
