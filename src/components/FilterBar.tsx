@@ -1,4 +1,5 @@
 import { Constants } from "@/integrations/supabase/types";
+import SourceBadge from "@/components/SourceBadge";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
