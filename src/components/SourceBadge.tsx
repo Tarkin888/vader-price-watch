@@ -44,7 +44,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         className="fill-primary"
         fontFamily="Georgia, serif"
         fontWeight="bold"
-        fontSize={isSm ? 10 : 16}
+        fontSize={isSm ? 20 : 16}
         letterSpacing="0.5"
       >
         {config.monogram}
