@@ -92,14 +92,7 @@ const Index = () => {
 
   useEffect(() => { loadLots(); }, [loadLots]);
 
-  // Cross-reference: read variant from URL params
-  useEffect(() => {
-    const variant = searchParams.get("variant");
-    if (variant) {
-      setFilters((f) => ({ ...f, variantCode: variant }));
-      changeTab("table");
-    }
-  }, [searchParams]);
+  // Cross-reference: read variant from URL params handled by initial state
 
   const filtered = useMemo(() => {
     return lots.filter((l) => {
