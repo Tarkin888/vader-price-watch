@@ -27,7 +27,12 @@ const Index = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "table" | "chart" | "session">("dashboard");
+  const validTabs = ["dashboard", "table", "chart", "session"] as const;
+  type Tab = typeof validTabs[number];
+  const tabFromUrl = searchParams.get("tab") as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(
+    tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "dashboard"
+  );
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [filters, setFilters] = useState<Filters>({
