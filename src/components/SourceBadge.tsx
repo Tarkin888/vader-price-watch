@@ -12,8 +12,8 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
   if (!config) return <span className="text-muted-foreground text-xs">{source}</span>;
 
   const isSm = size === "sm";
-  const w = isSm ? 72 : 120;
-  const h = isSm ? 20 : 32;
+  const w = isSm ? 144 : 120;
+  const h = isSm ? 40 : 32;
 
   return (
     <svg
