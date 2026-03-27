@@ -38,7 +38,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
       />
       {/* Monogram */}
       <text
-        x={isSm ? 6 : 10}
+        x={config.monoX ?? (isSm ? 6 : 10)}
         y={h / 2}
         dominantBaseline="central"
         className="fill-primary"
@@ -94,6 +94,7 @@ const BADGE_CONFIG: Record<string, {
   monogram: string;
   label: string;
   currency: string;
+  monoX?: number;
   dividerX: [number, number]; // [sm, md]
   nameX: [number, number];
 }> = {
@@ -101,29 +102,33 @@ const BADGE_CONFIG: Record<string, {
     monogram: "HA",
     label: "HERITAGE",
     currency: "USD",
-    dividerX: [38, 32],
-    nameX: [42, 36],
+    monoX: 8,
+    dividerX: [40, 32],
+    nameX: [44, 36],
   },
   Hakes: {
     monogram: "H",
     label: "HAKE'S",
     currency: "USD",
-    dividerX: [26, 22],
-    nameX: [30, 26],
+    monoX: 10,
+    dividerX: [28, 22],
+    nameX: [32, 26],
   },
   Vectis: {
     monogram: "V",
     label: "VECTIS",
     currency: "GBP",
-    dividerX: [26, 22],
-    nameX: [30, 26],
+    monoX: 10,
+    dividerX: [28, 22],
+    nameX: [32, 26],
   },
   LCG: {
     monogram: "LCG",
     label: "LCG",
     currency: "GBP",
-    dividerX: [44, 36],
-    nameX: [48, 40],
+    monoX: 6,
+    dividerX: [50, 36],
+    nameX: [54, 40],
   },
 };
 
