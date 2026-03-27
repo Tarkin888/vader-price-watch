@@ -75,7 +75,7 @@ const Index = () => {
     const variant = searchParams.get("variant");
     if (variant) {
       setFilters((f) => ({ ...f, variantCode: variant }));
-      setActiveTab("table");
+      changeTab("table");
     }
   }, [searchParams]);
 
@@ -163,7 +163,7 @@ const Index = () => {
         currency={filters.currency}
         onSelectCardback={(code) => {
           setFilters((f) => ({ ...f, cardbackCode: code }));
-          setActiveTab("table");
+          changeTab("table");
           setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         }}
       />
@@ -171,25 +171,25 @@ const Index = () => {
       <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex gap-1">
           <button
-            onClick={() => setActiveTab("dashboard")}
+            onClick={() => changeTab("dashboard")}
             className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             DASHBOARD
           </button>
           <button
-            onClick={() => setActiveTab("table")}
+            onClick={() => changeTab("table")}
             className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             RESULTS
           </button>
           <button
-            onClick={() => setActiveTab("chart")}
+            onClick={() => changeTab("chart")}
             className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             PRICE CHART
           </button>
           <button
-            onClick={() => setActiveTab("session")}
+            onClick={() => changeTab("session")}
             className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             SESSION LOG {copiedRows.length > 0 && `(${copiedRows.length})`}
