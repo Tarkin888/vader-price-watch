@@ -56,16 +56,16 @@ const ReferencePanel = () => {
   const eras = ["SW", "ESB", "ROTJ", "POTF", "INT"];
 
   return (
-    <div className="border-b border-border">
+    <div className="relative ml-auto">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-6 py-2 text-[10px] text-muted-foreground tracking-widest uppercase hover:text-primary transition-colors w-full text-left"
+        className="flex items-center gap-1.5 px-3 py-1 text-[10px] text-muted-foreground tracking-widest uppercase hover:text-primary transition-colors"
       >
         {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
         REFERENCE PANEL
       </button>
       {open && (
-        <div className="px-6 pb-4 grid md:grid-cols-2 gap-4">
+        <div className="absolute right-0 top-full z-50 mt-1 w-[700px] border border-border bg-background shadow-lg rounded-md p-4 grid md:grid-cols-2 gap-4">
           <div>
             <h3 className="text-[10px] text-primary tracking-widest uppercase mb-2">
               Cardback Variant Codes
@@ -82,7 +82,7 @@ const ReferencePanel = () => {
                 {eras.map((era) => {
                   const items = CARDBACK_VARIANTS.filter((v) => v.era === era);
                   if (items.length === 0) return null;
-                  return items.map((v, i) => (
+                  return items.map((v) => (
                     <tr key={v.code} className="border-b border-border/30">
                       <td className="py-1 font-bold" style={{ color: ERA_COLORS[era] }}>
                         {v.code}
