@@ -33,6 +33,14 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>(
     tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "dashboard"
   );
+  const changeTab = useCallback((tab: Tab) => {
+    setActiveTab(tab);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("tab", tab);
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [filters, setFilters] = useState<Filters>({
