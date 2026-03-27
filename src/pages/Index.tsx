@@ -79,7 +79,7 @@ const Index = () => {
 
   const loadLots = useCallback(async () => {
     try {
-      await seedIfEmpty();
+      
       await fixUnknownEraCardback();
       const data = await getAllLots();
       setLots(data);
