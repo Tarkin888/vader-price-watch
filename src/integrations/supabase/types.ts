@@ -190,6 +190,11 @@ export type Database = {
         | "UKG-90"
         | "UKG-70"
         | "GRADED-UNKNOWN"
+        | "AFA-40"
+        | "AFA-50"
+        | "AFA-60"
+        | "CAS-70"
+        | "CAS-85"
       lot_era: "SW" | "ESB" | "ROTJ" | "POTF" | "UNKNOWN"
       lot_source: "Heritage" | "Hakes" | "Vectis" | "LCG"
       variant_code:
@@ -224,6 +229,13 @@ export type Database = {
         | "POTF-92"
         | "UNKNOWN"
         | "TAK"
+        | "CLIP"
+        | "ROTJ-65A"
+        | "ROTJ-65B"
+        | "ROTJ-65D"
+        | "ROTJ-79A"
+        | "ROTJ-79B"
+        | "PAL-TL"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -389,6 +401,11 @@ export const Constants = {
         "UKG-90",
         "UKG-70",
         "GRADED-UNKNOWN",
+        "AFA-40",
+        "AFA-50",
+        "AFA-60",
+        "CAS-70",
+        "CAS-85",
       ],
       lot_era: ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"],
       lot_source: ["Heritage", "Hakes", "Vectis", "LCG"],
@@ -424,6 +441,13 @@ export const Constants = {
         "POTF-92",
         "UNKNOWN",
         "TAK",
+        "CLIP",
+        "ROTJ-65A",
+        "ROTJ-65B",
+        "ROTJ-65D",
+        "ROTJ-79A",
+        "ROTJ-79B",
+        "PAL-TL",
       ],
     },
   },
