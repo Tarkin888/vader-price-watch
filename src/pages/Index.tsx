@@ -171,7 +171,7 @@ const Index = () => {
         </button>
       </div>
       <ReferencePanel />
-      <FilterBar filters={filters} onChange={setFilters} />
+      <FilterBar filters={filters} onChange={updateFilters} />
       <StatsBar lots={filtered} filters={filters} currency={filters.currency} />
       <CardbackBenchmarkPanel
         allLots={lots}
