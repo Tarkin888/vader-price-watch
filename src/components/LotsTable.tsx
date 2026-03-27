@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";
 import popCounts, { type PopEntry } from "@/data/popCounts";
 import { Checkbox } from "@/components/ui/checkbox";
+import SourceBadge from "@/components/SourceBadge";
 import {
   AlertDialog,
   AlertDialogAction,
