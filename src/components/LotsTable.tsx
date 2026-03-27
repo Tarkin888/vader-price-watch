@@ -333,7 +333,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                 </td>
                 <td className="px-3 py-2 text-muted-foreground">{(l as any).cardback_code ?? "—"}</td>
                 <td className="px-3 py-2"><PopBadge variantCode={l.variant_code} /></td>
-                <td className="px-3 py-2">{l.source}</td>
+                <td className="px-3 py-2"><SourceBadge source={l.source} /></td>
                 <td className="px-3 py-2">
                   {l.lot_url ? (
                     <a href={l.lot_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
