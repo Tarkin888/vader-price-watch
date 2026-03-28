@@ -388,7 +388,7 @@ const KnowledgeHub = () => {
 
         {/* ──── FOOTER NOTE ──── */}
         <p className="text-[10px] text-primary/70 italic tracking-wider leading-relaxed pt-4 border-t border-border">
-          Reference data compiled from Heritage Auctions, Hake's Auctions, Dallas Vintage Toys, 4th Moon Toys, Brian's Toys, the SWCA archive, and the Kenner Star Wars Collectors' Handbook. Rarity ratings are collector consensus estimates. Always verify against current auction records in the Price Tracker tab.
+          Reference data compiled from Heritage Auctions, Hake's Auctions, C&T Auctions, Dallas Vintage Toys, 4th Moon Toys, Brian's Toys, the SWCA archive, and the Kenner Star Wars Collectors' Handbook. Rarity ratings are collector consensus estimates. Always verify against current auction records in the Price Tracker tab.
         </p>
       </div>
 
