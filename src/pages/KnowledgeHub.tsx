@@ -63,6 +63,14 @@ const INTL_TABLE = [
   { code: "MEX", market: "Lili Ledy Mexico", cardbacks: "ROTJ-65D", features: "Different card stock and finish; Made in Mexico stamping", source: "Heritage; Hake's" },
 ];
 
+const AUCTION_SOURCES = [
+  { name: "Heritage Auctions", location: "Dallas, TX, USA", currency: "USD", premium: "20% (standard)", bestFor: "High-grade AFA figures; major U.S. vintage Star Wars auctions", website: "ha.com", notes: "Largest U.S. auction house for vintage Star Wars" },
+  { name: "Hake's Auctions", location: "York, PA, USA", currency: "USD", premium: "22% (varies)", bestFor: "Rare prototypes; DT sabers; pop-culture memorabilia", website: "hakes.com", notes: "Strong track record for record-breaking Star Wars lots" },
+  { name: "Vectis Auctions", location: "Thornaby, UK", currency: "GBP", premium: "20.83% inc. VAT", bestFor: "Palitoy; UK/European carded figures; large volume vintage toy sales", website: "vectis.co.uk", notes: "Leading UK vintage toy auction house" },
+  { name: "C&T Auctions", location: "Kent, UK", currency: "GBP", premium: "22% + 20% VAT on premium (26.4% inclusive)", bestFor: "Palitoy and Kenner carded figures; UKG/AFA graded lots; dedicated Star Wars auctions", website: "candtauctions.co.uk", notes: "Additional 3–4.95% + VAT surcharge if bidding via the-saleroom.com or EasyLiveAuctions; direct C&T website bids carry no surcharge" },
+  { name: "LCG Auctions", location: "Online, UK", currency: "GBP", premium: "Varies", bestFor: "Vintage Star Wars lots; UK-based online auctions", website: "lcgauctions.com", notes: "Specialist vintage toy and Star Wars auctioneer" },
+];
+
 const GRADE_TABLE = [
   { code: "RAW-NM", grade: "Ungraded Near Mint", desc: "Sharp corners, clear bubble, no sticker, unpunched tab", premium: "Baseline" },
   { code: "RAW-EX", grade: "Ungraded Excellent", desc: "Light wear, minor corner rounding or small bubble blemish", premium: "−30 to −50%" },

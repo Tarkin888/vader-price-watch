@@ -154,7 +154,7 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
-        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary">
+        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary" aria-current="page">
           PRICE TRACKER
         </button>
         <button
