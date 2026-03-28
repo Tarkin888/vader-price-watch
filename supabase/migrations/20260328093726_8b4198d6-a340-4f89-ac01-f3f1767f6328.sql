@@ -1,0 +1,1 @@
+ALTER TYPE variant_code ADD VALUE IF NOT EXISTS 'PBP';
