@@ -134,7 +134,7 @@ const KnowledgeHub = () => {
             <p className="mt-1 text-[11px] text-muted-foreground tracking-wider leading-relaxed">
               SW 12/20/21 &nbsp;•&nbsp; ESB 31/32/41/45/47/48 &nbsp;•&nbsp; ROTJ 48/65/77/79 &nbsp;•&nbsp; POTF 92
               <br />
-              Hake's &nbsp;•&nbsp; Heritage &nbsp;•&nbsp; LCG &nbsp;•&nbsp; Vectis
+              C&T &nbsp;•&nbsp; Hake's &nbsp;•&nbsp; Heritage &nbsp;•&nbsp; LCG &nbsp;•&nbsp; Vectis
             </p>
           </div>
           <ThemeToggle />
