@@ -65,20 +65,20 @@ const Header = ({ totalRecords, lastScrapeDate, lots = [] }: HeaderProps) => {
             return (
               <div
                 key={era}
-                className="border border-border rounded px-4 py-2.5 min-w-[210px] bg-secondary/50"
+                className="border border-border rounded px-3 py-1.5 min-w-[150px] bg-secondary/50"
               >
-                <div className="flex items-center gap-2.5 mb-1">
+                <div className="flex items-center gap-2 mb-0.5">
                   <span
-                    className="text-sm font-bold tracking-widest px-2 py-0.5 rounded"
+                    className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded"
                     style={{ backgroundColor: color, color: "#fff" }}
                   >
                     {era}
                   </span>
-                  <span className="text-sm text-muted-foreground tracking-wider">
+                  <span className="text-[10px] text-muted-foreground tracking-wider">
                     {stats.count} records
                   </span>
                 </div>
-                <div className="flex gap-4 text-sm tracking-wider">
+                <div className="flex gap-3 text-[10px] tracking-wider">
                   <span>
                     <span className="text-muted-foreground">AVG </span>
                     <span className="text-primary font-bold">{fmt(stats.avg)}</span>
