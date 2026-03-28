@@ -236,6 +236,7 @@ export type Database = {
         | "ROTJ-79A"
         | "ROTJ-79B"
         | "PAL-TL"
+        | "PBP"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -448,6 +449,7 @@ export const Constants = {
         "ROTJ-79A",
         "ROTJ-79B",
         "PAL-TL",
+        "PBP",
       ],
     },
   },
