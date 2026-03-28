@@ -197,7 +197,7 @@ export type Database = {
         | "CAS-85"
         | "CAS-75"
       lot_era: "SW" | "ESB" | "ROTJ" | "POTF" | "UNKNOWN"
-      lot_source: "Heritage" | "Hakes" | "Vectis" | "LCG"
+      lot_source: "Heritage" | "Hakes" | "Vectis" | "LCG" | "CandT"
       variant_code:
         | "12A"
         | "12B"
@@ -412,7 +412,7 @@ export const Constants = {
         "CAS-75",
       ],
       lot_era: ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"],
-      lot_source: ["Heritage", "Hakes", "Vectis", "LCG"],
+      lot_source: ["Heritage", "Hakes", "Vectis", "LCG", "CandT"],
       variant_code: [
         "12A",
         "12B",
