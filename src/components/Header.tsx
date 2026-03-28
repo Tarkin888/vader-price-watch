@@ -40,7 +40,7 @@ const Header = ({ totalRecords, lastScrapeDate, lots = [] }: HeaderProps) => {
         <div className="shrink-0">
           <div className="flex items-baseline gap-3">
             <h1 className="text-xl md:text-2xl font-bold text-primary tracking-wider">
-              IMPERIAL PRICE TERMINAL
+              DARTH VADER MINT ON CARDS FOCUS
             </h1>
             <span className="text-[10px] text-muted-foreground tracking-widest">
               v4.0 | March 2026
