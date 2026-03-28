@@ -195,6 +195,7 @@ export type Database = {
         | "AFA-60"
         | "CAS-70"
         | "CAS-85"
+        | "CAS-75"
       lot_era: "SW" | "ESB" | "ROTJ" | "POTF" | "UNKNOWN"
       lot_source: "Heritage" | "Hakes" | "Vectis" | "LCG"
       variant_code:
@@ -237,6 +238,7 @@ export type Database = {
         | "ROTJ-79B"
         | "PAL-TL"
         | "PBP"
+        | "SW-12-DT"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -407,6 +409,7 @@ export const Constants = {
         "AFA-60",
         "CAS-70",
         "CAS-85",
+        "CAS-75",
       ],
       lot_era: ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"],
       lot_source: ["Heritage", "Hakes", "Vectis", "LCG"],
@@ -450,6 +453,7 @@ export const Constants = {
         "ROTJ-79B",
         "PAL-TL",
         "PBP",
+        "SW-12-DT",
       ],
     },
   },
