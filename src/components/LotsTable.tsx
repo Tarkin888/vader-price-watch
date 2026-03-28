@@ -296,7 +296,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                     className="border-muted-foreground"
                   />
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap">{l.sale_date}</td>
+                <td className="px-3 py-2 whitespace-nowrap">
+                  {new Date(l.sale_date).toLocaleDateString("en-GB")}
+                </td>
                 <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
                   {new Date(l.created_at).toLocaleDateString("en-GB")}{" "}
                   <span className="text-[9px]">{new Date(l.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
