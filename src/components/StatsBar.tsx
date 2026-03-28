@@ -120,46 +120,22 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
     );
   }
 
-  // All eras mode: one card per era
-  const eraGroups = ERAS_ORDER.map((era) => ({
-    era,
-    lots: lots.filter((l) => l.era === era),
-  })).filter((g) => g.lots.length > 0);
+  // All eras mode: just show a compact summary line (era cards are in the header)
+  const totalStats = calcStats(lots, isUSD);
 
   return (
-    <div className="flex flex-wrap gap-4 px-6 py-3 border-b border-border">
-      {eraGroups.map(({ era, lots: eraLots }) => {
-        const stats = calcStats(eraLots, isUSD);
-        const color = ERA_COLORS[era] ?? "hsl(0, 0%, 33%)";
-        return (
-          <div
-            key={era}
-            className="border border-border rounded px-4 py-2 min-w-[160px] bg-secondary/50"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <span
-                className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded"
-                style={{ backgroundColor: color, color: "#fff" }}
-              >
-                {era}
-              </span>
-              <span className="text-[10px] text-muted-foreground tracking-wider">
-                {stats.count} records
-              </span>
-            </div>
-            <div className="flex gap-4 text-xs tracking-wider">
-              <span>
-                <span className="text-muted-foreground">AVG </span>
-                <span className="text-primary font-bold">{fmt(stats.avg)}</span>
-              </span>
-              <span>
-                <span className="text-muted-foreground">HIGH </span>
-                <span className="text-primary font-bold">{fmt(stats.max)}</span>
-              </span>
-            </div>
-          </div>
-        );
-      })}
+    <div className="flex items-center gap-4 px-6 py-2 border-b border-border text-xs tracking-wider">
+      <span className="text-muted-foreground">
+        {totalStats.count} RECORDS
+      </span>
+      <span>
+        <span className="text-muted-foreground">AVG: </span>
+        <span className="text-primary font-bold">{fmt(totalStats.avg)}</span>
+      </span>
+      <span>
+        <span className="text-muted-foreground">HIGH: </span>
+        <span className="text-primary font-bold">{fmt(totalStats.max)}</span>
+      </span>
     </div>
   );
 };
