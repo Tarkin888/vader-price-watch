@@ -130,6 +130,14 @@ const BADGE_CONFIG: Record<string, {
     dividerX: [50, 36],
     nameX: [54, 40],
   },
+  CandT: {
+    monogram: "C&T",
+    label: "C&T",
+    currency: "GBP",
+    monoX: 6,
+    dividerX: [46, 34],
+    nameX: [50, 38],
+  },
 };
 
 export default SourceBadge;

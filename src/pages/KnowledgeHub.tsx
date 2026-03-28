@@ -63,6 +63,14 @@ const INTL_TABLE = [
   { code: "MEX", market: "Lili Ledy Mexico", cardbacks: "ROTJ-65D", features: "Different card stock and finish; Made in Mexico stamping", source: "Heritage; Hake's" },
 ];
 
+const AUCTION_SOURCES = [
+  { name: "Heritage Auctions", location: "Dallas, TX, USA", currency: "USD", premium: "20% (standard)", bestFor: "High-grade AFA figures; major U.S. vintage Star Wars auctions", website: "ha.com", notes: "Largest U.S. auction house for vintage Star Wars" },
+  { name: "Hake's Auctions", location: "York, PA, USA", currency: "USD", premium: "22% (varies)", bestFor: "Rare prototypes; DT sabers; pop-culture memorabilia", website: "hakes.com", notes: "Strong track record for record-breaking Star Wars lots" },
+  { name: "Vectis Auctions", location: "Thornaby, UK", currency: "GBP", premium: "20.83% inc. VAT", bestFor: "Palitoy; UK/European carded figures; large volume vintage toy sales", website: "vectis.co.uk", notes: "Leading UK vintage toy auction house" },
+  { name: "C&T Auctions", location: "Kent, UK", currency: "GBP", premium: "22% + 20% VAT on premium (26.4% inclusive)", bestFor: "Palitoy and Kenner carded figures; UKG/AFA graded lots; dedicated Star Wars auctions", website: "candtauctions.co.uk", notes: "Additional 3–4.95% + VAT surcharge if bidding via the-saleroom.com or EasyLiveAuctions; direct C&T website bids carry no surcharge" },
+  { name: "LCG Auctions", location: "Online, UK", currency: "GBP", premium: "Varies", bestFor: "Vintage Star Wars lots; UK-based online auctions", website: "lcgauctions.com", notes: "Specialist vintage toy and Star Wars auctioneer" },
+];
+
 const GRADE_TABLE = [
   { code: "RAW-NM", grade: "Ungraded Near Mint", desc: "Sharp corners, clear bubble, no sticker, unpunched tab", premium: "Baseline" },
   { code: "RAW-EX", grade: "Ungraded Excellent", desc: "Light wear, minor corner rounding or small bubble blemish", premium: "−30 to −50%" },
@@ -90,7 +98,7 @@ const VALUE_RANKING = [
   { era: "POTF", highest: "POTF-92", reason: "Coin included; last vintage run; strong demand for complete examples" },
 ];
 
-const SECTIONS = ["TIMELINE", "CARDBACK TABLE", "VARIANT SPOTLIGHTS", "INTERNATIONAL", "GRADES & VALUE"] as const;
+const SECTIONS = ["TIMELINE", "CARDBACK TABLE", "VARIANT SPOTLIGHTS", "INTERNATIONAL", "AUCTION SOURCES", "GRADES & VALUE"] as const;
 
 const ERA_ROW_BG: Record<string, string> = {
   SW: "rgba(30, 58, 95, 0.18)",
@@ -134,7 +142,7 @@ const KnowledgeHub = () => {
             <p className="mt-1 text-[11px] text-muted-foreground tracking-wider leading-relaxed">
               SW 12/20/21 &nbsp;•&nbsp; ESB 31/32/41/45/47/48 &nbsp;•&nbsp; ROTJ 48/65/77/79 &nbsp;•&nbsp; POTF 92
               <br />
-              Hake's &nbsp;•&nbsp; Heritage &nbsp;•&nbsp; LCG &nbsp;•&nbsp; Vectis
+              C&T &nbsp;•&nbsp; Hake's &nbsp;•&nbsp; Heritage &nbsp;•&nbsp; LCG &nbsp;•&nbsp; Vectis
             </p>
           </div>
           <ThemeToggle />
@@ -296,7 +304,40 @@ const KnowledgeHub = () => {
           </p>
         </div>
 
-        {/* ──── SECTION 5: GRADES & VALUE ──── */}
+        {/* ──── SECTION 5: AUCTION SOURCES ──── */}
+        <div ref={(el) => { sectionRefs.current["AUCTION SOURCES"] = el; }}>
+          <SectionHeader title="AUCTION SOURCE REFERENCE" />
+          <div className="overflow-x-auto mt-4">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className={thCls}>SOURCE</th>
+                  <th className={thCls}>LOCATION</th>
+                  <th className={thCls}>CURRENCY</th>
+                  <th className={thCls}>BUYER'S PREMIUM</th>
+                  <th className={thCls}>BEST FOR</th>
+                  <th className={thCls}>NOTES</th>
+                </tr>
+              </thead>
+              <tbody>
+                {AUCTION_SOURCES.map((s) => (
+                  <tr key={s.name}>
+                    <td className={`${tdCls} text-primary font-bold whitespace-nowrap`}>
+                      <a href={`https://${s.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{s.name}</a>
+                    </td>
+                    <td className={`${tdCls} whitespace-nowrap`}>{s.location}</td>
+                    <td className={`${tdCls} whitespace-nowrap`}>{s.currency}</td>
+                    <td className={tdCls}>{s.premium}</td>
+                    <td className={tdCls}>{s.bestFor}</td>
+                    <td className={tdCls}>{s.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ──── SECTION 6: GRADES & VALUE ──── */}
         <div ref={(el) => { sectionRefs.current["GRADES & VALUE"] = el; }}>
           <SectionHeader title="GRADE TIER & VALUE FRAMEWORK" />
           <div className="grid lg:grid-cols-2 gap-6 mt-4">
@@ -355,7 +396,7 @@ const KnowledgeHub = () => {
 
         {/* ──── FOOTER NOTE ──── */}
         <p className="text-[10px] text-primary/70 italic tracking-wider leading-relaxed pt-4 border-t border-border">
-          Reference data compiled from Heritage Auctions, Hake's Auctions, Dallas Vintage Toys, 4th Moon Toys, Brian's Toys, the SWCA archive, and the Kenner Star Wars Collectors' Handbook. Rarity ratings are collector consensus estimates. Always verify against current auction records in the Price Tracker tab.
+          Reference data compiled from Heritage Auctions, Hake's Auctions, C&T Auctions, Dallas Vintage Toys, 4th Moon Toys, Brian's Toys, the SWCA archive, and the Kenner Star Wars Collectors' Handbook. Rarity ratings are collector consensus estimates. Always verify against current auction records in the Price Tracker tab.
         </p>
       </div>
 

@@ -1,0 +1,1 @@
+ALTER TYPE public.lot_source ADD VALUE IF NOT EXISTS 'CandT';
