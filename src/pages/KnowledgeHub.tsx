@@ -296,7 +296,40 @@ const KnowledgeHub = () => {
           </p>
         </div>
 
-        {/* ──── SECTION 5: GRADES & VALUE ──── */}
+        {/* ──── SECTION 5: AUCTION SOURCES ──── */}
+        <div ref={(el) => { sectionRefs.current["AUCTION SOURCES"] = el; }}>
+          <SectionHeader title="AUCTION SOURCE REFERENCE" />
+          <div className="overflow-x-auto mt-4">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className={thCls}>SOURCE</th>
+                  <th className={thCls}>LOCATION</th>
+                  <th className={thCls}>CURRENCY</th>
+                  <th className={thCls}>BUYER'S PREMIUM</th>
+                  <th className={thCls}>BEST FOR</th>
+                  <th className={thCls}>NOTES</th>
+                </tr>
+              </thead>
+              <tbody>
+                {AUCTION_SOURCES.map((s) => (
+                  <tr key={s.name}>
+                    <td className={`${tdCls} text-primary font-bold whitespace-nowrap`}>
+                      <a href={`https://${s.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{s.name}</a>
+                    </td>
+                    <td className={`${tdCls} whitespace-nowrap`}>{s.location}</td>
+                    <td className={`${tdCls} whitespace-nowrap`}>{s.currency}</td>
+                    <td className={tdCls}>{s.premium}</td>
+                    <td className={tdCls}>{s.bestFor}</td>
+                    <td className={tdCls}>{s.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ──── SECTION 6: GRADES & VALUE ──── */}
         <div ref={(el) => { sectionRefs.current["GRADES & VALUE"] = el; }}>
           <SectionHeader title="GRADE TIER & VALUE FRAMEWORK" />
           <div className="grid lg:grid-cols-2 gap-6 mt-4">
