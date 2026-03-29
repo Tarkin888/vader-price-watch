@@ -317,6 +317,18 @@ const Collection = () => {
               {privacyMode ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
               PRIVACY {privacyMode ? "ON" : "OFF"}
             </Button>
+            {!privacyMode && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-[10px] tracking-wider h-8"
+                onClick={handleBulkAutoCalc}
+                disabled={bulkCalcing || items.length === 0}
+              >
+                <Calculator className="w-3 h-3 mr-1" />
+                {bulkCalcing ? "CALCULATING..." : "1-YR AVG ALL"}
+              </Button>
+            )}
           </div>
 
           {/* Table */}
