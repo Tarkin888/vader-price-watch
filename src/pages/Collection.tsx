@@ -4,7 +4,8 @@ import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type
 import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
 import CollectionPhotoGallery from "@/components/CollectionPhotoGallery";
-import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
 import EstimatedValueCell from "@/components/EstimatedValueCell";
@@ -32,6 +33,7 @@ const Collection = () => {
   const [deleteItem, setDeleteItem] = useState<CollectionItem | null>(null);
   const [subTab, setSubTab] = useState<"inventory" | "analytics" | "gallery">("inventory");
   const [privacyMode, setPrivacyMode] = useState(false);
+  const [bulkCalcing, setBulkCalcing] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -121,6 +123,76 @@ const Collection = () => {
     if (items.length === 0) return null;
     return items.reduce((latest, i) => i.purchase_date > latest.purchase_date ? i : latest, items[0]);
   }, [items]);
+
+  const CATEGORY_TO_VARIANTS: Record<string, string[]> = {
+    "12 BACK": ["SW-12", "SW-12A", "SW-12B", "SW-12C", "SW-12A-DT", "SW-12B-DT", "12A", "12B", "12C", "12A-DT", "12B-DT"],
+    "20 BACK": ["SW-20"],
+    "21 BACK": ["SW-21"],
+    "ESB": ["ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48"],
+    "ROTJ": ["ROTJ-48", "ROTJ-65", "ROTJ-65-VP", "ROTJ-77", "ROTJ-79"],
+    "SECRET OFFER": ["SW-20", "SW-21"],
+    "FETT STICKER": ["SW-20", "SW-21"],
+    "TRILOGO": ["ROTJ-65", "ROTJ-77"],
+    "OTHER": [],
+  };
+  const CATEGORY_TO_ERA: Record<string, string> = {
+    "12 BACK": "SW", "20 BACK": "SW", "21 BACK": "SW",
+    "ESB": "ESB", "ROTJ": "ROTJ",
+    "SECRET OFFER": "SW", "FETT STICKER": "SW",
+    "TRILOGO": "ROTJ", "OTHER": "",
+  };
+
+  const handleBulkAutoCalc = async () => {
+    setBulkCalcing(true);
+    let updated = 0;
+    let failed = 0;
+    try {
+      for (const item of items) {
+        const variants = CATEGORY_TO_VARIANTS[item.category] || [];
+        const fallbackEra = CATEGORY_TO_ERA[item.category] || "";
+        if (variants.length === 0 && !fallbackEra) { failed++; continue; }
+
+        const windows = [1, 2, 3, 0];
+        let data: any[] | null = null;
+
+        for (const years of windows) {
+          if (variants.length === 0) break;
+          let query = supabase.from("lots").select("total_paid_gbp").in("variant_code", variants as any);
+          if (years > 0) {
+            const cutoff = new Date();
+            cutoff.setFullYear(cutoff.getFullYear() - years);
+            query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
+          }
+          const { data: result } = await query;
+          if (result && result.length > 0) { data = result; break; }
+        }
+
+        if ((!data || data.length === 0) && fallbackEra) {
+          for (const years of windows) {
+            let query = supabase.from("lots").select("total_paid_gbp").eq("era", fallbackEra as any);
+            if (years > 0) {
+              const cutoff = new Date();
+              cutoff.setFullYear(cutoff.getFullYear() - years);
+              query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
+            }
+            const { data: result } = await query;
+            if (result && result.length > 0) { data = result; break; }
+          }
+        }
+
+        if (!data || data.length === 0) { failed++; continue; }
+        const avg = Math.round(data.reduce((s: number, r: any) => s + Number(r.total_paid_gbp), 0) / data.length);
+        const { error } = await supabase.from("collection").update({ current_estimated_value: avg } as any).eq("id", item.id);
+        if (!error) updated++; else failed++;
+      }
+      toast.success(`Updated ${updated} item(s)${failed > 0 ? `, ${failed} could not be calculated` : ""}`);
+      load();
+    } catch (e: any) {
+      toast.error("Bulk calculation failed: " + e.message);
+    } finally {
+      setBulkCalcing(false);
+    }
+  };
 
   const selectClass = "bg-secondary border border-border text-foreground text-xs px-2 py-1.5 tracking-wider focus:outline-none focus:ring-1 focus:ring-primary";
 
@@ -245,6 +317,18 @@ const Collection = () => {
               {privacyMode ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
               PRIVACY {privacyMode ? "ON" : "OFF"}
             </Button>
+            {!privacyMode && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-[10px] tracking-wider h-8"
+                onClick={handleBulkAutoCalc}
+                disabled={bulkCalcing || items.length === 0}
+              >
+                <Calculator className="w-3 h-3 mr-1" />
+                {bulkCalcing ? "CALCULATING..." : "1-YR AVG ALL"}
+              </Button>
+            )}
           </div>
 
           {/* Table */}
