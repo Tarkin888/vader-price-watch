@@ -39,18 +39,19 @@ const SEARCH_URLS = [
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
-// ─── Title filter ──────────────────────────────────────────────
-const KEEP_KEYWORDS = [
-  "carded", "on card", "moc", "afa", "ukg", "cas",
-  "12 back", "12-back", "20 back", "21 back",
-  "31 back", "32 back", "41 back", "45 back", "47 back", "48 back",
-  "65 back", "77 back", "79 back", "92 back",
-  "potf", "power of the force",
-  "punched", "unpunched", "sealed", "mint on card",
-  "on original card", "original card", "blister",
+// ─── MOC Filter ───────────────────────────────────────────────
+const CARDBACK_INDICATORS = [
+  "carded", "moc", "on card", "mint on card",
+  "unpunched", "punched", "cardback", "back card",
+  "factory sealed", "bubble",
 ];
+// Also match any "NN back" or "NN-back" pattern (e.g. "12 back", "65-back")
+const CARDBACK_BACK_RE = /\d{2}[\s-]?back/i;
 
-const DISCARD_KEYWORDS = [
+const GRADING_INDICATORS_RE = /\b(afa|ukg|cas)\s*\d{2}\b|\b(afa|ukg|cas)\s+graded\b/i;
+const GRADING_KEYWORDS = ["afa", "ukg", "cas"];
+
+const MOC_REJECT_PATTERNS = [
   '12"', "12 inch", "tie fighter", "tie-fighter", "collector case",
   "carry case", "playset", "loose", "inflatable", "transfer sheet",
   "job lot", "quantity of", "quantity", "collection of", "group of",
@@ -67,48 +68,42 @@ const DISCARD_KEYWORDS = [
   "sote", "x twenty", "x ten", "x 20", "x 10",
   "figures x", "vehicles x",
   "hong kong", "taiwan",
+  // New reject patterns
+  "figures including", "x three", "x four", "x five", "x six",
+  "vader & emperor", "vader & obi-wan",
+  "collectors coins", "crystal", "don post", "gentle giant",
+  "jumbo", "doll", "roller skate", "bed head",
 ];
+// Reject titles ending with "(N)" — bulk/multi-figure lots
+const TRAILING_COUNT_RE = /\(\d+\)\s*$/;
 
-const GRADING_KEYWORDS = ["afa", "ukg", "cas"];
+function hasCardbackEvidence(text) {
+  const t = text.toLowerCase();
+  if (CARDBACK_INDICATORS.some((kw) => t.includes(kw))) return true;
+  if (CARDBACK_BACK_RE.test(t)) return true;
+  return false;
+}
 
-// Graded lots are assumed carded UNLESS they contain a loose indicator
-const LOOSE_INDICATORS = [
-  "loose", "unpackaged", "removed from card",
-  "out of packaging", "baggie", "in baggie",
-];
+function isMocLot(title, description = "") {
+  const combined = `${title} ${description}`.toLowerCase();
 
-// Carded indicators — used for ungraded lot filtering
-const CARDED_INDICATORS = [
-  "on card", "on original card", "carded", "back card",
-  "back", "moc", "sealed card", "unpunched", "punched",
-  "12 b-back", "12 a-back", "12 c-back",
-  "31back", "41back", "47back", "65back", "77back",
-  "79back", "92back", "potf",
-  "blister", "blister pack", "backing card", "backing",
-  "original backing", "within good", "within fair",
-  "within excellent", "within near mint", "within mint",
-  "card back", "cardback",
-  "return of the jedi", "empire strikes back",
-  "power of the force", "star wars card",
-];
+  // 1. Must contain "Darth Vader"
+  if (!combined.includes("darth vader")) return false;
 
-function shouldKeep(title) {
-  const t = title.toLowerCase();
-  // Must contain "Darth Vader"
-  if (!t.includes("darth vader")) return false;
-  // Discard if any exclusion keyword matches
-  if (DISCARD_KEYWORDS.some((kw) => t.includes(kw))) return false;
-  const hasGrading = GRADING_KEYWORDS.some((kw) => t.includes(kw));
-  const hasCardback = CARDED_INDICATORS.some((kw) => t.includes(kw));
-  // Graded lots: assume carded UNLESS explicitly loose
-  if (hasGrading && LOOSE_INDICATORS.some((kw) => t.includes(kw))) return false;
-  // Discard graded figures with no cardback reference in title
-  if (hasGrading && !hasCardback) return false;
-  if (!hasGrading && !hasCardback) {
-    if (/darth\s+vader\s+\d/.test(t) || t.includes("vintage figure")) return false;
-  }
-  // Must contain at least one MOC/cardback keyword
-  return KEEP_KEYWORDS.some((kw) => t.includes(kw));
+  // 2. Reject if any exclusion pattern matches
+  if (MOC_REJECT_PATTERNS.some((kw) => combined.includes(kw))) return false;
+
+  // 3. Reject trailing "(N)" pattern (bulk lots)
+  if (TRAILING_COUNT_RE.test(title.trim())) return false;
+
+  // 4. Graded lots: require cardback evidence, otherwise reject (graded loose)
+  const hasGrading = GRADING_KEYWORDS.some((kw) => combined.includes(kw));
+  if (hasGrading && !hasCardbackEvidence(combined)) return false;
+
+  // 5. Must have cardback evidence OR grading to qualify as MOC
+  if (!hasCardbackEvidence(combined) && !hasGrading) return false;
+
+  return true;
 }
 
 // ─── Classification (mirrors src/lib/classify-lot.ts) ─────────
