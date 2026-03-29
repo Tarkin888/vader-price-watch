@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
+import HeaderPhoto from "./HeaderPhoto";
 import type { Lot } from "@/lib/db";
 
 const ERA_COLORS: Record<string, string> = {
