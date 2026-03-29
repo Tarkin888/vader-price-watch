@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +26,9 @@ const CARDBACK_CODES = [
   "POTF-92",
   "UNKNOWN",
 ] as const;
+
+const MIN_DATE = "1977-01-01";
+const today = () => new Date().toISOString().slice(0, 10);
 
 interface Props {
   open: boolean;
@@ -55,10 +59,10 @@ function lotToForm(lot: Lot) {
 }
 
 const defaultForm = () => {
-  const today = new Date().toISOString().slice(0, 10);
+  const d = today();
   return {
-    capture_date: today,
-    sale_date: today,
+    capture_date: d,
+    sale_date: d,
     source: SOURCES[0] as string,
     lot_ref: "",
     lot_url: "",
@@ -76,20 +80,43 @@ const defaultForm = () => {
   };
 };
 
+type FormErrors = Record<string, string>;
+
+function validateDate(val: string): string | null {
+  if (!val) return "This field is required";
+  if (val < MIN_DATE || val > today()) return "Date must be between 1977 and today.";
+  return null;
+}
+
+function validate(form: ReturnType<typeof defaultForm>): FormErrors {
+  const e: FormErrors = {};
+  if (!form.source) e.source = "This field is required";
+  if (!form.era) e.era = "This field is required";
+  if (!form.cardback_code) e.cardback_code = "This field is required";
+  const tp = parseFloat(form.total_paid_gbp);
+  if (!form.total_paid_gbp || isNaN(tp) || tp <= 0) e.total_paid_gbp = "Must be a positive number";
+  const sdErr = validateDate(form.sale_date);
+  if (sdErr) e.sale_date = sdErr;
+  const cdErr = validateDate(form.capture_date);
+  if (cdErr) e.capture_date = cdErr;
+  return e;
+}
+
 const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(defaultForm());
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (open) {
       setForm(editLot ? lotToForm(editLot) : defaultForm());
+      setErrors({});
     }
   }, [open, editLot]);
 
   const set = (key: string, val: string) => {
     setForm((f) => {
       const next = { ...f, [key]: val };
-      // Auto-derive era + cardback when variant_code changes
       if (key === "variant_code") {
         const derived = deriveFromVariantCode(val);
         next.era = derived.era;
@@ -97,6 +124,8 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
       }
       return next;
     });
+    // Clear error on change
+    if (errors[key]) setErrors((e) => { const n = { ...e }; delete n[key]; return n; });
   };
 
   const selectClass =
@@ -104,6 +133,12 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
   const inputClass = "bg-secondary border-border text-xs tracking-wider";
 
   const handleSubmit = async () => {
+    const errs = validate(form);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      toast.error("Please fix the highlighted fields");
+      return;
+    }
     setSaving(true);
     try {
       const data: LotInsert = {
@@ -146,31 +181,34 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border max-w-lg max-h-[85vh] overflow-y-auto" aria-describedby="lot-form-desc">
         <DialogHeader>
           <DialogTitle className="text-primary tracking-wider text-sm">
             {editLot ? "EDIT LOT RECORD" : "ADD NEW LOT RECORD"}
           </DialogTitle>
+          <DialogDescription id="lot-form-desc" className="sr-only">
+            Form to add or edit an auction lot record
+          </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3 mt-2">
-          <Field label="Capture Date">
-            <Input type="date" value={form.capture_date} onChange={(e) => set("capture_date", e.target.value)} className={inputClass} />
+          <Field label="Capture Date" error={errors.capture_date}>
+            <Input type="date" required min={MIN_DATE} max={today()} value={form.capture_date} onChange={(e) => set("capture_date", e.target.value)} className={inputClass} />
           </Field>
-          <Field label="Sale Date">
-            <Input type="date" value={form.sale_date} onChange={(e) => set("sale_date", e.target.value)} className={inputClass} />
+          <Field label="Sale Date *" error={errors.sale_date}>
+            <Input type="date" required min={MIN_DATE} max={today()} value={form.sale_date} onChange={(e) => set("sale_date", e.target.value)} className={inputClass} />
           </Field>
-          <Field label="Source">
-            <select className={selectClass} value={form.source} onChange={(e) => set("source", e.target.value)}>
+          <Field label="Source *" error={errors.source}>
+            <select className={selectClass} required value={form.source} onChange={(e) => set("source", e.target.value)}>
               {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </Field>
-          <Field label="Era">
-            <select className={selectClass} value={form.era} onChange={(e) => set("era", e.target.value)}>
+          <Field label="Era *" error={errors.era}>
+            <select className={selectClass} required value={form.era} onChange={(e) => set("era", e.target.value)}>
               {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
             </select>
           </Field>
-          <Field label="Cardback Code">
-            <select className={selectClass} value={form.cardback_code} onChange={(e) => set("cardback_code", e.target.value)}>
+          <Field label="Cardback Code *" error={errors.cardback_code}>
+            <select className={selectClass} required value={form.cardback_code} onChange={(e) => set("cardback_code", e.target.value)}>
               {CARDBACK_CODES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </Field>
@@ -193,8 +231,8 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
           <Field label="Buyer's Premium (£)">
             <Input type="number" step="0.01" value={form.buyers_premium_gbp} onChange={(e) => set("buyers_premium_gbp", e.target.value)} className={inputClass} />
           </Field>
-          <Field label="Total Paid (£)" span={2}>
-            <Input type="number" step="0.01" value={form.total_paid_gbp} onChange={(e) => set("total_paid_gbp", e.target.value)} className={inputClass} />
+          <Field label="Total Paid (£) *" span={2} error={errors.total_paid_gbp}>
+            <Input type="number" step="0.01" required value={form.total_paid_gbp} onChange={(e) => set("total_paid_gbp", e.target.value)} className={inputClass} />
           </Field>
           <Field label="Lot Ref">
             <Input value={form.lot_ref} onChange={(e) => set("lot_ref", e.target.value)} className={inputClass} />
@@ -222,11 +260,12 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
   );
 };
 
-function Field({ label, children, span }: { label: string; children: React.ReactNode; span?: number }) {
+function Field({ label, children, span, error }: { label: string; children: React.ReactNode; span?: number; error?: string }) {
   return (
     <div className={span === 2 ? "col-span-2" : ""}>
       <label className="text-[10px] text-muted-foreground tracking-widest uppercase block mb-1">{label}</label>
       {children}
+      {error && <p className="text-[10px] text-destructive mt-0.5">{error}</p>}
     </div>
   );
 }

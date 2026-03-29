@@ -40,9 +40,11 @@ const Header = ({ totalRecords, lastScrapeDate, lots = [] }: HeaderProps) => {
       <div className="flex items-start justify-between gap-4">
         <div className="shrink-0">
           <div className="flex items-baseline gap-3">
-            <h1 className="text-xl md:text-2xl font-bold text-primary tracking-wider">
-              DARTH VADER MINT ON CARD FOCUS
-            </h1>
+            <Link to="/" className="cursor-pointer">
+              <h1 className="text-xl md:text-2xl font-bold text-primary tracking-wider">
+                DARTH VADER MINT ON CARD FOCUS
+              </h1>
+            </Link>
             <span className="text-[10px] text-muted-foreground tracking-widest">
               v4.0 | March 2026
             </span>
