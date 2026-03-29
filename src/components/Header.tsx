@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 import type { Lot } from "@/lib/db";
 
