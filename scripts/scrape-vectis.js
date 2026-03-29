@@ -31,9 +31,29 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SEARCH_URLS = [
-  "https://www.vectis.co.uk/catalog?query=darth+vader+kenner&timeframe=archived&per_page=96",
-  "https://www.vectis.co.uk/departments/star-wars-auctions?per_page=96",
+const SEARCH_QUERIES = [
+  "darth vader kenner",
+  "darth vader palitoy",
+  "darth vader tri-logo",
+  "darth vader carded",
+  "darth vader MOC",
+  "darth vader 12 back",
+  "darth vader 20 back",
+  "darth vader 21 back",
+  "darth vader 31 back",
+  "darth vader 32 back",
+  "darth vader 41 back",
+  "darth vader 45 back",
+  "darth vader 47 back",
+  "darth vader 48 back",
+  "darth vader 65 back",
+  "darth vader 77 back",
+  "darth vader 79 back",
+  "darth vader 92 back",
+  "darth vader POTF",
+  "darth vader AFA",
+  "darth vader UKG",
+  "darth vader CAS",
 ];
 
 const USER_AGENT =
