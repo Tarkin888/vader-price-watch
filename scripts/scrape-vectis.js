@@ -31,9 +31,29 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SEARCH_URLS = [
-  "https://www.vectis.co.uk/catalog?query=darth+vader+kenner&timeframe=archived&per_page=96",
-  "https://www.vectis.co.uk/departments/star-wars-auctions?per_page=96",
+const SEARCH_QUERIES = [
+  "darth vader kenner",
+  "darth vader palitoy",
+  "darth vader tri-logo",
+  "darth vader carded",
+  "darth vader MOC",
+  "darth vader 12 back",
+  "darth vader 20 back",
+  "darth vader 21 back",
+  "darth vader 31 back",
+  "darth vader 32 back",
+  "darth vader 41 back",
+  "darth vader 45 back",
+  "darth vader 47 back",
+  "darth vader 48 back",
+  "darth vader 65 back",
+  "darth vader 77 back",
+  "darth vader 79 back",
+  "darth vader 92 back",
+  "darth vader POTF",
+  "darth vader AFA",
+  "darth vader UKG",
+  "darth vader CAS",
 ];
 
 const USER_AGENT =
@@ -202,239 +222,249 @@ function parseEstimate(text) {
   return { low: nums[0] ?? null, high: nums[1] ?? nums[0] ?? null };
 }
 
-// ─── Scrape a single search URL ───────────────────────────────
-async function scrapeSearchUrl(page, baseUrl, seenLotRefs, stats) {
-  const separator = baseUrl.includes("?") ? "&" : "?";
+// ─── Phase 1: Collect all lot URLs from all queries ───────────
+async function collectLotUrls(page) {
+  const allLots = new Map(); // lotRef -> { title, url, imageUrl, lotRef }
 
-  // Page 1 to get total count
-  console.log(`\nLoading: ${baseUrl}`);
-  await page.goto(`${baseUrl}${separator}page=1`, { waitUntil: "domcontentloaded", timeout: 90000 });
-  await page.waitForTimeout(3000);
+  for (let qi = 0; qi < SEARCH_QUERIES.length; qi++) {
+    const query = SEARCH_QUERIES[qi];
+    const encoded = query.replace(/ /g, "+");
+    const baseUrl = `https://www.vectis.co.uk/catalog?query=${encoded}&timeframe=archived&per_page=96`;
 
-  const bodyText = await page.textContent("body");
-  const totalMatch = bodyText.match(/showing\s+\d+\s+of\s+([\d,]+)\s+lots/i);
-  const totalLots = totalMatch ? parseInt(totalMatch[1].replace(/,/g, ""), 10) : 96;
-  const totalPages = Math.ceil(totalLots / 96);
-  console.log(`Found ${totalLots} lots across ${totalPages} pages\n`);
+    console.log(`\n── Query ${qi + 1}/${SEARCH_QUERIES.length}: "${query}" ──`);
 
-  for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-    if (pageNum > 1) {
-      console.log(`\n─── Page ${pageNum}/${totalPages} ───`);
-      await page.goto(`${baseUrl}${separator}page=${pageNum}`, { waitUntil: "domcontentloaded", timeout: 90000 });
-      await page.waitForTimeout(3000);
-    }
+    await page.goto(`${baseUrl}&page=1`, { waitUntil: "domcontentloaded", timeout: 90000 });
+    await page.waitForTimeout(3000);
 
-    // Extract lot cards from listing
-    const cards = await page.evaluate(() => {
-      const foundCards = [];
-      const seenRefs = new Set();
+    const bodyText = await page.textContent("body");
+    const totalMatch = bodyText.match(/showing\s+\d+\s+of\s+([\d,]+)\s+lots/i);
+    const totalLots = totalMatch ? parseInt(totalMatch[1].replace(/,/g, ""), 10) : 0;
+    const totalPages = Math.max(1, Math.ceil(totalLots / 96));
+    console.log(`  Found ${totalLots} results across ${totalPages} pages`);
 
-      const findCardContainer = (element) => {
-        let current = element;
-        while (current && current !== document.body) {
-          const hasImg = current.querySelector("img");
-          const hasHeading = current.querySelector("h2, h3, h4");
-          if (hasImg && hasHeading) return current;
-          current = current.parentElement;
-        }
-        return null;
-      };
+    if (totalLots === 0) continue;
 
-      const selectors = ['a[href*="-lot-"]', 'a[href*="el="]'];
-      for (const selector of selectors) {
-        const links = Array.from(document.querySelectorAll(selector));
-        for (const link of links) {
-          const href = link.getAttribute("href");
-          if (!href) continue;
-
-          const lotRefMatch = href.match(/el=(\d+)/);
-          if (!lotRefMatch) continue;
-          const lotRef = lotRefMatch[1];
-
-          if (seenRefs.has(lotRef)) continue;
-          seenRefs.add(lotRef);
-
-          const container = findCardContainer(link);
-          if (!container) continue;
-
-          const heading = container.querySelector("h2, h3, h4");
-          const title = heading ? heading.textContent.trim() : "";
-          const img = container.querySelector("img");
-          const imageUrl = img ? img.getAttribute("src") || "" : "";
-          const lotNumberMatch = container.textContent.match(/lot\s+(\d+)/i);
-
-          foundCards.push({
-            title,
-            url: href.startsWith("http") ? href : `https://www.vectis.co.uk${href}`,
-            imageUrl,
-            lotNumber: lotNumberMatch ? lotNumberMatch[1] : "",
-            lotRef,
-          });
-        }
-      }
-      return foundCards;
-    });
-
-    if (pageNum === 1 && cards.length > 0) {
-      console.log("First card extracted:", JSON.stringify(cards[0], null, 2));
-    }
-    console.log(`Page ${pageNum}: found ${cards.length} lot cards`);
-
-    for (const card of cards) {
-      // De-duplicate across search URLs
-      if (seenLotRefs.has(card.lotRef)) {
-        stats.skipped++;
-        continue;
-      }
-      seenLotRefs.add(card.lotRef);
-
-      // Apply MOC title filter
-      if (!isMocLot(card.title)) {
-        stats.filtered++;
-        continue;
-      }
-
-      const lotRef = card.lotRef;
-
-      // Check for duplicate in Supabase
-      const { data: existing } = await supabase
-        .from("lots")
-        .select("id")
-        .eq("lot_ref", lotRef)
-        .eq("source", "Vectis")
-        .limit(1);
-
-      if (existing && existing.length > 0) {
-        stats.skipped++;
-        continue;
-      }
-
-      // Random delay before visiting lot page
-      await sleep(2000, 4000);
-      console.log(`  Visiting: ${card.title.substring(0, 55)}...`);
-
-      try {
-        await page.goto(card.url, { waitUntil: "domcontentloaded", timeout: 30000 });
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      if (pageNum > 1) {
+        await sleep(2000, 4000);
+        await page.goto(`${baseUrl}&page=${pageNum}`, { waitUntil: "domcontentloaded", timeout: 90000 });
         await page.waitForTimeout(3000);
-      } catch (e) {
-        console.warn(`  ⚠ Failed to load: ${e.message}`);
-        continue;
       }
 
-      // Extract lot details
-      const fullTitle = await page
-        .evaluate(() => {
-          const h = document.querySelector("h1, h2, .lot-title, [class*='lot-title']");
-          return h?.textContent?.trim() || "";
-        })
-        .catch(() => card.title);
+      const cards = await page.evaluate(() => {
+        const foundCards = [];
+        const seenRefs = new Set();
 
-      const conditionNotes = await page
-        .evaluate(() => {
-          const REJECT = [
-            "cookies", "payment", "buyer", "endeavoured", "sold as is",
-            "bidding", "privacy", "credit or debit", "bank transfer", "consent",
-          ];
+        const findCardContainer = (element) => {
+          let current = element;
+          while (current && current !== document.body) {
+            const hasImg = current.querySelector("img");
+            const hasHeading = current.querySelector("h2, h3, h4");
+            if (hasImg && hasHeading) return current;
+            current = current.parentElement;
+          }
+          return null;
+        };
 
-          function stripDisclaimer(t) {
-            const DISCLAIMERS = ["We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot"];
-            for (const d of DISCLAIMERS) {
-              const idx = t.indexOf(d);
-              if (idx > -1) t = t.substring(0, idx).trim();
+        const selectors = ['a[href*="-lot-"]', 'a[href*="el="]'];
+        for (const selector of selectors) {
+          const links = Array.from(document.querySelectorAll(selector));
+          for (const link of links) {
+            const href = link.getAttribute("href");
+            if (!href) continue;
+
+            const lotRefMatch = href.match(/el=(\d+)/);
+            if (!lotRefMatch) continue;
+            const lotRef = lotRefMatch[1];
+
+            if (seenRefs.has(lotRef)) continue;
+            seenRefs.add(lotRef);
+
+            const container = findCardContainer(link);
+            if (!container) continue;
+
+            const heading = container.querySelector("h2, h3, h4");
+            const title = heading ? heading.textContent.trim() : "";
+            const img = container.querySelector("img");
+            const imageUrl = img ? img.getAttribute("src") || "" : "";
+
+            foundCards.push({
+              title,
+              url: href.startsWith("http") ? href : `https://www.vectis.co.uk${href}`,
+              imageUrl,
+              lotRef,
+            });
+          }
+        }
+        return foundCards;
+      });
+
+      for (const card of cards) {
+        if (!allLots.has(card.lotRef)) {
+          allLots.set(card.lotRef, card);
+        }
+      }
+
+      console.log(`  Page ${pageNum}/${totalPages}: ${cards.length} cards (unique total: ${allLots.size})`);
+    }
+  }
+
+  console.log(`\n══════════════════════════════════════════`);
+  console.log(`Total unique lot URLs discovered: ${allLots.size}`);
+  console.log(`══════════════════════════════════════════\n`);
+
+  return Array.from(allLots.values());
+}
+
+// ─── Phase 2: Visit each unique lot and process ───────────────
+async function processLots(page, lots, stats) {
+  for (const card of lots) {
+    // Apply MOC title filter
+    if (!isMocLot(card.title)) {
+      stats.filtered++;
+      continue;
+    }
+
+    const lotRef = card.lotRef;
+
+    // Check for duplicate in Supabase
+    const { data: existing } = await supabase
+      .from("lots")
+      .select("id")
+      .eq("lot_ref", lotRef)
+      .eq("source", "Vectis")
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      stats.skipped++;
+      continue;
+    }
+
+    // Random delay before visiting lot page
+    await sleep(2000, 4000);
+    console.log(`  Visiting: ${card.title.substring(0, 55)}...`);
+
+    try {
+      await page.goto(card.url, { waitUntil: "domcontentloaded", timeout: 30000 });
+      await page.waitForTimeout(3000);
+    } catch (e) {
+      console.warn(`  ⚠ Failed to load: ${e.message}`);
+      continue;
+    }
+
+    // Extract lot details
+    const fullTitle = await page
+      .evaluate(() => {
+        const h = document.querySelector("h1, h2, .lot-title, [class*='lot-title']");
+        return h?.textContent?.trim() || "";
+      })
+      .catch(() => card.title);
+
+    const conditionNotes = await page
+      .evaluate(() => {
+        const REJECT = [
+          "cookies", "payment", "buyer", "endeavoured", "sold as is",
+          "bidding", "privacy", "credit or debit", "bank transfer", "consent",
+        ];
+
+        function stripDisclaimer(t) {
+          const DISCLAIMERS = ["We have endeavoured", "SOLD AS IS", "Buyer's Premium", "bidding on any lot"];
+          for (const d of DISCLAIMERS) {
+            const idx = t.indexOf(d);
+            if (idx > -1) t = t.substring(0, idx).trim();
+          }
+          return t;
+        }
+
+        const allHeadings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, strong, b"));
+        for (const h of allHeadings) {
+          if (/full\s*lot\s*description/i.test(h.textContent || "")) {
+            let sibling = h.nextElementSibling;
+            if (!sibling && h.parentElement) sibling = h.parentElement.nextElementSibling;
+            if (sibling) {
+              const text = stripDisclaimer(sibling.textContent?.trim() || "");
+              if (text.length > 10) return text;
             }
-            return t;
           }
+        }
 
-          const allHeadings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, strong, b"));
-          for (const h of allHeadings) {
-            if (/full\s*lot\s*description/i.test(h.textContent || "")) {
-              let sibling = h.nextElementSibling;
-              if (!sibling && h.parentElement) sibling = h.parentElement.nextElementSibling;
-              if (sibling) {
-                const text = stripDisclaimer(sibling.textContent?.trim() || "");
-                if (text.length > 10) return text;
-              }
-            }
-          }
+        const allP = Array.from(document.querySelectorAll("p"));
+        for (const p of allP) {
+          const raw = p.textContent?.trim() || "";
+          const text = stripDisclaimer(raw);
+          if (text.length < 40) continue;
+          const lower = text.toLowerCase();
+          if (REJECT.some((r) => lower.includes(r))) continue;
+          if (/^(kenner|palitoy|star wars)/i.test(text)) return text;
+        }
 
-          const allP = Array.from(document.querySelectorAll("p"));
-          for (const p of allP) {
-            const raw = p.textContent?.trim() || "";
-            const text = stripDisclaimer(raw);
-            if (text.length < 40) continue;
-            const lower = text.toLowerCase();
-            if (REJECT.some((r) => lower.includes(r))) continue;
-            if (/^(kenner|palitoy|star wars)/i.test(text)) return text;
-          }
+        return "";
+      })
+      .catch(() => "");
 
-          return "";
-        })
-        .catch(() => "");
+    const auctionName = await page
+      .evaluate(() => {
+        const sel = document.querySelector(
+          ".sale-name, .auction-title, [class*='auction'], [class*='sale-info']"
+        );
+        return sel?.textContent?.trim() || "";
+      })
+      .catch(() => "");
 
-      const auctionName = await page
-        .evaluate(() => {
-          const sel = document.querySelector(
-            ".sale-name, .auction-title, [class*='auction'], [class*='sale-info']"
-          );
-          return sel?.textContent?.trim() || "";
-        })
-        .catch(() => "");
+    const dateMatch = auctionName.match(/(\d{1,2}\s+\w+\s+\d{4})/);
+    const saleDate = dateMatch ? parseDate(dateMatch[1]) : new Date().toISOString().split("T")[0];
 
-      const dateMatch = auctionName.match(/(\d{1,2}\s+\w+\s+\d{4})/);
-      const saleDate = dateMatch ? parseDate(dateMatch[1]) : new Date().toISOString().split("T")[0];
+    const estimateText = await page
+      .evaluate(() => {
+        const est = document.querySelector(
+          ".estimate, [class*='estimate'], .price-estimate"
+        );
+        return est?.textContent?.trim() || "";
+      })
+      .catch(() => "");
+    const { low: estimateLowGBP, high: estimateHighGBP } = parseEstimate(estimateText);
 
-      const estimateText = await page
-        .evaluate(() => {
-          const est = document.querySelector(
-            ".estimate, [class*='estimate'], .price-estimate"
-          );
-          return est?.textContent?.trim() || "";
-        })
-        .catch(() => "");
-      const { low: estimateLowGBP, high: estimateHighGBP } = parseEstimate(estimateText);
+    const imageUrls = card.imageUrl
+      ? [card.imageUrl.replace("/medium/", "/large/").replace("/thumb/", "/large/")]
+      : [];
 
-      const imageUrls = card.imageUrl
-        ? [card.imageUrl.replace("/medium/", "/large/").replace("/thumb/", "/large/")]
-        : [];
+    const classification = classifyLot(fullTitle, conditionNotes);
 
-      const classification = classifyLot(fullTitle, conditionNotes);
+    const record = {
+      capture_date: new Date().toISOString().split("T")[0],
+      sale_date: saleDate,
+      source: "Vectis",
+      lot_ref: lotRef,
+      lot_url: card.url,
+      variant_code: classification.variant_code,
+      grade_tier_code: classification.grade_tier_code,
+      era: classification.era,
+      cardback_code: classification.cardback_code,
+      hammer_price_gbp: null,
+      buyers_premium_gbp: null,
+      total_paid_gbp: null,
+      usd_to_gbp_rate: 1.0,
+      image_urls: imageUrls,
+      condition_notes: conditionNotes.substring(0, 1000),
+      grade_subgrades: extractSubgrades(conditionNotes),
+      estimate_low_gbp: estimateLowGBP,
+      estimate_high_gbp: estimateHighGBP,
+      price_status: "ESTIMATE_ONLY",
+    };
 
-      const record = {
-        capture_date: new Date().toISOString().split("T")[0],
-        sale_date: saleDate,
-        source: "Vectis",
-        lot_ref: lotRef,
-        lot_url: card.url,
-        variant_code: classification.variant_code,
-        grade_tier_code: classification.grade_tier_code,
-        era: classification.era,
-        cardback_code: classification.cardback_code,
-        hammer_price_gbp: null,
-        buyers_premium_gbp: null,
-        total_paid_gbp: null,
-        usd_to_gbp_rate: 1.0,
-        image_urls: imageUrls,
-        condition_notes: conditionNotes.substring(0, 1000),
-        grade_subgrades: extractSubgrades(conditionNotes),
-        estimate_low_gbp: estimateLowGBP,
-        estimate_high_gbp: estimateHighGBP,
-        price_status: "ESTIMATE_ONLY",
-      };
+    if ((!record.estimate_low_gbp || record.estimate_low_gbp === 0) &&
+        (!record.estimate_high_gbp || record.estimate_high_gbp === 0)) {
+      stats.filtered++;
+      console.log(`  ✗ Skipped (no estimate): ${card.title.substring(0, 55)}...`);
+      continue;
+    }
 
-      if ((!record.estimate_low_gbp || record.estimate_low_gbp === 0) &&
-          (!record.estimate_high_gbp || record.estimate_high_gbp === 0)) {
-        stats.filtered++;
-        console.log(`  ✗ Skipped (no estimate): ${card.title.substring(0, 55)}...`);
-        continue;
-      }
-
-      const { error } = await supabase.from("lots").insert(record);
-      if (error) {
-        console.warn(`  ✗ Insert failed: ${error.message}`);
-      } else {
-        stats.inserted++;
-        console.log(`  ✓ Inserted: ${classification.variant_code} | ${lotRef}`);
-      }
+    const { error } = await supabase.from("lots").insert(record);
+    if (error) {
+      console.warn(`  ✗ Insert failed: ${error.message}`);
+    } else {
+      stats.inserted++;
+      console.log(`  ✓ Inserted: ${classification.variant_code} | ${lotRef}`);
     }
   }
 }
@@ -447,13 +477,15 @@ async function scrapeVectis() {
   const context = await browser.newContext({ userAgent: USER_AGENT });
   const page = await context.newPage();
 
-  const seenLotRefs = new Set();
   const stats = { inserted: 0, skipped: 0, filtered: 0 };
 
   try {
-    for (const url of SEARCH_URLS) {
-      await scrapeSearchUrl(page, url, seenLotRefs, stats);
-    }
+    // Phase 1: Collect all unique lot URLs
+    const uniqueLots = await collectLotUrls(page);
+
+    // Phase 2: Visit and process each lot
+    console.log(`Processing ${uniqueLots.length} unique lots...\n`);
+    await processLots(page, uniqueLots, stats);
   } catch (e) {
     console.error("Scraper error:", e);
   } finally {
