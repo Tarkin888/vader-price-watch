@@ -289,7 +289,7 @@ async function scrapeSearchUrl(page, baseUrl, seenLotRefs, stats) {
       seenLotRefs.add(card.lotRef);
 
       // Apply MOC title filter
-      if (!shouldKeep(card.title)) {
+      if (!isMocLot(card.title)) {
         stats.filtered++;
         continue;
       }
