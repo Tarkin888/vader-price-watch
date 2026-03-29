@@ -248,7 +248,7 @@ const Index = () => {
       )}
 
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
-        IMPERIAL PRICE TERMINAL v3.0 • GALACTIC EMPIRE • CLASSIFIED
+        IMPERIAL PRICE TERMINAL v4.0 • GALACTIC EMPIRE • CLASSIFIED
       </footer>
     </div>
   );
