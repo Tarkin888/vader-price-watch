@@ -39,6 +39,8 @@ const Header = ({ totalRecords, lastScrapeDate, lots = [] }: HeaderProps) => {
   return (
     <header className="border-b border-border px-6 py-5">
       <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <HeaderPhoto />
         <div className="shrink-0">
           <div className="flex items-baseline gap-3">
             <Link to="/" className="cursor-pointer">
