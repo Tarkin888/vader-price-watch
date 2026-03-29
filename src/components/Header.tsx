@@ -60,7 +60,8 @@ const Header = ({ totalRecords, lastScrapeDate, lots = [] }: HeaderProps) => {
           <div className="mt-1 flex gap-6 text-xs text-muted-foreground tracking-wider">
             <span>RECORDS IN DATABASE: <span className="text-primary">{totalRecords}</span></span>
             <span>LAST SCRAPE: <span className="text-primary">{lastScrapeDate ?? "N/A"}</span></span>
-          </div>
+        </div>
+        </div>
         </div>
 
         {/* Era stat badges */}
