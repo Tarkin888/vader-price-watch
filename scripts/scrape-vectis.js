@@ -161,7 +161,9 @@ function classifyLot(title, conditionNotes = "") {
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
   if (isDT) variantCode = cardbackCode + "-DT";
   const isMex = /\bmexico\b|\bmexican\b|\blili\s*ledy\b/i.test(text);
-  if (/\bcanadian\b|\bbilingual\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "CAN";
+  if (/tri[\s-]?logo|trilogo/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "PAL-TL";
+  else if (/\bcanadian\b|\bbilingual\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "CAN";
+  else if (/tri[\s-]?logo|trilogo/i.test(text) && /\bpalitoy\b/i.test(text)) variantCode = "PAL-TL";
   else if (/\bpalitoy\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "PAL";
   else if (isMex && cardbackCode === "UNKNOWN") variantCode = "MEX";
   else if (/vader\s*pointing|alternate\s*photo/i.test(text)) variantCode = "VP";

@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       .from("lots")
       .select("id, condition_notes, variant_code, grade_tier_code, era, cardback_code")
       .eq("source", "Vectis")
-      .or("variant_code.eq.UNKNOWN,grade_tier_code.eq.UNKNOWN");
+      .or("variant_code.eq.UNKNOWN,grade_tier_code.eq.UNKNOWN,cardback_code.eq.UNKNOWN,variant_code.eq.PAL");
 
     if (fetchErr) throw fetchErr;
     if (!lots || lots.length === 0) {
