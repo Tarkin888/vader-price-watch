@@ -40,6 +40,7 @@ function classifyLot(title, conditionNotes = "") {
   if (/92[\s-]?back|potf/i.test(text)) cardbackCode = "POTF-92";
   else if (/79[\s-]?a?\s*-?back|79a\b|\brotj[\s-]?79\b/i.test(text)) cardbackCode = "ROTJ-79";
   else if (/77[\s-]?a?\s*-?back|77a\b|\brotj[\s-]?77\b/i.test(text)) cardbackCode = "ROTJ-77";
+  else if (/70[\s-]?back|70b\b|70[\s-]?figure/i.test(text)) cardbackCode = "ROTJ-70";
   else if (/65[\s-]?a?\s*-?back|65a\b|\brotj[\s-]?65\b/i.test(text)) cardbackCode = "ROTJ-65";
   else if (/48[\s-]?a?\s*-?back|48a\b/i.test(text) && era === "ROTJ") cardbackCode = "ROTJ-48";
   else if (/48[\s-]?a?\s*-?back|48a\b/i.test(text) && era === "ESB") cardbackCode = "ESB-48";
@@ -60,7 +61,9 @@ function classifyLot(title, conditionNotes = "") {
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
   if (isDT) variantCode = cardbackCode + "-DT";
   const isMex = /\bmexico\b|\bmexican\b|\blili\s*ledy\b/i.test(text);
-  if (/\bcanadian\b|\bbilingual\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "CAN";
+  if (/tri[\s-]?logo|trilogo/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "PAL-TL";
+  else if (/\bcanadian\b|\bbilingual\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "CAN";
+  else if (/tri[\s-]?logo|trilogo/i.test(text) && /\bpalitoy\b/i.test(text)) variantCode = "PAL-TL";
   else if (/\bpalitoy\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "PAL";
   else if (isMex && cardbackCode === "UNKNOWN") variantCode = "MEX";
   else if (/vader\s*pointing|alternate\s*photo/i.test(text)) variantCode = "VP";
