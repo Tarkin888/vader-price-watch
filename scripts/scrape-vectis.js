@@ -140,6 +140,7 @@ function classifyLot(title, conditionNotes = "") {
   if (/92[\s-]?back|potf/i.test(text)) cardbackCode = "POTF-92";
   else if (/79[\s-]?back/i.test(text)) cardbackCode = "ROTJ-79";
   else if (/77[\s-]?back/i.test(text)) cardbackCode = "ROTJ-77";
+  else if (/70[\s-]?back|70b\b|70[\s-]?figure/i.test(text)) cardbackCode = "ROTJ-70";
   else if (/65[\s-]?back/i.test(text)) cardbackCode = "ROTJ-65";
   else if (/48[\s-]?back/i.test(text) && era === "ROTJ") cardbackCode = "ROTJ-48";
   else if (/48[\s-]?back/i.test(text) && era === "ESB") cardbackCode = "ESB-48";
