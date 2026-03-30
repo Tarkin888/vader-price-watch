@@ -1,0 +1,1 @@
+DELETE FROM lots WHERE lot_ref = '238493' AND source = 'Hakes';
