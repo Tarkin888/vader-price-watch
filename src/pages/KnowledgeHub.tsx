@@ -60,7 +60,8 @@ const SPOTLIGHT_CARDS = [
 
 const INTL_TABLE = [
   { code: "CAN", market: "Canadian Kenner", cardbacks: "SW-20, SW-21, ESB-31, ESB-41, ROTJ-77", features: "Bilingual English/French card; different logo layout", source: "Vectis; Heritage" },
-  { code: "PAL", market: "Palitoy UK", cardbacks: "SW-12, SW-20, ESB series", features: "Palitoy branding; UK market; different back layout", source: "Vectis" },
+  { code: "PAL", market: "Palitoy UK", cardbacks: "SW-12, SW-20, ESB series, ROTJ-70", features: "Palitoy branding; UK market; different back layout", source: "Vectis" },
+  { code: "PAL-TL", market: "Palitoy Tri-Logo", cardbacks: "ROTJ-70", features: "Tri-Logo branding; European multi-language text; 70-figure grid", source: "Vectis; Heritage; Hake's" },
   { code: "MEX", market: "Lili Ledy Mexico", cardbacks: "ROTJ-65D", features: "Different card stock and finish; Made in Mexico stamping", source: "Heritage; Hake's" },
 ];
 

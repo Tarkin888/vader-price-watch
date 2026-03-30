@@ -20,6 +20,7 @@ const CARDBACK_VARIANTS = [
   { era: "ROTJ", code: "ROTJ-65", desc: "Return of the Jedi 65-back", value: "Common" },
   { era: "ROTJ", code: "ROTJ-65-VP", desc: "65-back Vader pointing variant", value: "Uncommon" },
   { era: "ROTJ", code: "ROTJ-77", desc: "Return of the Jedi 77-back", value: "Common" },
+  { era: "ROTJ", code: "ROTJ-70", desc: "Return of the Jedi 70-back (Tri-Logo / Palitoy)", value: "Regional premium" },
   { era: "ROTJ", code: "ROTJ-79", desc: "Return of the Jedi 79-back", value: "Common" },
   { era: "POTF", code: "POTF-92", desc: "Power of the Force 92-back", value: "High premium" },
   { era: "INT", code: "CAN", desc: "Canadian release variant", value: "Regional premium" },
