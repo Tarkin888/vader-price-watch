@@ -1,0 +1,1 @@
+UPDATE lots SET sale_date = '2025-05-07', cardback_code = 'ROTJ-65', variant_code = 'PAL' WHERE lot_ref = '66892' AND source = 'CandT';
