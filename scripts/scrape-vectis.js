@@ -47,6 +47,7 @@ const SEARCH_QUERIES = [
   "darth vader 47 back",
   "darth vader 48 back",
   "darth vader 65 back",
+  "darth vader 70 back",
   "darth vader 77 back",
   "darth vader 79 back",
   "darth vader 92 back",
