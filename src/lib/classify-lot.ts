@@ -94,8 +94,14 @@ export function classifyLot(title: string, conditionNotes?: string): ClassifiedF
   else if (/cas\s*80|cas80/i.test(text)) gradeTierCode = "CAS-80";
   else if (/cas\s*75|cas75/i.test(text)) gradeTierCode = "CAS-75";
   else if (/cas\s*70|cas70/i.test(text)) gradeTierCode = "CAS-70";
-  // RAW MOC
-  else if (/\bmoc\b/i.test(text)) gradeTierCode = "RAW-NM";
+  // RAW MOC / carded / unpunched / sealed
+  else if (/\bmoc\b|\bcarded\b|\bunpunched\b|\bsealed\b/i.test(text)) gradeTierCode = "RAW-NM";
+  // Prose-based grade fallbacks (condition_notes)
+  else if (/\bmint\b|near[\s-]?mint|\bnm\b|excellent\s*plus/i.test(text)) gradeTierCode = "RAW-NM";
+  else if (/\bexcellent\b|good\s*plus|\bvg\+|very\s*good\s*plus/i.test(text)) gradeTierCode = "RAW-EX";
+  else if (/\bgood\b|\bfair\b|\bpoor\b|\bplayworn\b|\bdamaged\b|\bcrushed\b/i.test(text) && !/good\s*plus|good\s*condition\s*overall/i.test(text)) gradeTierCode = "RAW-VG";
+  // AFA mentioned without numeric score
+  else if (/\bafa\b/i.test(text)) gradeTierCode = "GRADED-UNKNOWN";
   // Generic "Graded" with no identifiable score
   else if (/\bgraded\b/i.test(text)) gradeTierCode = "GRADED-UNKNOWN";
 
