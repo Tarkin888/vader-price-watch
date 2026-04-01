@@ -226,7 +226,7 @@ const Index = () => {
       </div>
       <div className="flex-1">
         {activeTab === "dashboard" ? (
-          <SummaryDashboard lots={filtered} />
+          <SummaryDashboard lots={filtered} allLots={lots} />
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
