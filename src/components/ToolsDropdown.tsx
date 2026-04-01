@@ -141,6 +141,21 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
             <Download className="w-3.5 h-3.5" />
             EXPORT CSV ({filteredLots.length})
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={onShowBenchmark}
+            className="text-xs tracking-wider gap-2 cursor-pointer"
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            BENCHMARK PANEL
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={onShowPriceTrend}
+            className="text-xs tracking-wider gap-2 cursor-pointer"
+          >
+            <TrendingUp className="w-3.5 h-3.5" />
+            PRICE TREND
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
