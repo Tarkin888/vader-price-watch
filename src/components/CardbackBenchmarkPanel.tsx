@@ -119,19 +119,23 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExp
     return toUsd(gbp, avgRate);
   };
 
-  return (
-    <div className="border-b border-border">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-6 py-2 text-left text-[10px] tracking-widest hover:text-primary transition-colors flex items-center gap-2"
-        style={{ color: "#e0d8c0" }}
-      >
-        <span className="text-primary">{expanded ? "▼" : "▶"}</span>
-        {expanded ? "Hide Benchmark Panel" : "Show Benchmark Panel"}
-        <span className="text-muted-foreground ml-2">({cards.length} cardbacks)</span>
-      </button>
+  const isOpen = alwaysExpanded || expanded;
 
-      {expanded && (
+  return (
+    <div className={alwaysExpanded ? "" : "border-b border-border"}>
+      {!alwaysExpanded && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full px-6 py-2 text-left text-[10px] tracking-widest hover:text-primary transition-colors flex items-center gap-2"
+          style={{ color: "#e0d8c0" }}
+        >
+          <span className="text-primary">{expanded ? "▼" : "▶"}</span>
+          {expanded ? "Hide Benchmark Panel" : "Show Benchmark Panel"}
+          <span className="text-muted-foreground ml-2">({cards.length} cardbacks)</span>
+        </button>
+      )}
+
+      {isOpen && (
         <div className="px-6 pb-4">
           {cards.length === 0 ? (
             <div className="text-muted-foreground text-xs tracking-wider py-4">
