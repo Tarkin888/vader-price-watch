@@ -79,7 +79,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         dominantBaseline="central"
         textAnchor="end"
         className="fill-muted-foreground"
-        fontFamily="system-ui, sans-serif"
+        fontFamily="'Aptos', sans-serif"
         fontSize={isSm ? 10 : 7}
         letterSpacing="0.5"
         opacity="0.7"

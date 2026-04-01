@@ -159,7 +159,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback }: Props) 
                       backgroundColor: "#111109",
                       borderColor: "#C9A84C",
                       borderWidth: "1px",
-                      fontFamily: "'Courier New', monospace",
+                      fontFamily: "'Aptos', sans-serif",
                       color: "#e0d8c0",
                     }}
                   >

@@ -316,7 +316,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
             <ZAxis range={[110, 110]} />
             <Tooltip content={<CustomTooltip currency={currency} />} />
             <Legend
-              wrapperStyle={{ fontSize: 10, fontFamily: "'Courier New', monospace" }}
+              wrapperStyle={{ fontSize: 10, fontFamily: "'Aptos', sans-serif" }}
               payload={ERAS.filter((e) => enabledEras.has(e)).map((e) => ({
                 value: e,
                 type: "circle" as const,
