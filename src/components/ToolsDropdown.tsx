@@ -24,7 +24,7 @@ interface Props {
   onShowPriceTrend?: () => void;
 }
 
-const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots }: Props) => {
+const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots, onShowBenchmark, onShowPriceTrend }: Props) => {
   const [addOpen, setAddOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
