@@ -378,9 +378,22 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                     const imgUrl = getLotImageUrl(l.image_urls);
                     return imgUrl ? (
                       <button onClick={() => setLightboxUrl(imgUrl)}>
-                        <img src={imgUrl} alt="lot" className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors" />
+                        <img
+                          src={imgUrl}
+                          alt="lot"
+                          className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            target.style.display = "none";
+                            const placeholder = document.createElement("div");
+                            placeholder.className = "w-8 h-10 flex items-center justify-center text-center font-bold tracking-wider leading-tight";
+                            placeholder.style.cssText = "width:32px;height:40px;background:#1a1a1a;border:1px solid #C9A84C;color:#C9A84C;font-size:6px;display:flex;align-items:center;justify-content:center;";
+                            placeholder.textContent = "No Image";
+                            target.parentElement?.appendChild(placeholder);
+                          }}
+                        />
                       </button>
-                    ) : <span className="text-muted-foreground">—</span>;
+                    ) : <NoImagePlaceholder />;
                   })()}
                 </td>
                 <td className="px-3 py-2">
