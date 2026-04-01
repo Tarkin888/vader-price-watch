@@ -70,24 +70,39 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
           </div>
         ) : (
           <div className="divide-y divide-border/50">
-            {comparables.map((c) => (
-              <div
-                key={c.id}
-                className="px-4 py-2.5 hover:bg-secondary/50 transition-colors"
-              >
-                <div className="flex justify-between items-baseline">
-                  <span className="text-[10px] text-muted-foreground">{c.sale_date}</span>
-                  <span className="text-primary font-bold text-xs">{fmt(Number(c.total_paid_gbp))}</span>
-                </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">
-                  {c.source} • {c.lot_ref}
-                </div>
-                {c.condition_notes && (
-                  <div className="text-[9px] text-muted-foreground/70 mt-0.5 truncate">
-                    {c.condition_notes}
+            {comparables.map((c) => {
+              const inner = (
+                <>
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-[10px] text-muted-foreground">{c.sale_date}</span>
+                    <span className="text-primary font-bold text-xs">{fmt(Number(c.total_paid_gbp))}</span>
                   </div>
-                )}
-              </div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">
+                    {c.source} • {c.lot_ref}
+                  </div>
+                  {c.condition_notes && (
+                    <div className="text-[9px] text-muted-foreground/70 mt-0.5 truncate">
+                      {c.condition_notes}
+                    </div>
+                  )}
+                </>
+              );
+              return c.lot_url ? (
+                <a
+                  key={c.id}
+                  href={c.lot_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-4 py-2.5 hover:bg-secondary/50 transition-colors cursor-pointer"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div key={c.id} className="px-4 py-2.5 hover:bg-secondary/50 transition-colors">
+                  {inner}
+                </div>
+              );
+            }
             ))}
           </div>
         )}
