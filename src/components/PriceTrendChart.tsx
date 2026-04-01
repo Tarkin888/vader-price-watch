@@ -35,6 +35,7 @@ const TOOLTIP_STYLE = {
 
 interface Props {
   lots: Lot[];
+  alwaysExpanded?: boolean;
 }
 
 type ChartMode = "line" | "scatter";
