@@ -281,7 +281,7 @@ const Index = () => {
           <SheetHeader className="px-6 pt-4 pb-2">
             <SheetTitle className="text-primary text-sm tracking-widest">PRICE TREND</SheetTitle>
           </SheetHeader>
-          <PriceTrendChart lots={filtered} />
+          <PriceTrendChart lots={filtered} alwaysExpanded />
         </SheetContent>
       </Sheet>
 
