@@ -102,8 +102,7 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
                   {inner}
                 </div>
               );
-            }
-            ))}
+            })}
           </div>
         )}
       </div>
