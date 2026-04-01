@@ -265,6 +265,7 @@ const Index = () => {
           <CardbackBenchmarkPanel
             allLots={lots}
             currency={filters.currency}
+            alwaysExpanded
             onSelectCardback={(code) => {
               updateFilters({ ...filters, cardbackCode: code });
               changeTab("table");
