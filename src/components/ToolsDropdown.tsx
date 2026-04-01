@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
-import { Wrench, RefreshCw, Plus, Upload, Download } from "lucide-react";
+import { Wrench, RefreshCw, Plus, Upload, Download, BarChart3, TrendingUp, LayoutGrid } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LotFormModal from "@/components/LotFormModal";
@@ -19,6 +20,8 @@ interface Props {
   onAdded: () => void;
   onImported: () => void;
   filteredLots: Lot[];
+  onShowBenchmark?: () => void;
+  onShowPriceTrend?: () => void;
 }
 
 const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots }: Props) => {
