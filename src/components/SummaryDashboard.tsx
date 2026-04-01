@@ -18,11 +18,39 @@ const TOOLTIP_STYLE = {
   fontFamily: "'Aptos', sans-serif",
 };
 
+const ERA_COLORS: Record<string, string> = {
+  SW: "hsl(210, 35%, 47%)",
+  ESB: "hsl(40, 12%, 49%)",
+  ROTJ: "hsl(0, 43%, 44%)",
+  POTF: "hsl(45, 50%, 54%)",
+};
+const ERAS_ORDER = ["SW", "ESB", "ROTJ", "POTF"] as const;
+
 interface Props {
   lots: Lot[];
+  allLots?: Lot[];
 }
 
-const SummaryDashboard = ({ lots }: Props) => {
+function calcEraStats(items: Lot[]) {
+  const priced = items.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
+  const prices = priced.map((l) => Number(l.total_paid_gbp));
+  return {
+    count: items.length,
+    avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
+    max: prices.length > 0 ? Math.max(...prices) : 0,
+  };
+}
+
+const SummaryDashboard = ({ lots, allLots }: Props) => {
+  const sourceLots = allLots ?? lots;
+
+  const eraGroups = useMemo(() =>
+    ERAS_ORDER.map((era) => ({
+      era,
+      lots: sourceLots.filter((l) => l.era === era),
+    })).filter((g) => g.lots.length > 0),
+  [sourceLots]);
+
   const bySource = useMemo(() => {
     const map: Record<string, number> = {};
     lots.forEach((l) => { map[l.source] = (map[l.source] || 0) + 1; });
@@ -52,9 +80,46 @@ const SummaryDashboard = ({ lots }: Props) => {
   }, [lots]);
 
   const fmt = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 0 })}`;
+  const fmtFull = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
     <div className="px-6 py-4 space-y-6">
+      {/* Era summary cards */}
+      <div className="flex flex-wrap gap-2">
+        {eraGroups.map(({ era, lots: eraLots }) => {
+          const stats = calcEraStats(eraLots);
+          const color = ERA_COLORS[era] ?? "hsl(0, 0%, 33%)";
+          return (
+            <div
+              key={era}
+              className="border border-border rounded px-3 py-1.5 min-w-[150px] bg-secondary/50"
+            >
+              <div className="flex items-center gap-2 mb-0.5">
+                <span
+                  className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded"
+                  style={{ backgroundColor: color, color: "#fff" }}
+                >
+                  {era}
+                </span>
+                <span className="text-[10px] text-muted-foreground tracking-wider">
+                  {stats.count} records
+                </span>
+              </div>
+              <div className="flex gap-3 text-[10px] tracking-wider">
+                <span>
+                  <span className="text-muted-foreground">AVG </span>
+                  <span className="text-primary font-bold">{fmtFull(stats.avg)}</span>
+                </span>
+                <span>
+                  <span className="text-muted-foreground">HIGH </span>
+                  <span className="text-primary font-bold">{fmtFull(stats.max)}</span>
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Stats row */}
       <div className="flex gap-6 text-xs tracking-wider">
         <div>
@@ -73,7 +138,6 @@ const SummaryDashboard = ({ lots }: Props) => {
 
       {/* Charts grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* By Source */}
         <div className="border border-border p-3">
           <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY SOURCE</div>
           <ResponsiveContainer width="100%" height={160}>
@@ -87,7 +151,6 @@ const SummaryDashboard = ({ lots }: Props) => {
           </ResponsiveContainer>
         </div>
 
-        {/* By Variant */}
         <div className="border border-border p-3">
           <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY VARIANT</div>
           <ResponsiveContainer width="100%" height={160}>
@@ -101,7 +164,6 @@ const SummaryDashboard = ({ lots }: Props) => {
           </ResponsiveContainer>
         </div>
 
-        {/* Avg by Grade */}
         <div className="border border-border p-3">
           <div className="text-[10px] text-muted-foreground tracking-widest mb-2">AVG PRICE BY GRADE</div>
           <ResponsiveContainer width="100%" height={160}>

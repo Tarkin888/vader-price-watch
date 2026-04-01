@@ -152,7 +152,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header totalRecords={lots.length} lastScrapeDate={lastScrape} lots={filtered} />
+      <Header totalRecords={lots.length} lastScrapeDate={lastScrape} />
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
         <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary" aria-current="page">
           PRICE TRACKER
@@ -226,7 +226,7 @@ const Index = () => {
       </div>
       <div className="flex-1">
         {activeTab === "dashboard" ? (
-          <SummaryDashboard lots={filtered} />
+          <SummaryDashboard lots={filtered} allLots={lots} />
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
