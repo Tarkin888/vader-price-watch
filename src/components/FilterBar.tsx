@@ -1,5 +1,4 @@
 import { Constants } from "@/integrations/supabase/types";
-import SourceBadge from "@/components/SourceBadge";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -11,6 +10,14 @@ import { cn } from "@/lib/utils";
 const SOURCES = Constants.public.Enums.lot_source;
 const GRADES = Constants.public.Enums.grade_tier_code;
 const ERAS = ["SW", "ESB", "ROTJ", "POTF"] as const;
+
+const SOURCE_LABELS: Record<string, string> = {
+  Heritage: "Heritage",
+  Hakes: "Hake's",
+  Vectis: "Vectis",
+  LCG: "LCG",
+  CandT: "C&T",
+};
 
 const CARDBACK_GROUPS: { label: string; codes: string[] }[] = [
   { label: "SW", codes: ["SW-12", "SW-12A", "SW-12A-DT", "SW-12B", "SW-12B-DT", "SW-12C", "SW-20", "SW-21"] },
@@ -45,32 +52,27 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
   const selectClass =
     "bg-secondary border border-border text-foreground text-xs px-2 py-1.5 tracking-wider focus:outline-none focus:ring-1 focus:ring-primary";
 
-  // Filter cardback groups by selected era
   const visibleGroups = filters.era
     ? CARDBACK_GROUPS.filter((g) => g.label === filters.era || g.label === "International")
     : CARDBACK_GROUPS;
 
   return (
-    <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
-      <div className="flex flex-col gap-1">
-        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Search</label>
-        <div className="relative">
+    <div className="px-6 py-3 border-b border-border space-y-3">
+      {/* Row 1: Search + Source buttons */}
+      <div className="flex flex-col md:flex-row md:items-center gap-3">
+        <div className="relative shrink-0">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
           <Input
             value={filters.search}
             onChange={(e) => set("search", e.target.value)}
             placeholder="Search lots..."
-            className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-44"
+            className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-full md:w-52"
           />
         </div>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Source</label>
-        <div className="flex gap-1 items-center">
+        <div className="flex flex-wrap gap-1 items-center">
           <button
             onClick={() => set("source", null)}
-            className={`text-[10px] tracking-widest px-2 py-1 rounded border transition-colors ${
+            className={`text-[10px] tracking-widest px-2.5 py-1 rounded border transition-colors ${
               !filters.source ? "border-primary text-primary" : "border-border text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -80,73 +82,63 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
             <button
               key={s}
               onClick={() => set("source", filters.source === s ? null : s)}
-              className={`rounded border transition-colors px-1 py-0.5 ${
-                filters.source === s ? "border-primary" : "border-border hover:border-primary/50"
+              className={`text-[10px] tracking-widest px-2.5 py-1 rounded border transition-colors ${
+                filters.source === s
+                  ? "border-primary text-primary"
+                  : "border-border text-muted-foreground hover:text-foreground"
               }`}
             >
-              <SourceBadge source={s} size="sm" />
+              {SOURCE_LABELS[s] ?? s}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Era</label>
-        <select className={selectClass} value={filters.era ?? ""} onChange={(e) => {
-          const era = e.target.value || null;
-          onChange({ ...filters, era, cardbackCode: null });
-        }}>
-          <option value="">ALL</option>
-          {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
-        </select>
-      </div>
+      {/* Row 2: Era, Cardback, Grade, Dates, Clear */}
+      <div className="flex flex-col md:flex-row md:items-end gap-3">
+        <div className="flex flex-col gap-1 flex-1">
+          <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Era</label>
+          <select className={selectClass} value={filters.era ?? ""} onChange={(e) => {
+            const era = e.target.value || null;
+            onChange({ ...filters, era, cardbackCode: null });
+          }}>
+            <option value="">ALL</option>
+            {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
+          </select>
+        </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Cardback</label>
-        <select className={selectClass} value={filters.cardbackCode ?? ""} onChange={(e) => set("cardbackCode", e.target.value || null)}>
-          <option value="">ALL</option>
-          {visibleGroups.map((g) => (
-            <optgroup key={g.label} label={g.label}>
-              {g.codes.map((c) => <option key={c} value={c}>{c}</option>)}
-            </optgroup>
-          ))}
-        </select>
-      </div>
+        <div className="flex flex-col gap-1 flex-1">
+          <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Cardback</label>
+          <select className={selectClass} value={filters.cardbackCode ?? ""} onChange={(e) => set("cardbackCode", e.target.value || null)}>
+            <option value="">ALL</option>
+            {visibleGroups.map((g) => (
+              <optgroup key={g.label} label={g.label}>
+                {g.codes.map((c) => <option key={c} value={c}>{c}</option>)}
+              </optgroup>
+            ))}
+          </select>
+        </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grade</label>
-        <select className={selectClass} value={filters.gradeTier ?? ""} onChange={(e) => set("gradeTier", e.target.value || null)}>
-          <option value="">ALL</option>
-          {GRADES.map((g) => <option key={g} value={g}>{g}</option>)}
-        </select>
-      </div>
+        <div className="flex flex-col gap-1 flex-1">
+          <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grade</label>
+          <select className={selectClass} value={filters.gradeTier ?? ""} onChange={(e) => set("gradeTier", e.target.value || null)}>
+            <option value="">ALL</option>
+            {GRADES.map((g) => <option key={g} value={g}>{g}</option>)}
+          </select>
+        </div>
 
-      <DateFilter label="From" value={filters.dateFrom} onChange={(d) => set("dateFrom", d)} />
-      <DateFilter label="To" value={filters.dateTo} onChange={(d) => set("dateTo", d)} />
+        <DateFilter label="From" value={filters.dateFrom} onChange={(d) => set("dateFrom", d)} />
+        <DateFilter label="To" value={filters.dateTo} onChange={(d) => set("dateTo", d)} />
 
-      <div className="flex flex-col gap-1">
-        <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Currency</label>
-        <button
-          onClick={() => set("currency", filters.currency === "GBP" ? "USD" : "GBP")}
-          className="text-[10px] font-bold tracking-widest px-3 py-1.5 rounded border transition-colors"
-          style={{
-            backgroundColor: filters.currency === "USD" ? "#C9A84C" : "transparent",
-            borderColor: "#C9A84C",
-            color: filters.currency === "USD" ? "#1a1a1a" : "#C9A84C",
-          }}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-xs text-muted-foreground hover:text-primary tracking-wider"
+          onClick={() => onChange({ source: null, era: null, cardbackCode: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "", currency: filters.currency })}
         >
-          {filters.currency}
-        </button>
+          <X className="w-3 h-3 mr-1" /> CLEAR
+        </Button>
       </div>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        className="text-xs text-muted-foreground hover:text-primary tracking-wider"
-        onClick={() => onChange({ source: null, era: null, cardbackCode: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "", currency: "GBP" })}
-      >
-        <X className="w-3 h-3 mr-1" /> CLEAR
-      </Button>
     </div>
   );
 };
