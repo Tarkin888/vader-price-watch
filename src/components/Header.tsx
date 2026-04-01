@@ -40,6 +40,7 @@ const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyTogg
         <ThemeToggle />
       </div>
     </header>
+  );
 };
 
 
