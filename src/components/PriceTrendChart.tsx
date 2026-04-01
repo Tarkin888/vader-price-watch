@@ -54,9 +54,9 @@ const ScatterTooltipContent = ({ active, payload }: any) => {
   );
 };
 
-const PriceTrendChart = ({ lots }: Props) => {
+const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
   const [mode, setMode] = useState<ChartMode>("line");
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(alwaysExpanded);
 
   const { lineData, lineVariants } = useMemo(() => {
     const byVariant: Record<string, Lot[]> = {};
