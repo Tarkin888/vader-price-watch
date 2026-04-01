@@ -6,6 +6,7 @@ interface Props {
   allLots: Lot[];
   currency: Currency;
   onSelectCardback: (code: string) => void;
+  alwaysExpanded?: boolean;
 }
 
 const ERA_ORDER = ["SW", "ESB", "ROTJ", "POTF"] as const;
