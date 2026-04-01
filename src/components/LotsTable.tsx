@@ -19,6 +19,23 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+/** Return the best actual lot image from image_urls, filtering out junk (cookie banners, spinners, site logos). */
+function getLotImageUrl(imageUrls: string[]): string | null {
+  if (!imageUrls || imageUrls.length === 0) return null;
+  // Prefer large lot images (_l.jpg), then small (_s.jpg), then any valid non-junk URL
+  const junkPatterns = [
+    /cookieyes/i, /spinner/i, /settings\//i, /data:image/i,
+    /\.svg$/i, /poweredbt/i, /revisit\./i, /close\./i,
+  ];
+  const isJunk = (url: string) => junkPatterns.some((p) => p.test(url));
+  const large = imageUrls.find((u) => /images\/lot\/.*_l\./i.test(u) && !isJunk(u));
+  if (large) return large;
+  const small = imageUrls.find((u) => /images\/lot\/.*_s\./i.test(u) && !isJunk(u));
+  if (small) return small;
+  const any = imageUrls.find((u) => !isJunk(u) && u.startsWith("http"));
+  return any || null;
+}
+
 // ... keep existing code (types, helpers, badges — lines 20-105)
 type SortKey = "sale_date" | "created_at" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
 type SortDir = "asc" | "desc";
