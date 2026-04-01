@@ -19,6 +19,23 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+/** Return the best actual lot image from image_urls, filtering out junk (cookie banners, spinners, site logos). */
+function getLotImageUrl(imageUrls: string[]): string | null {
+  if (!imageUrls || imageUrls.length === 0) return null;
+  // Prefer large lot images (_l.jpg), then small (_s.jpg), then any valid non-junk URL
+  const junkPatterns = [
+    /cookieyes/i, /spinner/i, /settings\//i, /data:image/i,
+    /\.svg$/i, /poweredbt/i, /revisit\./i, /close\./i,
+  ];
+  const isJunk = (url: string) => junkPatterns.some((p) => p.test(url));
+  const large = imageUrls.find((u) => /images\/lot\/.*_l\./i.test(u) && !isJunk(u));
+  if (large) return large;
+  const small = imageUrls.find((u) => /images\/lot\/.*_s\./i.test(u) && !isJunk(u));
+  if (small) return small;
+  const any = imageUrls.find((u) => !isJunk(u) && u.startsWith("http"));
+  return any || null;
+}
+
 // ... keep existing code (types, helpers, badges — lines 20-105)
 type SortKey = "sale_date" | "created_at" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
 type SortDir = "asc" | "desc";
@@ -345,11 +362,14 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                 </td>
                 <td className="px-3 py-2 max-w-[200px] truncate" title={l.condition_notes}>{l.condition_notes}</td>
                 <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
-                  {l.image_urls.length > 0 ? (
-                    <button onClick={() => setLightboxUrl(l.image_urls[0])}>
-                      <img src={l.image_urls[0]} alt="lot" className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors" />
-                    </button>
-                  ) : <span className="text-muted-foreground">—</span>}
+                  {(() => {
+                    const imgUrl = getLotImageUrl(l.image_urls);
+                    return imgUrl ? (
+                      <button onClick={() => setLightboxUrl(imgUrl)}>
+                        <img src={imgUrl} alt="lot" className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors" />
+                      </button>
+                    ) : <span className="text-muted-foreground">—</span>;
+                  })()}
                 </td>
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-1.5">
