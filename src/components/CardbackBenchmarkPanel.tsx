@@ -6,6 +6,7 @@ interface Props {
   allLots: Lot[];
   currency: Currency;
   onSelectCardback: (code: string) => void;
+  alwaysExpanded?: boolean;
 }
 
 const ERA_ORDER = ["SW", "ESB", "ROTJ", "POTF"] as const;
@@ -57,8 +58,8 @@ interface CardData {
 
 const MIN_RECORDS = 3;
 
-const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback }: Props) => {
-  const [expanded, setExpanded] = useState(false);
+const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExpanded = false }: Props) => {
+  const [expanded, setExpanded] = useState(alwaysExpanded);
   const isUSD = currency === "USD";
 
   const cards = useMemo(() => {
@@ -118,19 +119,23 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback }: Props) 
     return toUsd(gbp, avgRate);
   };
 
-  return (
-    <div className="border-b border-border">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-6 py-2 text-left text-[10px] tracking-widest hover:text-primary transition-colors flex items-center gap-2"
-        style={{ color: "#e0d8c0" }}
-      >
-        <span className="text-primary">{expanded ? "▼" : "▶"}</span>
-        {expanded ? "Hide Benchmark Panel" : "Show Benchmark Panel"}
-        <span className="text-muted-foreground ml-2">({cards.length} cardbacks)</span>
-      </button>
+  const isOpen = alwaysExpanded || expanded;
 
-      {expanded && (
+  return (
+    <div className={alwaysExpanded ? "" : "border-b border-border"}>
+      {!alwaysExpanded && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full px-6 py-2 text-left text-[10px] tracking-widest hover:text-primary transition-colors flex items-center gap-2"
+          style={{ color: "#e0d8c0" }}
+        >
+          <span className="text-primary">{expanded ? "▼" : "▶"}</span>
+          {expanded ? "Hide Benchmark Panel" : "Show Benchmark Panel"}
+          <span className="text-muted-foreground ml-2">({cards.length} cardbacks)</span>
+        </button>
+      )}
+
+      {isOpen && (
         <div className="px-6 pb-4">
           {cards.length === 0 ? (
             <div className="text-muted-foreground text-xs tracking-wider py-4">

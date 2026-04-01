@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
-import { Wrench, RefreshCw, Plus, Upload, Download } from "lucide-react";
+import { Wrench, RefreshCw, Plus, Upload, Download, BarChart3, TrendingUp, LayoutGrid } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LotFormModal from "@/components/LotFormModal";
@@ -19,9 +20,11 @@ interface Props {
   onAdded: () => void;
   onImported: () => void;
   filteredLots: Lot[];
+  onShowBenchmark?: () => void;
+  onShowPriceTrend?: () => void;
 }
 
-const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots }: Props) => {
+const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots, onShowBenchmark, onShowPriceTrend }: Props) => {
   const [addOpen, setAddOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -137,6 +140,21 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
           >
             <Download className="w-3.5 h-3.5" />
             EXPORT CSV ({filteredLots.length})
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={onShowBenchmark}
+            className="text-xs tracking-wider gap-2 cursor-pointer"
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            BENCHMARK PANEL
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={onShowPriceTrend}
+            className="text-xs tracking-wider gap-2 cursor-pointer"
+          >
+            <TrendingUp className="w-3.5 h-3.5" />
+            PRICE TREND
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

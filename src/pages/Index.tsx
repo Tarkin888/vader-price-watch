@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { getAllLots, fixUnknownEraCardback, type Lot } from "@/lib/db";
 import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
-import StatsBar from "@/components/StatsBar";
 import ScatterChartPanel from "@/components/ScatterChartPanel";
 import PriceTrendChart from "@/components/PriceTrendChart";
 import ReferencePanel from "@/components/ReferencePanel";
@@ -14,9 +13,28 @@ import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
 import ComparableSalesPanel from "@/components/ComparableSalesPanel";
 import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+function calcQuickStats(lots: Lot[], isUSD: boolean) {
+  const priced = lots.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
+  const prices = priced.map((l) => {
+    const gbp = Number(l.total_paid_gbp);
+    if (!isUSD) return gbp;
+    const rate = Number(l.usd_to_gbp_rate);
+    return rate > 0 ? Math.round(gbp / rate) : 0;
+  });
+  return {
+    count: lots.length,
+    avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
+    max: prices.length > 0 ? Math.max(...prices) : 0,
+  };
+}
+
+const fmtPrice = (n: number, isUSD: boolean) =>
+  isUSD ? `$${Math.round(n).toLocaleString("en-US")}` : `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,6 +58,8 @@ const Index = () => {
   }, [setSearchParams]);
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
+  const [showBenchmark, setShowBenchmark] = useState(false);
+  const [showPriceTrend, setShowPriceTrend] = useState(false);
   const [filters, setFilters] = useState<Filters>(() => ({
     source: searchParams.get("source") || null,
     era: searchParams.get("era") || null,
@@ -76,7 +96,6 @@ const Index = () => {
 
   const loadLots = useCallback(async () => {
     try {
-      
       await fixUnknownEraCardback();
       const data = await getAllLots();
       setLots(data);
@@ -88,8 +107,6 @@ const Index = () => {
   }, []);
 
   useEffect(() => { loadLots(); }, [loadLots]);
-
-  // Cross-reference: read variant from URL params handled by initial state
 
   const filtered = useMemo(() => {
     return lots.filter((l) => {
@@ -137,6 +154,9 @@ const Index = () => {
     }
   };
 
+  const isUSD = filters.currency === "USD";
+  const quickStats = useMemo(() => calcQuickStats(filtered, isUSD), [filtered, isUSD]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -169,19 +189,15 @@ const Index = () => {
         <ReferencePanel />
       </div>
       <FilterBar filters={filters} onChange={updateFilters} />
-      <StatsBar lots={filtered} filters={filters} currency={filters.currency} />
-      <CardbackBenchmarkPanel
-        allLots={lots}
-        currency={filters.currency}
-        onSelectCardback={(code) => {
-          updateFilters({ ...filters, cardbackCode: code });
-          changeTab("table");
-          setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-        }}
-      />
-      <PriceTrendChart lots={filtered} />
+
+      {/* Tab bar with inline stats */}
       <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
-        <div className="flex gap-1">
+        <div className="flex items-center gap-1">
+          <span className="text-[11px] text-muted-foreground tracking-wider mr-3">
+            {quickStats.count} RECORDS
+            <span className="ml-2">AVG <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
+            <span className="ml-2">HIGH <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
+          </span>
           <button
             onClick={() => changeTab("dashboard")}
             className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
@@ -213,6 +229,8 @@ const Index = () => {
           onAdded={loadLots}
           onImported={loadLots}
           filteredLots={filtered}
+          onShowBenchmark={() => setShowBenchmark(true)}
+          onShowPriceTrend={() => setShowPriceTrend(true)}
         />
       </div>
       <div className="flex-1">
@@ -237,6 +255,35 @@ const Index = () => {
           onClose={() => setSelectedLot(null)}
         />
       )}
+
+      {/* Benchmark Panel slide-in */}
+      <Sheet open={showBenchmark} onOpenChange={setShowBenchmark}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto bg-background border-border p-0">
+          <SheetHeader className="px-6 pt-4 pb-2">
+            <SheetTitle className="text-primary text-sm tracking-widest">BENCHMARK PANEL</SheetTitle>
+          </SheetHeader>
+          <CardbackBenchmarkPanel
+            allLots={lots}
+            currency={filters.currency}
+            alwaysExpanded
+            onSelectCardback={(code) => {
+              updateFilters({ ...filters, cardbackCode: code });
+              changeTab("table");
+              setShowBenchmark(false);
+            }}
+          />
+        </SheetContent>
+      </Sheet>
+
+      {/* Price Trend slide-in */}
+      <Sheet open={showPriceTrend} onOpenChange={setShowPriceTrend}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto bg-background border-border p-0">
+          <SheetHeader className="px-6 pt-4 pb-2">
+            <SheetTitle className="text-primary text-sm tracking-widest">PRICE TREND</SheetTitle>
+          </SheetHeader>
+          <PriceTrendChart lots={filtered} alwaysExpanded />
+        </SheetContent>
+      </Sheet>
 
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
         IMPERIAL PRICE TERMINAL v4.0 • GALACTIC EMPIRE • CLASSIFIED
