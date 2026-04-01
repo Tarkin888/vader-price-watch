@@ -8,9 +8,7 @@ import ScatterChartPanel from "@/components/ScatterChartPanel";
 import PriceTrendChart from "@/components/PriceTrendChart";
 import ReferencePanel from "@/components/ReferencePanel";
 import LotsTable from "@/components/LotsTable";
-import ExportCSV from "@/components/ExportCSV";
-import ImportCSV from "@/components/ImportCSV";
-import AddLotModal from "@/components/AddLotModal";
+import ToolsDropdown from "@/components/ToolsDropdown";
 import SessionLog from "@/components/SessionLog";
 import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
@@ -19,7 +17,6 @@ import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCw } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();

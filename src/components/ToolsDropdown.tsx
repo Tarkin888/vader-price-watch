@@ -61,27 +61,41 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
     const rows: LotInsert[] = [];
     for (let i = start; i < lines.length; i++) {
       const cols = parseCSVLine(lines[i]);
-      if (cols.length < 8) continue;
-      const raw: Partial<LotInsert> = {
+      if (cols.length < 12) continue;
+      const titleText = [cols[3], cols[4], cols[5], cols[11]].join(" ");
+      const classified = classifyLot(titleText);
+      let era = classified.era;
+      let cardback_code = classified.cardback_code;
+      const variantCode = classified.variant_code;
+      if (era === "UNKNOWN" || cardback_code === "UNKNOWN") {
+        const derived = deriveFromVariantCode(variantCode);
+        if (era === "UNKNOWN" && derived.era !== "UNKNOWN") era = derived.era;
+        if (cardback_code === "UNKNOWN" && derived.cardback_code !== "UNKNOWN") cardback_code = derived.cardback_code;
+      }
+      rows.push({
         capture_date: cols[0],
         sale_date: cols[1],
         source: cols[2] as any,
-        lot_ref: cols[5],
-        variant_code: cols[6] as any,
-        grade_tier_code: cols[7] as any,
-        hammer_price_gbp: cols[9] ? Number(cols[9]) : null,
-        buyers_premium_gbp: cols[10] ? Number(cols[10]) : null,
-        total_paid_gbp: cols[11] ? Number(cols[11]) : null,
-        usd_to_gbp_rate: cols[12] ? Number(cols[12]) : 1,
-        condition_notes: cols[13] ?? "",
-      };
-      const classified = classifyLot(raw);
-      rows.push(classified as LotInsert);
+        lot_ref: cols[3],
+        era: era as any,
+        cardback_code,
+        variant_code: variantCode as any,
+        grade_tier_code: classified.grade_tier_code as any,
+        hammer_price_gbp: parseFloat(cols[7]) || 0,
+        buyers_premium_gbp: parseFloat(cols[8]) || 0,
+        total_paid_gbp: parseFloat(cols[9]) || 0,
+        usd_to_gbp_rate: parseFloat(cols[10]) || 1,
+        condition_notes: cols[11] || "",
+      });
     }
     if (rows.length === 0) { toast.error("No valid rows found"); return; }
-    const { error } = await supabase.from("lots").insert(rows);
+    const { data: existing } = await supabase.from("lots").select("lot_ref, source");
+    const existingKeys = new Set((existing ?? []).map((e) => `${e.lot_ref}|||${e.source}`));
+    const toInsert = rows.filter((r) => !existingKeys.has(`${r.lot_ref}|||${r.source}`));
+    if (toInsert.length === 0) { toast.info("All rows already exist"); return; }
+    const { error } = await supabase.from("lots").insert(toInsert);
     if (error) { toast.error("Import failed: " + error.message); return; }
-    toast.success(`Imported ${rows.length} lot(s)`);
+    toast.success(`Imported ${toInsert.length} row(s)`);
     onImported();
   };
 
