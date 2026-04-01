@@ -338,7 +338,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                 <td className="px-3 py-2"><SourceBadge source={l.source} /></td>
                 <td className="px-3 py-2">
                   {l.lot_url ? (
-                    <a href={l.lot_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                    <a href={l.lot_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline inline-flex items-center gap-1">
                       {l.lot_ref} <ExternalLink className="w-3 h-3" />
                     </a>
                   ) : l.lot_ref}
