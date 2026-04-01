@@ -213,7 +213,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
   }, [eraData, enabledEras]);
 
   return (
-    <div className="border-b border-border px-6 py-4 space-y-4" style={{ fontFamily: "'Courier New', monospace" }}>
+    <div className="border-b border-border px-6 py-4 space-y-4">
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-widest">
         {/* Era toggles */}
