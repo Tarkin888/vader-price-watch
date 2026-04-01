@@ -19,13 +19,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-/** Return the best actual lot image from image_urls, filtering out junk (cookie banners, spinners, site logos). */
+/** Return the best actual lot image from image_urls, filtering out junk (cookie banners, spinners, site logos, profile pics). */
 function getLotImageUrl(imageUrls: string[]): string | null {
   if (!imageUrls || imageUrls.length === 0) return null;
-  // Prefer large lot images (_l.jpg), then small (_s.jpg), then any valid non-junk URL
   const junkPatterns = [
     /cookieyes/i, /spinner/i, /settings\//i, /data:image/i,
     /\.svg$/i, /poweredbt/i, /revisit\./i, /close\./i,
+    /profile/i, /avatar/i, /\/user\//i, /\/user\?/i, /\/users\//i,
   ];
   const isJunk = (url: string) => junkPatterns.some((p) => p.test(url));
   const large = imageUrls.find((u) => /images\/lot\/.*_l\./i.test(u) && !isJunk(u));
@@ -34,6 +34,18 @@ function getLotImageUrl(imageUrls: string[]): string | null {
   if (small) return small;
   const any = imageUrls.find((u) => !isJunk(u) && u.startsWith("http"));
   return any || null;
+}
+
+/** Fallback placeholder when no valid image is available */
+function NoImagePlaceholder() {
+  return (
+    <div
+      className="w-8 h-10 flex items-center justify-center text-[6px] font-bold tracking-wider leading-tight text-center"
+      style={{ background: "#1a1a1a", border: "1px solid #C9A84C", color: "#C9A84C" }}
+    >
+      No Image
+    </div>
+  );
 }
 
 // ... keep existing code (types, helpers, badges — lines 20-105)
