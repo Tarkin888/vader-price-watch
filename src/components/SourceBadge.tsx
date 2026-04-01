@@ -65,7 +65,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         y={h / 2}
         dominantBaseline="central"
         className="fill-foreground"
-        fontFamily="system-ui, sans-serif"
+        fontFamily="'Aptos', sans-serif"
         fontWeight="600"
         fontSize={isSm ? 14 : 10}
         letterSpacing="1"
