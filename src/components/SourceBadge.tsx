@@ -42,7 +42,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         y={h / 2}
         dominantBaseline="central"
         className="fill-primary"
-        fontFamily="Georgia, serif"
+        fontFamily="'Aptos', sans-serif"
         fontWeight="bold"
         fontSize={isSm ? 20 : 16}
         letterSpacing="0.5"
@@ -65,7 +65,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         y={h / 2}
         dominantBaseline="central"
         className="fill-foreground"
-        fontFamily="system-ui, sans-serif"
+        fontFamily="'Aptos', sans-serif"
         fontWeight="600"
         fontSize={isSm ? 14 : 10}
         letterSpacing="1"
@@ -79,7 +79,7 @@ const SourceBadge = ({ source, size = "sm", className }: SourceBadgeProps) => {
         dominantBaseline="central"
         textAnchor="end"
         className="fill-muted-foreground"
-        fontFamily="system-ui, sans-serif"
+        fontFamily="'Aptos', sans-serif"
         fontSize={isSm ? 10 : 7}
         letterSpacing="0.5"
         opacity="0.7"

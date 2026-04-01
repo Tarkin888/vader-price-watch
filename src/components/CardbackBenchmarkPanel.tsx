@@ -123,7 +123,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback }: Props) 
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full px-6 py-2 text-left text-[10px] tracking-widest hover:text-primary transition-colors flex items-center gap-2"
-        style={{ color: "#e0d8c0", fontFamily: "'Courier New', monospace" }}
+        style={{ color: "#e0d8c0" }}
       >
         <span className="text-primary">{expanded ? "▼" : "▶"}</span>
         {expanded ? "Hide Benchmark Panel" : "Show Benchmark Panel"}
@@ -159,7 +159,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback }: Props) 
                       backgroundColor: "#111109",
                       borderColor: "#C9A84C",
                       borderWidth: "1px",
-                      fontFamily: "'Courier New', monospace",
+                      fontFamily: "'Aptos', sans-serif",
                       color: "#e0d8c0",
                     }}
                   >

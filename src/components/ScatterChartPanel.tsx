@@ -31,10 +31,10 @@ const TOOLTIP_STYLE: React.CSSProperties = {
   border: "1px solid hsl(43, 20%, 18%)",
   color: "hsl(40, 30%, 82%)",
   fontSize: 11,
-  fontFamily: "'Courier New', monospace",
+  fontFamily: "'Aptos', sans-serif",
 };
 
-const FONT_AXIS = { fontSize: 10, fill: "hsl(40, 15%, 50%)", fontFamily: "'Courier New', monospace" };
+const FONT_AXIS = { fontSize: 10, fill: "hsl(40, 15%, 50%)", fontFamily: "'Aptos', sans-serif" };
 
 function toPrice(gbp: number, rate: number, currency: Currency): number {
   return currency === "USD" ? (rate > 0 ? Math.round(gbp / rate) : 0) : Number(gbp);
@@ -213,7 +213,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
   }, [eraData, enabledEras]);
 
   return (
-    <div className="border-b border-border px-6 py-4 space-y-4" style={{ fontFamily: "'Courier New', monospace" }}>
+    <div className="border-b border-border px-6 py-4 space-y-4">
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-widest">
         {/* Era toggles */}
@@ -239,7 +239,6 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
             value={cardbackFilter}
             onChange={(e) => setCardbackFilter(e.target.value)}
             className="bg-[hsl(50,14%,6%)] border border-border text-foreground px-1 py-0.5 text-[10px] rounded"
-            style={{ fontFamily: "'Courier New', monospace" }}
           >
             <option value="ALL">All</option>
             {cardbacks.map((c) => (
@@ -255,7 +254,6 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
             value={gradeFilter}
             onChange={(e) => setGradeFilter(e.target.value)}
             className="bg-[hsl(50,14%,6%)] border border-border text-foreground px-1 py-0.5 text-[10px] rounded"
-            style={{ fontFamily: "'Courier New', monospace" }}
           >
             <option value="ALL">All</option>
             {grades.map((g) => (
@@ -318,7 +316,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
             <ZAxis range={[110, 110]} />
             <Tooltip content={<CustomTooltip currency={currency} />} />
             <Legend
-              wrapperStyle={{ fontSize: 10, fontFamily: "'Courier New', monospace" }}
+              wrapperStyle={{ fontSize: 10, fontFamily: "'Aptos', sans-serif" }}
               payload={ERAS.filter((e) => enabledEras.has(e)).map((e) => ({
                 value: e,
                 type: "circle" as const,
