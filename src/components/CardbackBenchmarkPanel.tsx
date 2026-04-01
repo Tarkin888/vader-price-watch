@@ -58,8 +58,8 @@ interface CardData {
 
 const MIN_RECORDS = 3;
 
-const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback }: Props) => {
-  const [expanded, setExpanded] = useState(false);
+const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExpanded = false }: Props) => {
+  const [expanded, setExpanded] = useState(alwaysExpanded);
   const isUSD = currency === "USD";
 
   const cards = useMemo(() => {
