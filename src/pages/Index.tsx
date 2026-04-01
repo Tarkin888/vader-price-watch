@@ -8,9 +8,7 @@ import ScatterChartPanel from "@/components/ScatterChartPanel";
 import PriceTrendChart from "@/components/PriceTrendChart";
 import ReferencePanel from "@/components/ReferencePanel";
 import LotsTable from "@/components/LotsTable";
-import ExportCSV from "@/components/ExportCSV";
-import ImportCSV from "@/components/ImportCSV";
-import AddLotModal from "@/components/AddLotModal";
+import ToolsDropdown from "@/components/ToolsDropdown";
 import SessionLog from "@/components/SessionLog";
 import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
@@ -19,7 +17,6 @@ import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCw } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -210,19 +207,13 @@ const Index = () => {
             SESSION LOG {copiedRows.length > 0 && `(${copiedRows.length})`}
           </button>
         </div>
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={handleReclassify}
-            disabled={reclassifying}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary tracking-wider transition-colors px-3 py-2 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${reclassifying ? "animate-spin" : ""}`} />
-            {reclassifying ? "RE-CLASSIFYING..." : "RE-CLASSIFY UNKNOWNS"}
-          </button>
-          <AddLotModal onAdded={loadLots} />
-          <ImportCSV onImported={loadLots} />
-          <ExportCSV lots={filtered} />
-        </div>
+        <ToolsDropdown
+          onReclassify={handleReclassify}
+          reclassifying={reclassifying}
+          onAdded={loadLots}
+          onImported={loadLots}
+          filteredLots={filtered}
+        />
       </div>
       <div className="flex-1">
         {activeTab === "dashboard" ? (
