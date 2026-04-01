@@ -239,7 +239,6 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
             value={cardbackFilter}
             onChange={(e) => setCardbackFilter(e.target.value)}
             className="bg-[hsl(50,14%,6%)] border border-border text-foreground px-1 py-0.5 text-[10px] rounded"
-            style={{ fontFamily: "'Courier New', monospace" }}
           >
             <option value="ALL">All</option>
             {cardbacks.map((c) => (
