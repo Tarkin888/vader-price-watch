@@ -218,7 +218,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
       <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-wider">
         {/* Era toggles */}
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">ERA:</span>
+          <span className="text-muted-foreground">Era:</span>
           {ERAS.map((e) => (
             <label key={e} className="flex items-center gap-1 cursor-pointer">
               <input
