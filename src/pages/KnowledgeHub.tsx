@@ -126,7 +126,7 @@ const KnowledgeHub = () => {
   };
 
   /* shared table cell class */
-  const thCls = "py-2 px-3 text-left text-[10px] tracking-widest text-primary font-bold border-b border-primary/30 whitespace-nowrap";
+  const thCls = "py-2 px-3 text-left text-[10px] tracking-wider text-primary font-medium border-b border-primary/30 whitespace-nowrap";
   const tdCls = "py-2 px-3 text-xs text-foreground border-b border-border/30";
 
   return (
