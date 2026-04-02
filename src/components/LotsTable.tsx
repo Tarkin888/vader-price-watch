@@ -121,11 +121,11 @@ const COL_LABELS: Record<ColId, string> = {
   hammer: "Hammer",
   bp: "BP",
   cardback: "Cardback",
-  pop: "POP",
+  pop: "Pop",
   source: "Source",
   lot_ref: "Lot Ref",
   notes: "Notes",
-  img: "IMG",
+  img: "Img",
   act: "Actions",
 };
 
