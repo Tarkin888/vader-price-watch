@@ -206,7 +206,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExp
 
                     {/* Highest */}
                     <div className="flex justify-between text-[10px] tracking-wider mb-1">
-                      <span className="text-muted-foreground">HIGH</span>
+                      <span className="text-muted-foreground">High</span>
                       <span className="text-primary font-bold">{fmtPrice(high, isUSD)}</span>
                     </div>
                     <div className="text-[8px] text-muted-foreground tracking-wider mb-1.5">
