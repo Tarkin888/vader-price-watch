@@ -45,13 +45,13 @@ const SessionLog = ({ copiedRows, onClear }: Props) => {
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
+            <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
               <th className="px-3 py-2">#</th>
-              <th className="px-3 py-2">SALE DATE</th>
-              <th className="px-3 py-2">VARIANT-GRADE</th>
-              <th className="px-3 py-2 text-right">TOTAL (£)</th>
-              <th className="px-3 py-2">SOURCE</th>
-              <th className="px-3 py-2">LOT REF</th>
+              <th className="px-3 py-2">Sale Date</th>
+              <th className="px-3 py-2">Variant-Grade</th>
+              <th className="px-3 py-2 text-right">Total (£)</th>
+              <th className="px-3 py-2">Source</th>
+              <th className="px-3 py-2">Lot Ref</th>
             </tr>
           </thead>
           <tbody>

@@ -134,8 +134,8 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
 
       {mode === "line" ? (
         lineVariants.length === 0 ? (
-          <div className="py-8 text-center text-muted-foreground text-[10px] tracking-widest">
-            LINE CHART REQUIRES 2+ DATA POINTS PER VARIANT
+          <div className="py-8 text-center text-muted-foreground text-[10px] tracking-wider">
+            Line chart requires 2+ data points per variant
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={260}>

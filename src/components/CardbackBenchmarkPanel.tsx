@@ -215,7 +215,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExp
 
                     {/* Most recent */}
                     <div className="flex justify-between text-[9px] tracking-wider">
-                      <span className="text-muted-foreground">LATEST</span>
+                      <span className="text-muted-foreground">Latest</span>
                       <span>{card.mostRecentDate}</span>
                     </div>
                   </button>

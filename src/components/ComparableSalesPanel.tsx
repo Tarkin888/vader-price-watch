@@ -65,8 +65,8 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
 
       <div className="flex-1 overflow-y-auto">
         {comparables.length === 0 ? (
-          <div className="px-4 py-8 text-center text-muted-foreground text-[10px] tracking-widest">
-            NO OTHER SALES FOR THIS VARIANT-GRADE
+          <div className="px-4 py-8 text-center text-muted-foreground text-[10px] tracking-wider">
+            No other sales for this variant-grade
           </div>
         ) : (
           <div className="divide-y divide-border/50">
