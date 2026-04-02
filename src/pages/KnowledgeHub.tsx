@@ -176,7 +176,7 @@ const KnowledgeHub = () => {
           <button
             key={s}
             onClick={() => { setActiveSection(s); scrollToSection(s); }}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors whitespace-nowrap ${
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${
               activeSection === s ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"
             }`}
           >
