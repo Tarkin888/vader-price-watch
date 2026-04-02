@@ -107,11 +107,11 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
               </div>
               <div className="flex gap-3 text-[10px] tracking-wider">
                 <span>
-                  <span className="text-muted-foreground">AVG </span>
+                  <span className="text-muted-foreground">Avg </span>
                   <span className="text-primary font-bold">{fmtFull(stats.avg)}</span>
                 </span>
                 <span>
-                  <span className="text-muted-foreground">HIGH </span>
+                  <span className="text-muted-foreground">High </span>
                   <span className="text-primary font-bold">{fmtFull(stats.max)}</span>
                 </span>
               </div>
