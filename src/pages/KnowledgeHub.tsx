@@ -275,8 +275,8 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 4: INTERNATIONAL ──── */}
-        <div ref={(el) => { sectionRefs.current["INTERNATIONAL"] = el; }}>
-          <SectionHeader title="INTERNATIONAL VARIANTS" />
+        <div ref={(el) => { sectionRefs.current["International"] = el; }}>
+          <SectionHeader title="International Variants" />
           <div className="overflow-x-auto mt-4">
             <table className="w-full text-sm">
               <thead>
