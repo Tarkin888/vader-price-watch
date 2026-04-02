@@ -100,7 +100,7 @@ const VALUE_RANKING = [
   { era: "POTF", highest: "POTF-92", reason: "Coin included; last vintage run; strong demand for complete examples" },
 ];
 
-const SECTIONS = ["TIMELINE", "CARDBACK TABLE", "VARIANT SPOTLIGHTS", "INTERNATIONAL", "AUCTION SOURCES", "GRADES & VALUE"] as const;
+const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value"] as const;
 
 const ERA_ROW_BG: Record<string, string> = {
   SW: "rgba(30, 58, 95, 0.18)",
@@ -115,7 +115,7 @@ const ERA_FILTERS = ["All", "SW", "ESB", "ROTJ", "POTF"] as const;
 
 const KnowledgeHub = () => {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>("TIMELINE");
+  const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>("Timeline");
   const [eraFilter, setEraFilter] = useState<string>("All");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -126,7 +126,7 @@ const KnowledgeHub = () => {
   };
 
   /* shared table cell class */
-  const thCls = "py-2 px-3 text-left text-[10px] tracking-widest text-primary font-bold border-b border-primary/30 whitespace-nowrap";
+  const thCls = "py-2 px-3 text-left text-[10px] tracking-wider text-primary font-medium border-b border-primary/30 whitespace-nowrap";
   const tdCls = "py-2 px-3 text-xs text-foreground border-b border-border/30";
 
   return (
@@ -155,18 +155,18 @@ const KnowledgeHub = () => {
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
         <button
           onClick={() => navigate("/")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          PRICE TRACKER
+          Price Tracker
         </button>
-        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary">
-          KNOWLEDGE HUB
+        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">
+          Knowledge Hub
         </button>
         <button
           onClick={() => navigate("/collection")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          MY COLLECTION
+          My Collection
         </button>
       </div>
 
@@ -176,7 +176,7 @@ const KnowledgeHub = () => {
           <button
             key={s}
             onClick={() => { setActiveSection(s); scrollToSection(s); }}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors whitespace-nowrap ${
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${
               activeSection === s ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"
             }`}
           >
@@ -189,15 +189,15 @@ const KnowledgeHub = () => {
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-12">
 
         {/* ──── SECTION 1: TIMELINE ──── */}
-        <div ref={(el) => { sectionRefs.current["TIMELINE"] = el; }}>
-          <SectionHeader title="CARDBACK TIMELINE" />
+        <div ref={(el) => { sectionRefs.current["Timeline"] = el; }}>
+          <SectionHeader title="Cardback Timeline" />
           <div className="relative flex items-center justify-between mt-6 mb-4 px-4">
             {/* gold line */}
             <div className="absolute top-1/2 left-0 right-0 h-px bg-primary/60" />
             {TIMELINE_NODES.map((node) => (
               <button
                 key={node.era}
-                onClick={() => { setActiveSection("CARDBACK TABLE"); setEraFilter(node.era); scrollToSection("CARDBACK TABLE"); }}
+                onClick={() => { setActiveSection("Cardback Table"); setEraFilter(node.era); scrollToSection("Cardback Table"); }}
                 className="relative z-10 flex flex-col items-center group"
               >
                 <div className="w-5 h-5 rounded-full border-2 border-primary bg-background group-hover:bg-primary/20 transition-colors shadow-[0_0_8px_hsl(43_50%_54%/0.4)]" />
@@ -210,15 +210,15 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 2: CARDBACK MASTER TABLE ──── */}
-        <div ref={(el) => { sectionRefs.current["CARDBACK TABLE"] = el; }}>
-          <SectionHeader title="CARDBACK MASTER TABLE" />
+        <div ref={(el) => { sectionRefs.current["Cardback Table"] = el; }}>
+          <SectionHeader title="Cardback Master Table" />
           {/* era filter pills */}
           <div className="flex gap-2 mt-4 mb-3">
             {ERA_FILTERS.map((e) => (
               <button
                 key={e}
                 onClick={() => setEraFilter(e)}
-                className={`text-[10px] tracking-widest px-3 py-1 border transition-colors ${
+                className={`text-[10px] tracking-wider px-3 py-1 border transition-colors ${
                   eraFilter === e
                     ? "border-primary text-primary bg-primary/10"
                     : "border-border text-muted-foreground hover:text-primary hover:border-primary/50"
@@ -232,13 +232,13 @@ const KnowledgeHub = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className={thCls}>CODE</th>
-                  <th className={thCls}>ERA</th>
-                  <th className={thCls}>CARDBACK</th>
-                  <th className={thCls}>YEAR</th>
-                  <th className={thCls}>KEY FEATURES</th>
-                  <th className={thCls}>RARITY</th>
-                  <th className={thCls}>NOTES</th>
+                  <th className={thCls}>Code</th>
+                  <th className={thCls}>Era</th>
+                  <th className={thCls}>Cardback</th>
+                  <th className={thCls}>Year</th>
+                  <th className={thCls}>Key Features</th>
+                  <th className={thCls}>Rarity</th>
+                  <th className={thCls}>Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -259,8 +259,8 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 3: VARIANT SPOTLIGHTS ──── */}
-        <div ref={(el) => { sectionRefs.current["VARIANT SPOTLIGHTS"] = el; }}>
-          <SectionHeader title="VARIANT SPOTLIGHT CARDS" />
+        <div ref={(el) => { sectionRefs.current["Variant Spotlights"] = el; }}>
+          <SectionHeader title="Variant Spotlight Cards" />
           <div className="grid md:grid-cols-2 gap-4 mt-4">
             {SPOTLIGHT_CARDS.map((card) => (
               <div
@@ -275,17 +275,17 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 4: INTERNATIONAL ──── */}
-        <div ref={(el) => { sectionRefs.current["INTERNATIONAL"] = el; }}>
-          <SectionHeader title="INTERNATIONAL VARIANTS" />
+        <div ref={(el) => { sectionRefs.current["International"] = el; }}>
+          <SectionHeader title="International Variants" />
           <div className="overflow-x-auto mt-4">
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className={thCls}>CODE</th>
-                  <th className={thCls}>MARKET</th>
-                  <th className={thCls}>CARDBACKS KNOWN</th>
-                  <th className={thCls}>KEY FEATURES</th>
-                  <th className={thCls}>BEST AUCTION SOURCE</th>
+                  <th className={thCls}>Code</th>
+                  <th className={thCls}>Market</th>
+                  <th className={thCls}>Cardbacks Known</th>
+                  <th className={thCls}>Key Features</th>
+                  <th className={thCls}>Best Auction Source</th>
                 </tr>
               </thead>
               <tbody>
@@ -307,18 +307,18 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 5: AUCTION SOURCES ──── */}
-        <div ref={(el) => { sectionRefs.current["AUCTION SOURCES"] = el; }}>
-          <SectionHeader title="AUCTION SOURCE REFERENCE" />
+        <div ref={(el) => { sectionRefs.current["Auction Sources"] = el; }}>
+          <SectionHeader title="Auction Source Reference" />
           <div className="overflow-x-auto mt-4">
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className={thCls}>SOURCE</th>
-                  <th className={thCls}>LOCATION</th>
-                  <th className={thCls}>CURRENCY</th>
-                  <th className={thCls}>BUYER'S PREMIUM</th>
-                  <th className={thCls}>BEST FOR</th>
-                  <th className={thCls}>NOTES</th>
+                  <th className={thCls}>Source</th>
+                  <th className={thCls}>Location</th>
+                  <th className={thCls}>Currency</th>
+                  <th className={thCls}>Buyer's Premium</th>
+                  <th className={thCls}>Best For</th>
+                  <th className={thCls}>Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -340,20 +340,20 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 6: GRADES & VALUE ──── */}
-        <div ref={(el) => { sectionRefs.current["GRADES & VALUE"] = el; }}>
-          <SectionHeader title="GRADE TIER & VALUE FRAMEWORK" />
+        <div ref={(el) => { sectionRefs.current["Grades & Value"] = el; }}>
+          <SectionHeader title="Grade Tier & Value Framework" />
           <div className="grid lg:grid-cols-2 gap-6 mt-4">
             {/* left – grade reference */}
             <div>
-              <h4 className="text-[10px] text-primary tracking-widest font-bold mb-2">GRADE TIER REFERENCE</h4>
+              <h4 className="text-[10px] text-primary tracking-wider font-medium mb-2">Grade Tier Reference</h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr>
-                      <th className={thCls}>CODE</th>
-                      <th className={thCls}>GRADE</th>
-                      <th className={thCls}>DESCRIPTION</th>
-                      <th className={thCls}>PREMIUM vs RAW-NM</th>
+                      <th className={thCls}>Code</th>
+                      <th className={thCls}>Grade</th>
+                      <th className={thCls}>Description</th>
+                      <th className={thCls}>Premium vs RAW-NM</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -371,14 +371,14 @@ const KnowledgeHub = () => {
             </div>
             {/* right – value ranking */}
             <div>
-              <h4 className="text-[10px] text-primary tracking-widest font-bold mb-2">RELATIVE VALUE RANKING BY ERA (RAW-NM, U.S. KENNER)</h4>
+              <h4 className="text-[10px] text-primary tracking-wider font-medium mb-2">Relative Value Ranking by Era (RAW-NM, U.S. Kenner)</h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr>
-                      <th className={thCls}>ERA</th>
-                      <th className={thCls}>HIGHEST VALUE</th>
-                      <th className={thCls}>REASON</th>
+                      <th className={thCls}>Era</th>
+                      <th className={thCls}>Highest Value</th>
+                      <th className={thCls}>Reason</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -402,8 +402,8 @@ const KnowledgeHub = () => {
         </p>
       </div>
 
-      <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
-        IMPERIAL PRICE TERMINAL v4.0 • GALACTIC EMPIRE • CLASSIFIED
+      <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
+        IMPERIAL PRICE TERMINAL v4.0 · Galactic Empire · Classified
       </footer>
     </div>
   );
@@ -412,7 +412,7 @@ const KnowledgeHub = () => {
 /* ───────── helpers ───────── */
 
 const SectionHeader = ({ title }: { title: string }) => (
-  <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase border-b border-primary/40 pb-2 shadow-[0_2px_8px_hsl(43_50%_54%/0.15)]">
+  <h2 className="text-sm font-medium text-primary tracking-wider border-b border-primary/40 pb-2 shadow-[0_2px_8px_hsl(43_50%_54%/0.15)]">
     {title}
   </h2>
 );

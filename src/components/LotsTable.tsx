@@ -121,11 +121,11 @@ const COL_LABELS: Record<ColId, string> = {
   hammer: "Hammer",
   bp: "BP",
   cardback: "Cardback",
-  pop: "POP",
+  pop: "Pop",
   source: "Source",
   lot_ref: "Lot Ref",
   notes: "Notes",
-  img: "IMG",
+  img: "Img",
   act: "Actions",
 };
 
@@ -299,22 +299,22 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
         <div className="flex items-center gap-3">
           {someSelected && (
             <>
-              <span className="text-[10px] tracking-widest text-primary font-bold">{selectedIds.size} SELECTED</span>
-              <button onClick={() => setShowBulkConfirm(true)} className="text-[10px] tracking-widest px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors font-bold">DELETE SELECTED</button>
-              <button onClick={() => setSelectedIds(new Set())} className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors">CLEAR</button>
+              <span className="text-[10px] tracking-wider text-primary font-bold">{selectedIds.size} selected</span>
+              <button onClick={() => setShowBulkConfirm(true)} className="text-[10px] tracking-wider px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors font-bold">Delete Selected</button>
+              <button onClick={() => setSelectedIds(new Set())} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Clear</button>
             </>
           )}
         </div>
         <Popover>
           <PopoverTrigger asChild>
-            <button className="text-[10px] tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 px-2 py-1 rounded border border-border hover:border-primary/50">
-              <Columns3 className="w-3 h-3" /> COLUMNS
+            <button className="text-[10px] tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 px-2 py-1 rounded border border-border hover:border-primary/50">
+              <Columns3 className="w-3 h-3" /> Columns
             </button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-48 p-2 bg-card border-border">
             <div className="space-y-1">
               {ALL_COLS.map((col) => (
-                <label key={col} className="flex items-center gap-2 text-[10px] tracking-widest cursor-pointer hover:text-primary transition-colors py-0.5">
+                <label key={col} className="flex items-center gap-2 text-[10px] tracking-wider cursor-pointer hover:text-primary transition-colors py-0.5">
                   <Checkbox
                     checked={colVisible(col)}
                     onCheckedChange={() => toggleCol(col)}
@@ -331,23 +331,23 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
+            <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
               <th className="px-3 py-2 w-8">
                 <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} className="border-muted-foreground" />
               </th>
-              {colVisible("sale_date") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("sale_date")}>SALE DATE<SortIcon col="sale_date" /></th>}
-              {colVisible("created_at") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("created_at")}>DATE/TIME ADDED<SortIcon col="created_at" /></th>}
-              {colVisible("variant_grade") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("variant_grade_key")}>VARIANT-GRADE<SortIcon col="variant_grade_key" /></th>}
-              {colVisible("total") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("total_paid_gbp")}>TOTAL ({sym}){isUSD ? " (USD)" : ""}<SortIcon col="total_paid_gbp" /></th>}
-              {colVisible("hammer") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("hammer_price_gbp")}>HAMMER{isUSD ? " (USD)" : ""}<SortIcon col="hammer_price_gbp" /></th>}
+              {colVisible("sale_date") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("sale_date")}>Sale Date<SortIcon col="sale_date" /></th>}
+              {colVisible("created_at") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("created_at")}>Date/Time Added<SortIcon col="created_at" /></th>}
+              {colVisible("variant_grade") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("variant_grade_key")}>Variant-Grade<SortIcon col="variant_grade_key" /></th>}
+              {colVisible("total") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("total_paid_gbp")}>Total ({sym}){isUSD ? " (USD)" : ""}<SortIcon col="total_paid_gbp" /></th>}
+              {colVisible("hammer") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("hammer_price_gbp")}>Hammer{isUSD ? " (USD)" : ""}<SortIcon col="hammer_price_gbp" /></th>}
               {colVisible("bp") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("buyers_premium_gbp")}>BP{isUSD ? " (USD)" : ""}<SortIcon col="buyers_premium_gbp" /></th>}
-              {colVisible("cardback") && <th className="px-3 py-2">CARDBACK</th>}
-              {colVisible("pop") && <th className="px-3 py-2">POP</th>}
-              {colVisible("source") && <th className="px-3 py-2">SOURCE</th>}
-              {colVisible("lot_ref") && <th className="px-3 py-2">LOT REF</th>}
-              {colVisible("notes") && <th className="px-3 py-2">NOTES</th>}
-              {colVisible("img") && <th className="px-3 py-2">IMG</th>}
-              {colVisible("act") && <th className="px-3 py-2">ACT</th>}
+              {colVisible("cardback") && <th className="px-3 py-2">Cardback</th>}
+              {colVisible("pop") && <th className="px-3 py-2">Pop</th>}
+              {colVisible("source") && <th className="px-3 py-2">Source</th>}
+              {colVisible("lot_ref") && <th className="px-3 py-2">Lot Ref</th>}
+              {colVisible("notes") && <th className="px-3 py-2">Notes</th>}
+              {colVisible("img") && <th className="px-3 py-2">Img</th>}
+              {colVisible("act") && <th className="px-3 py-2">Act</th>}
             </tr>
           </thead>
           <tbody>
@@ -450,7 +450,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
                           <button onClick={(e) => { e.stopPropagation(); copyRow(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Copy row"><Copy className="w-3.5 h-3.5" /></button>
                           <button onClick={(e) => { e.stopPropagation(); setEditLot(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Edit lot"><Pencil className="w-3.5 h-3.5" /></button>
                           <button onClick={(e) => { e.stopPropagation(); setDeleteLot(l); }} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete lot"><Trash2 className="w-3.5 h-3.5" /></button>
-                          <button onClick={(e) => { e.stopPropagation(); onSelectLot?.(l); }} className="text-muted-foreground hover:text-primary transition-colors text-[9px] tracking-widest ml-2">VIEW DETAILS →</button>
+                          <button onClick={(e) => { e.stopPropagation(); onSelectLot?.(l); }} className="text-muted-foreground hover:text-primary transition-colors text-[9px] tracking-wider ml-2">View Details →</button>
                         </div>
                       </td>
                     </tr>
@@ -462,8 +462,8 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
         </table>
       </div>
 
-      <div className="px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-widest flex items-center gap-4">
-        <span><span className="text-primary">★ Gold</span> = confirmed POP</span>
+      <div className="px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-wider flex items-center gap-4">
+        <span><span className="text-primary">★ Gold</span> = confirmed Pop</span>
         <span><span className="text-amber-400">Amber</span> = estimated</span>
         <span>Grey = unknown</span>
       </div>
@@ -473,14 +473,14 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
       <AlertDialog open={!!deleteLot} onOpenChange={(o) => { if (!o) setDeleteLot(null); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-primary tracking-wider text-sm">CONFIRM DELETION</AlertDialogTitle>
+            <AlertDialogTitle className="text-primary tracking-wider text-sm">Confirm Deletion</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
               Delete lot <span className="text-primary font-bold">{deleteLot?.variant_grade_key}</span> ({deleteLot?.lot_ref})? This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs tracking-wider">CANCEL</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">DELETE</AlertDialogAction>
+            <AlertDialogCancel className="text-xs tracking-wider">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -488,15 +488,15 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
       <AlertDialog open={showBulkConfirm} onOpenChange={(o) => { if (!o) setShowBulkConfirm(false); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-primary tracking-wider text-sm">CONFIRM BULK DELETION</AlertDialogTitle>
+            <AlertDialogTitle className="text-primary tracking-wider text-sm">Confirm Bulk Deletion</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
               Delete <span className="text-primary font-bold">{selectedIds.size}</span> selected lot(s)? This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs tracking-wider">CANCEL</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs tracking-wider">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleBulkDelete} disabled={bulkDeleting} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">
-              {bulkDeleting ? "DELETING..." : `DELETE ${selectedIds.size}`}
+              {bulkDeleting ? "Deleting..." : `Delete ${selectedIds.size}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

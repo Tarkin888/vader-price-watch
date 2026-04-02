@@ -186,7 +186,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExp
 
                     {/* Median */}
                     <div className="flex justify-between text-[10px] tracking-wider mb-1">
-                      <span className="text-muted-foreground">MEDIAN</span>
+                      <span className="text-muted-foreground">Median</span>
                       <span className="text-primary font-bold">{fmtPrice(med, isUSD)}</span>
                     </div>
 
@@ -206,7 +206,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExp
 
                     {/* Highest */}
                     <div className="flex justify-between text-[10px] tracking-wider mb-1">
-                      <span className="text-muted-foreground">HIGH</span>
+                      <span className="text-muted-foreground">High</span>
                       <span className="text-primary font-bold">{fmtPrice(high, isUSD)}</span>
                     </div>
                     <div className="text-[8px] text-muted-foreground tracking-wider mb-1.5">
@@ -215,7 +215,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExp
 
                     {/* Most recent */}
                     <div className="flex justify-between text-[9px] tracking-wider">
-                      <span className="text-muted-foreground">LATEST</span>
+                      <span className="text-muted-foreground">Latest</span>
                       <span>{card.mostRecentDate}</span>
                     </div>
                   </button>

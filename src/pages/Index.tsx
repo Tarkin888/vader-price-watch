@@ -160,8 +160,8 @@ const Index = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <span className="text-primary text-sm tracking-widest" style={{ animation: "flicker 2s infinite" }}>
-          LOADING IMPERIAL DATABASE...
+        <span className="text-primary text-sm tracking-wider" style={{ animation: "flicker 2s infinite" }}>
+          Loading Imperial Database...
         </span>
       </div>
     );
@@ -171,20 +171,20 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} currency={filters.currency} onCurrencyToggle={() => updateFilters({ ...filters, currency: filters.currency === "GBP" ? "USD" : "GBP" })} />
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
-        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary" aria-current="page">
-          PRICE TRACKER
+        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary" aria-current="page">
+          Price Tracker
         </button>
         <button
           onClick={() => navigate("/knowledge")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          KNOWLEDGE HUB
+          Knowledge Hub
         </button>
         <button
           onClick={() => navigate("/collection")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          MY COLLECTION
+          My Collection
         </button>
         <ReferencePanel />
       </div>
@@ -194,33 +194,33 @@ const Index = () => {
       <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex items-center gap-1">
           <span className="text-[11px] text-muted-foreground tracking-wider mr-3">
-            {quickStats.count} RECORDS
-            <span className="ml-2">AVG <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
-            <span className="ml-2">HIGH <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
+            {quickStats.count} records
+            <span className="ml-2">Avg <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
+            <span className="ml-2">High <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
           </span>
           <button
             onClick={() => changeTab("dashboard")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            DASHBOARD
+            Dashboard
           </button>
           <button
             onClick={() => changeTab("table")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            RESULTS
+            Results
           </button>
           <button
             onClick={() => changeTab("chart")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            PRICE CHART
+            Price Chart
           </button>
           <button
             onClick={() => changeTab("session")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            SESSION LOG {copiedRows.length > 0 && `(${copiedRows.length})`}
+            Session Log {copiedRows.length > 0 && `(${copiedRows.length})`}
           </button>
         </div>
         <ToolsDropdown
@@ -260,7 +260,7 @@ const Index = () => {
       <Sheet open={showBenchmark} onOpenChange={setShowBenchmark}>
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto bg-background border-border p-0">
           <SheetHeader className="px-6 pt-4 pb-2">
-            <SheetTitle className="text-primary text-sm tracking-widest">BENCHMARK PANEL</SheetTitle>
+            <SheetTitle className="text-primary text-sm tracking-wider font-medium">Benchmark Panel</SheetTitle>
           </SheetHeader>
           <CardbackBenchmarkPanel
             allLots={lots}
@@ -279,14 +279,14 @@ const Index = () => {
       <Sheet open={showPriceTrend} onOpenChange={setShowPriceTrend}>
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto bg-background border-border p-0">
           <SheetHeader className="px-6 pt-4 pb-2">
-            <SheetTitle className="text-primary text-sm tracking-widest">PRICE TREND</SheetTitle>
+            <SheetTitle className="text-primary text-sm tracking-wider font-medium">Price Trend</SheetTitle>
           </SheetHeader>
           <PriceTrendChart lots={filtered} alwaysExpanded />
         </SheetContent>
       </Sheet>
 
-      <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
-        IMPERIAL PRICE TERMINAL v4.0 • GALACTIC EMPIRE • CLASSIFIED
+      <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
+        IMPERIAL PRICE TERMINAL v4.0 · Galactic Empire · Classified
       </footer>
     </div>
   );

@@ -199,8 +199,8 @@ const Collection = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <span className="text-primary text-sm tracking-widest" style={{ animation: "flicker 2s infinite" }}>
-          LOADING COLLECTION...
+        <span className="text-primary text-sm tracking-wider" style={{ animation: "flicker 2s infinite" }}>
+          Loading collection...
         </span>
       </div>
     );
@@ -216,9 +216,9 @@ const Collection = () => {
               My Collection — Personal Inventory
             </h1>
             <div className="mt-1 flex gap-6 text-xs text-muted-foreground tracking-wider">
-              <span>TOTAL ITEMS: <span className="text-primary">{items.length}</span></span>
-              <span>TOTAL COST: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
-              <span>PORTFOLIO VALUE: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
+              <span>Total Items: <span className="text-primary">{items.length}</span></span>
+              <span>Total Cost: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
+              <span>Portfolio Value: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -228,7 +228,7 @@ const Collection = () => {
               className="text-xs tracking-wider"
               onClick={() => setAddOpen(true)}
             >
-              <Plus className="w-3 h-3 mr-1" /> ADD ITEM
+              <Plus className="w-3 h-3 mr-1" /> Add Item
             </Button>
           </div>
         </div>
@@ -236,42 +236,13 @@ const Collection = () => {
 
       {/* Nav */}
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
-        <button
-          onClick={() => navigate("/")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          PRICE TRACKER
-        </button>
-        <button
-          onClick={() => navigate("/knowledge")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          KNOWLEDGE HUB
-        </button>
-        <button
-          className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary"
-        >
-          MY COLLECTION
-        </button>
+        <button onClick={() => navigate("/")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Price Tracker</button>
+        <button onClick={() => navigate("/knowledge")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Knowledge Hub</button>
+        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">My Collection</button>
         <span className="text-muted-foreground/30 mx-2">|</span>
-        <button
-          onClick={() => setSubTab("inventory")}
-          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-        >
-          INVENTORY
-        </button>
-        <button
-          onClick={() => setSubTab("analytics")}
-          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-        >
-          ANALYTICS
-        </button>
-        <button
-          onClick={() => setSubTab("gallery")}
-          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-        >
-          PHOTO GALLERY
-        </button>
+        <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Inventory</button>
+        <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Analytics</button>
+        <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>
       </div>
 
       {subTab === "analytics" ? (
@@ -315,7 +286,7 @@ const Collection = () => {
               onClick={() => setPrivacyMode(!privacyMode)}
             >
               {privacyMode ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
-              PRIVACY {privacyMode ? "ON" : "OFF"}
+              Privacy {privacyMode ? "On" : "Off"}
             </Button>
             {!privacyMode && (
               <Button
@@ -326,7 +297,7 @@ const Collection = () => {
                 disabled={bulkCalcing || items.length === 0}
               >
                 <Calculator className="w-3 h-3 mr-1" />
-                {bulkCalcing ? "CALCULATING..." : "1-YR AVG ALL"}
+                {bulkCalcing ? "Calculating..." : "1-Yr Avg All"}
               </Button>
             )}
           </div>
@@ -335,20 +306,20 @@ const Collection = () => {
           <div className="flex-1 overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-                  <th className="px-1.5 py-2">ITEM ID</th>
-                  <th className="px-1.5 py-2">FRONT</th>
-                  <th className="px-1.5 py-2">BACK</th>
-                  <th className="px-1.5 py-2">DESCRIPTION</th>
-                  <th className="px-1.5 py-2">CATEGORY</th>
-                  <th className="px-1.5 py-2">GRADING</th>
-                  {!privacyMode && <th className="px-1.5 py-2 text-right">PRICE (£)</th>}
-                  <th className="px-1.5 py-2">DATE</th>
-                  <th className="px-1.5 py-2">SOURCE</th>
-                  {!privacyMode && <th className="px-1.5 py-2 text-right">EST. VALUE (£)</th>}
+                <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
+                  <th className="px-1.5 py-2">Item ID</th>
+                  <th className="px-1.5 py-2">Front</th>
+                  <th className="px-1.5 py-2">Back</th>
+                  <th className="px-1.5 py-2">Description</th>
+                  <th className="px-1.5 py-2">Category</th>
+                  <th className="px-1.5 py-2">Grading</th>
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">Price (£)</th>}
+                  <th className="px-1.5 py-2">Date</th>
+                  <th className="px-1.5 py-2">Source</th>
+                  {!privacyMode && <th className="px-1.5 py-2 text-right">Est. Value (£)</th>}
                   {!privacyMode && <th className="px-1.5 py-2 text-right">P&L (£)</th>}
-                  <th className="px-1.5 py-2">NOTES</th>
-                  <th className="px-1.5 py-2">ACTIONS</th>
+                  <th className="px-1.5 py-2">Notes</th>
+                  <th className="px-1.5 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -421,10 +392,10 @@ const Collection = () => {
 
           {/* Stats Panel */}
           <div className="border-t border-border px-6 py-4">
-            <h2 className="text-[10px] text-muted-foreground tracking-widest uppercase mb-3">COLLECTION STATS</h2>
+            <h2 className="text-[10px] text-muted-foreground tracking-wider mb-3">Collection Stats</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY CATEGORY</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">By Category</h3>
                 {categoryBreakdown.map(([cat, count]) => (
                   <div key={cat} className="flex justify-between">
                     <span>{cat}</span>
@@ -433,7 +404,7 @@ const Collection = () => {
                 ))}
               </div>
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY GRADING</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">By Grading</h3>
                 {gradingBreakdown.map(([grade, count]) => (
                   <div key={grade} className="flex justify-between">
                     <span>{grade}</span>
@@ -442,7 +413,7 @@ const Collection = () => {
                 ))}
               </div>
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST EXPENSIVE</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">Most Expensive</h3>
                 {mostExpensive && (
                   <div>
                     <div className="text-primary font-bold">{mostExpensive.description}</div>
@@ -451,7 +422,7 @@ const Collection = () => {
                 )}
               </div>
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST RECENT</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">Most Recent</h3>
                 {mostRecent && (
                   <div>
                     <div className="text-primary font-bold">{mostRecent.description}</div>
@@ -464,8 +435,8 @@ const Collection = () => {
         </>
       )}
 
-      <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-widest">
-        IMPERIAL PRICE TERMINAL v4.0 • GALACTIC EMPIRE • CLASSIFIED
+      <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
+        IMPERIAL PRICE TERMINAL v4.0 · Galactic Empire · Classified
       </footer>
 
       {/* Modals */}
@@ -479,15 +450,15 @@ const Collection = () => {
       <AlertDialog open={!!deleteItem} onOpenChange={(o) => { if (!o) setDeleteItem(null); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-primary tracking-wider text-sm">CONFIRM DELETION</AlertDialogTitle>
+            <AlertDialogTitle className="text-primary tracking-wider text-sm">Confirm Deletion</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
               Delete <span className="text-primary font-bold">{deleteItem?.item_id}</span> — {deleteItem?.description}? This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs tracking-wider">CANCEL</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs tracking-wider">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">
-              DELETE
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

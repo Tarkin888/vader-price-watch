@@ -215,10 +215,10 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
   return (
     <div className="border-b border-border px-6 py-4 space-y-4">
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-widest">
+      <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-wider">
         {/* Era toggles */}
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">ERA:</span>
+          <span className="text-muted-foreground">Era:</span>
           {ERAS.map((e) => (
             <label key={e} className="flex items-center gap-1 cursor-pointer">
               <input
@@ -234,7 +234,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
         {/* Cardback filter */}
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground">CARDBACK:</span>
+          <span className="text-muted-foreground">Cardback:</span>
           <select
             value={cardbackFilter}
             onChange={(e) => setCardbackFilter(e.target.value)}
@@ -249,7 +249,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
         {/* Grade filter */}
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground">GRADE:</span>
+          <span className="text-muted-foreground">Grade:</span>
           <select
             value={gradeFilter}
             onChange={(e) => setGradeFilter(e.target.value)}
@@ -270,7 +270,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
             onChange={() => setShowTrend(!showTrend)}
             className="accent-primary w-3 h-3"
           />
-          <span className="text-muted-foreground">TREND LINE</span>
+          <span className="text-muted-foreground">Trend Line</span>
         </label>
 
         {/* Date range */}
@@ -289,8 +289,8 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
       {/* Chart */}
       {allPoints.length === 0 ? (
-        <div className="py-12 text-center text-muted-foreground text-[10px] tracking-widest">
-          NO DATA FOR SELECTED FILTERS
+        <div className="py-12 text-center text-muted-foreground text-[10px] tracking-wider">
+          No data for selected filters
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={360}>
@@ -338,8 +338,8 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
       {/* Trend lines rendered as SVG overlay — simpler approach: use a separate mini chart */}
       {showTrend && Object.keys(trendLines).length > 0 && allPoints.length > 0 && (
-        <div className="text-[9px] text-muted-foreground tracking-widest pl-12">
-          TREND LINES ACTIVE — {Object.keys(trendLines).map((e) => {
+        <div className="text-[9px] text-muted-foreground tracking-wider pl-12">
+          Trend lines active — {Object.keys(trendLines).map((e) => {
             const tl = trendLines[e];
             if (!tl || tl.length < 2) return null;
             const slope = tl[1].y - tl[0].y;
@@ -355,13 +355,13 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
       {/* Summary table */}
       {summaryRows.length > 0 && (
-        <table className="w-full text-[10px] tracking-widest border-collapse">
+        <table className="w-full text-[10px] tracking-wider border-collapse">
           <thead>
             <tr className="border-b border-border text-muted-foreground">
-              <th className="text-left py-1 px-2">ERA</th>
-              <th className="text-right py-1 px-2">RECORDS</th>
-              <th className="text-right py-1 px-2">MEDIAN ({currency})</th>
-              <th className="text-center py-1 px-2">TREND</th>
+              <th className="text-left py-1 px-2">Era</th>
+              <th className="text-right py-1 px-2">Records</th>
+              <th className="text-right py-1 px-2">Median ({currency})</th>
+              <th className="text-center py-1 px-2">Trend</th>
             </tr>
           </thead>
           <tbody>

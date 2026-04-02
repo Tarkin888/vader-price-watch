@@ -29,7 +29,7 @@ const NotableSalesBanner = ({ lots }: Props) => {
     <div className="px-6 py-2 border-b border-primary/30">
       <div className="flex items-center gap-2 text-[10px] tracking-wider">
         <Star className="w-3 h-3 text-primary fill-primary" />
-        <span className="text-muted-foreground tracking-widest">
+        <span className="text-muted-foreground tracking-wider">
           Notable Sales ({notable.length})
         </span>
         <span className="text-foreground">

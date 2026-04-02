@@ -105,27 +105,27 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
       )}
 
       {(alwaysExpanded || expanded) && lots.length === 0 && (
-        <div className="px-6 py-4 text-center text-muted-foreground text-[10px] tracking-widest">
-          NO DATA FOR CHART
+        <div className="px-6 py-4 text-center text-muted-foreground text-[10px] tracking-wider">
+          No data for chart
         </div>
       )}
 
       {(alwaysExpanded || expanded) && lots.length > 0 && (
       <div className="px-6 py-4">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] text-muted-foreground tracking-widest uppercase">
+        <div className="text-[10px] text-muted-foreground tracking-wider font-medium">
           {mode === "line" ? "Price Trend by Variant" : "Scatter Plot — All Lots"}
         </div>
         <div className="flex gap-1">
           <button
             onClick={() => setMode("line")}
-            className={`text-[10px] tracking-widest px-2 py-0.5 transition-colors ${mode === "line" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-2 py-0.5 transition-colors ${mode === "line" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             LINE
           </button>
           <button
             onClick={() => setMode("scatter")}
-            className={`text-[10px] tracking-widest px-2 py-0.5 transition-colors ${mode === "scatter" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-2 py-0.5 transition-colors ${mode === "scatter" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             SCATTER
           </button>
@@ -134,8 +134,8 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
 
       {mode === "line" ? (
         lineVariants.length === 0 ? (
-          <div className="py-8 text-center text-muted-foreground text-[10px] tracking-widest">
-            LINE CHART REQUIRES 2+ DATA POINTS PER VARIANT
+          <div className="py-8 text-center text-muted-foreground text-[10px] tracking-wider">
+            Line chart requires 2+ data points per variant
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={260}>

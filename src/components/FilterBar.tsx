@@ -136,7 +136,7 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
           className="text-xs text-muted-foreground hover:text-primary tracking-wider"
           onClick={() => onChange({ source: null, era: null, cardbackCode: null, variantCode: null, gradeTier: null, dateFrom: null, dateTo: null, search: "", currency: filters.currency })}
         >
-          <X className="w-3 h-3 mr-1" /> CLEAR
+          <X className="w-3 h-3 mr-1" /> Clear
         </Button>
       </div>
     </div>

@@ -33,7 +33,7 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
   return (
     <div className="fixed right-0 top-0 h-full w-80 bg-card border-l border-border z-50 flex flex-col shadow-2xl">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <div className="text-[10px] tracking-widest text-muted-foreground uppercase">
+        <div className="text-[10px] tracking-wider text-muted-foreground">
           Comparable Sales
         </div>
         <button onClick={onClose} className="text-muted-foreground hover:text-primary transition-colors">
@@ -48,12 +48,12 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
         </div>
         <div className="flex gap-4 mt-2">
           <div>
-            <div className="text-[9px] text-muted-foreground tracking-widest">AVG PRICE</div>
+            <div className="text-[9px] text-muted-foreground tracking-wider">Avg Price</div>
             <div className="text-primary font-bold text-xs">{fmt(avgPrice)}</div>
           </div>
           {pctChange !== null && (
             <div>
-              <div className="text-[9px] text-muted-foreground tracking-widest">RECENT Δ</div>
+              <div className="text-[9px] text-muted-foreground tracking-wider">Recent Δ</div>
               <div className={`font-bold text-xs ${pctChange >= 0 ? "text-green-500" : "text-destructive"}`}>
                 {pctChange >= 0 ? "+" : ""}
                 {pctChange.toFixed(1)}%
@@ -65,8 +65,8 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
 
       <div className="flex-1 overflow-y-auto">
         {comparables.length === 0 ? (
-          <div className="px-4 py-8 text-center text-muted-foreground text-[10px] tracking-widest">
-            NO OTHER SALES FOR THIS VARIANT-GRADE
+          <div className="px-4 py-8 text-center text-muted-foreground text-[10px] tracking-wider">
+            No other sales for this variant-grade
           </div>
         ) : (
           <div className="divide-y divide-border/50">

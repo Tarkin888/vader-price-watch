@@ -36,22 +36,22 @@ const SessionLog = ({ copiedRows, onClear }: Props) => {
     <div>
       <div className="flex items-center gap-2 px-6 py-2 border-b border-border">
         <Button variant="outline" size="sm" onClick={copyAll} className="text-xs tracking-wider border-border hover:border-primary hover:text-primary">
-          <Copy className="w-3 h-3 mr-1" /> COPY ALL ({copiedRows.length})
+          <Copy className="w-3 h-3 mr-1" /> Copy All ({copiedRows.length})
         </Button>
         <Button variant="outline" size="sm" onClick={onClear} className="text-xs tracking-wider border-border hover:border-destructive hover:text-destructive">
-          <Trash2 className="w-3 h-3 mr-1" /> CLEAR
+          <Trash2 className="w-3 h-3 mr-1" /> Clear
         </Button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
+            <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
               <th className="px-3 py-2">#</th>
-              <th className="px-3 py-2">SALE DATE</th>
-              <th className="px-3 py-2">VARIANT-GRADE</th>
-              <th className="px-3 py-2 text-right">TOTAL (£)</th>
-              <th className="px-3 py-2">SOURCE</th>
-              <th className="px-3 py-2">LOT REF</th>
+              <th className="px-3 py-2">Sale Date</th>
+              <th className="px-3 py-2">Variant-Grade</th>
+              <th className="px-3 py-2 text-right">Total (£)</th>
+              <th className="px-3 py-2">Source</th>
+              <th className="px-3 py-2">Lot Ref</th>
             </tr>
           </thead>
           <tbody>

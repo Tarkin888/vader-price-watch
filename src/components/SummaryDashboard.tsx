@@ -107,11 +107,11 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
               </div>
               <div className="flex gap-3 text-[10px] tracking-wider">
                 <span>
-                  <span className="text-muted-foreground">AVG </span>
+                  <span className="text-muted-foreground">Avg </span>
                   <span className="text-primary font-bold">{fmtFull(stats.avg)}</span>
                 </span>
                 <span>
-                  <span className="text-muted-foreground">HIGH </span>
+                  <span className="text-muted-foreground">High </span>
                   <span className="text-primary font-bold">{fmtFull(stats.max)}</span>
                 </span>
               </div>
@@ -123,15 +123,15 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
       {/* Stats row */}
       <div className="flex gap-6 text-xs tracking-wider">
         <div>
-          <span className="text-muted-foreground">TOTAL RECORDS: </span>
+          <span className="text-muted-foreground">Total Records: </span>
           <span className="text-primary font-bold">{lots.length}</span>
         </div>
         <div>
-          <span className="text-muted-foreground">SOURCES: </span>
+          <span className="text-muted-foreground">Sources: </span>
           <span className="text-primary font-bold">{bySource.length}</span>
         </div>
         <div>
-          <span className="text-muted-foreground">VARIANTS: </span>
+          <span className="text-muted-foreground">Variants: </span>
           <span className="text-primary font-bold">{byVariant.length}</span>
         </div>
       </div>
@@ -139,7 +139,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
       {/* Charts grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="border border-border p-3">
-          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY SOURCE</div>
+          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Records by Source</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={bySource} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
@@ -152,7 +152,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
         </div>
 
         <div className="border border-border p-3">
-          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY VARIANT</div>
+          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Records by Variant</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={byVariant} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
@@ -165,7 +165,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
         </div>
 
         <div className="border border-border p-3">
-          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">AVG PRICE BY GRADE</div>
+          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Avg Price by Grade</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={avgByGrade} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
@@ -180,16 +180,16 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
 
       {/* Recent Sales */}
       <div className="border border-border">
-        <div className="text-[10px] text-muted-foreground tracking-widest px-3 py-2 border-b border-border">
-          5 MOST RECENT SALES
+        <div className="text-[10px] text-muted-foreground tracking-wider font-medium px-3 py-2 border-b border-border">
+          5 Most Recent Sales
         </div>
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-              <th className="px-3 py-1.5">DATE</th>
-              <th className="px-3 py-1.5">VARIANT-GRADE</th>
-              <th className="px-3 py-1.5">SOURCE</th>
-              <th className="px-3 py-1.5 text-right">TOTAL</th>
+            <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
+              <th className="px-3 py-1.5">Date</th>
+              <th className="px-3 py-1.5">Variant-Grade</th>
+              <th className="px-3 py-1.5">Source</th>
+              <th className="px-3 py-1.5 text-right">Total</th>
             </tr>
           </thead>
           <tbody>

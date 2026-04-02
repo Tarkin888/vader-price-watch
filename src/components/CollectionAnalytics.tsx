@@ -37,11 +37,11 @@ const fmt = (n: number) => `£${n.toLocaleString("en-GB")}`;
 const fmtK = (n: number) => n >= 1000 ? `£${(n / 1000).toFixed(1)}k` : `£${n}`;
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-[11px] tracking-[0.2em] uppercase text-primary mb-3 font-bold">{children}</h3>
+  <h3 className="text-[11px] tracking-wider text-primary mb-3 font-medium">{children}</h3>
 );
 
 const ChartTitle = ({ children }: { children: React.ReactNode }) => (
-  <div className="text-[10px] tracking-[0.15em] uppercase text-primary/80 mb-2">{children}</div>
+  <div className="text-[10px] tracking-wider text-primary/80 mb-2 font-medium">{children}</div>
 );
 
 const NoData = ({ name }: { name: string }) => (
@@ -248,7 +248,7 @@ export default function CollectionAnalytics({ items }: Props) {
   if (items.length === 0) {
     return (
       <div className="p-6 text-center text-muted-foreground text-sm tracking-wider">
-        NO ITEMS IN COLLECTION — ADD ITEMS TO UNLOCK ANALYTICS
+        No items in collection — add items to unlock analytics
       </div>
     );
   }
@@ -415,11 +415,11 @@ export default function CollectionAnalytics({ items }: Props) {
               <thead>
                 <tr className="border-b border-border text-muted-foreground">
                   <th className="px-2 py-1.5 text-left">#</th>
-                  <th className="px-2 py-1.5 text-left">SOURCE</th>
-                  <th className="px-2 py-1.5 text-right">ITEMS</th>
-                  <th className="px-2 py-1.5 text-right">TOTAL</th>
-                  <th className="px-2 py-1.5 text-right">AVG</th>
-                  <th className="px-2 py-1.5 text-right">HIGHEST</th>
+                  <th className="px-2 py-1.5 text-left">Source</th>
+                  <th className="px-2 py-1.5 text-right">Items</th>
+                  <th className="px-2 py-1.5 text-right">Total</th>
+                  <th className="px-2 py-1.5 text-right">Avg</th>
+                  <th className="px-2 py-1.5 text-right">Highest</th>
                 </tr>
               </thead>
               <tbody>
@@ -539,7 +539,7 @@ export default function CollectionAnalytics({ items }: Props) {
       <SectionTitle>P&L Tracker</SectionTitle>
       {pnlItems.length === 0 ? (
         <div className="border border-primary/30 rounded p-6 bg-card text-center">
-          <div className="text-primary text-sm tracking-wider font-bold mb-1">UNLOCK P&L TRACKING</div>
+          <div className="text-primary text-sm tracking-wider font-medium mb-1">Unlock P&L Tracking</div>
           <div className="text-muted-foreground text-xs tracking-wider">
             Add estimated values to your items in the Inventory view to unlock P&L tracking.
           </div>
