@@ -404,7 +404,7 @@ const Collection = () => {
                 ))}
               </div>
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY GRADING</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">By Grading</h3>
                 {gradingBreakdown.map(([grade, count]) => (
                   <div key={grade} className="flex justify-between">
                     <span>{grade}</span>
