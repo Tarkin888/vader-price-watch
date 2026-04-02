@@ -1,13 +1,14 @@
-import { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import type { Lot } from "@/lib/db";
 import type { Currency } from "@/components/FilterBar";
 import { supabase } from "@/integrations/supabase/client";
-import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown, CheckSquare, Square, XSquare } from "lucide-react";
+import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown, ChevronDown, ChevronUp, Columns3 } from "lucide-react";
 import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";
 import popCounts, { type PopEntry } from "@/data/popCounts";
 import { Checkbox } from "@/components/ui/checkbox";
 import SourceBadge from "@/components/SourceBadge";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,8 +19,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-/** Return the best actual lot image from image_urls, filtering out junk (cookie banners, spinners, site logos, profile pics). */
+/* ── image helpers ── */
 function getLotImageUrl(imageUrls: string[]): string | null {
   if (!imageUrls || imageUrls.length === 0) return null;
   const junkPatterns = [
@@ -36,7 +42,6 @@ function getLotImageUrl(imageUrls: string[]): string | null {
   return any || null;
 }
 
-/** Fallback placeholder when no valid image is available */
 function NoImagePlaceholder() {
   return (
     <div
@@ -48,9 +53,12 @@ function NoImagePlaceholder() {
   );
 }
 
-// ... keep existing code (types, helpers, badges — lines 20-105)
+/* ── types ── */
 type SortKey = "sale_date" | "created_at" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
 type SortDir = "asc" | "desc";
+
+// All toggleable column keys
+type ColId = "sale_date" | "created_at" | "variant_grade" | "total" | "hammer" | "bp" | "cardback" | "pop" | "source" | "lot_ref" | "notes" | "img" | "act";
 
 interface LotsTableProps {
   lots: Lot[];
@@ -60,8 +68,20 @@ interface LotsTableProps {
   currency?: Currency;
 }
 
+/* ── constants ── */
 const USD_SOURCES = ["Heritage", "Hakes"];
+const NOTABLE_THRESHOLD = 5000;
 
+const ERA_COLORS: Record<string, string> = {
+  SW: "#4a7fa5", ESB: "#8a7f6e", ROTJ: "#a04040", POTF: "#C9A84C", UNKNOWN: "#555",
+};
+
+// Default hidden columns
+const DEFAULT_HIDDEN: ColId[] = ["created_at", "bp"];
+// Additional columns hidden below 1024px
+const NARROW_HIDDEN: ColId[] = ["hammer", "pop"];
+
+/* ── small components ── */
 function toUsd(gbp: number, rate: number): number {
   return rate > 0 ? Math.round(gbp / rate) : 0;
 }
@@ -69,11 +89,7 @@ function toUsd(gbp: number, rate: number): number {
 function CurrencyBadge({ source }: { source: string }) {
   const isOrig = USD_SOURCES.includes(source);
   return (
-    <span
-      className={`ml-1 text-[8px] tracking-widest font-bold px-1 py-0.5 rounded ${
-        isOrig ? "bg-amber-500/20 text-amber-400" : "bg-muted text-muted-foreground"
-      }`}
-    >
+    <span className={`ml-1 text-[8px] tracking-widest font-bold px-1 py-0.5 rounded ${isOrig ? "bg-amber-500/20 text-amber-400" : "bg-muted text-muted-foreground"}`}>
       {isOrig ? "ORIG USD" : "EST USD"}
     </span>
   );
@@ -82,59 +98,38 @@ function CurrencyBadge({ source }: { source: string }) {
 function PopBadge({ variantCode }: { variantCode: string }) {
   const entry: PopEntry | undefined = popCounts[variantCode];
   if (!entry) return null;
-
   if (entry.pop !== null && entry.confidence === "HIGH") {
-    return (
-      <span
-        className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-primary/20 text-primary"
-        title={`Population: ${entry.pop} known graded examples — ${entry.source}`}
-      >
-        ★ POP {entry.pop}
-      </span>
-    );
+    return <span className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-primary/20 text-primary" title={`Population: ${entry.pop} known graded examples — ${entry.source}`}>★ POP {entry.pop}</span>;
   }
   if (entry.confidence === "LOW") {
-    return (
-      <span
-        className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400"
-        title={`Population estimate only — ${entry.source}`}
-      >
-        POP ?
-      </span>
-    );
+    return <span className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400" title={`Population estimate only — ${entry.source}`}>POP ?</span>;
   }
-  return (
-    <span
-      className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
-      title="Population unknown — approximate"
-    >
-      POP ~?
-    </span>
-  );
+  return <span className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground" title="Population unknown — approximate">POP ~?</span>;
 }
-
-const NOTABLE_THRESHOLD = 5000;
-
-const ERA_COLORS: Record<string, string> = {
-  SW: "#4a7fa5",
-  ESB: "#8a7f6e",
-  ROTJ: "#a04040",
-  POTF: "#C9A84C",
-  UNKNOWN: "#555",
-};
 
 function EraBadge({ era }: { era: string }) {
   const bg = ERA_COLORS[era] ?? ERA_COLORS.UNKNOWN;
-  return (
-    <span
-      className="inline-block px-1.5 py-0.5 text-[9px] tracking-widest font-bold rounded"
-      style={{ backgroundColor: bg, color: "#fff" }}
-    >
-      {era}
-    </span>
-  );
+  return <span className="inline-block px-1.5 py-0.5 text-[9px] tracking-widest font-bold rounded" style={{ backgroundColor: bg, color: "#fff" }}>{era}</span>;
 }
 
+/* ── column definitions ── */
+const COL_LABELS: Record<ColId, string> = {
+  sale_date: "Sale Date",
+  created_at: "Date/Time Added",
+  variant_grade: "Variant-Grade",
+  total: "Total",
+  hammer: "Hammer",
+  bp: "BP",
+  cardback: "Cardback",
+  pop: "POP",
+  source: "Source",
+  lot_ref: "Lot Ref",
+  notes: "Notes",
+  img: "IMG",
+  act: "Actions",
+};
+
+/* ── main component ── */
 const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
@@ -144,6 +139,56 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [hiddenCols, setHiddenCols] = useState<Set<ColId>>(new Set(DEFAULT_HIDDEN));
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+
+  const isMobile = useIsMobile();
+  const isNarrow = typeof window !== "undefined" && window.innerWidth < 1024;
+
+  // Compute effective visible columns
+  const isVisible = (col: ColId) => {
+    if (hiddenCols.has(col)) return false;
+    if (isNarrow && NARROW_HIDDEN.includes(col)) return !hiddenCols.has(col) ? true : false;
+    // For narrow screens, auto-hide hammer/pop unless user explicitly toggled them on
+    return true;
+  };
+
+  // On narrow screens, auto-hide hammer and pop unless user explicitly showed them
+  const effectiveHidden = useMemo(() => {
+    const set = new Set(hiddenCols);
+    if (isNarrow) {
+      NARROW_HIDDEN.forEach((c) => {
+        // Only auto-hide if user hasn't explicitly toggled
+        if (!hiddenCols.has(c) && DEFAULT_HIDDEN.indexOf(c) === -1) {
+          // Check: if user toggled it on, respect that. We track this via hiddenCols not containing it.
+          // For narrow auto-hide, we need separate tracking. Simplify: on narrow, always hide these unless user toggled.
+        }
+      });
+    }
+    return set;
+  }, [hiddenCols, isNarrow]);
+
+  // Simpler: track user overrides separately
+  const [userShown, setUserShown] = useState<Set<ColId>>(new Set());
+
+  const colVisible = (col: ColId): boolean => {
+    if (userShown.has(col)) return true;
+    if (hiddenCols.has(col)) return false;
+    if (isNarrow && NARROW_HIDDEN.includes(col)) return false;
+    return true;
+  };
+
+  const toggleCol = (col: ColId) => {
+    // If currently visible, hide it
+    if (colVisible(col)) {
+      setUserShown((prev) => { const n = new Set(prev); n.delete(col); return n; });
+      setHiddenCols((prev) => { const n = new Set(prev); n.add(col); return n; });
+    } else {
+      // Show it
+      setHiddenCols((prev) => { const n = new Set(prev); n.delete(col); return n; });
+      setUserShown((prev) => { const n = new Set(prev); n.add(col); return n; });
+    }
+  };
 
   const sorted = useMemo(() => {
     const copy = [...lots];
@@ -161,52 +206,31 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
   }, [lots, sortKey, sortDir]);
 
   const toggleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("desc");
-    }
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("desc"); }
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setSelectedIds((prev) => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === sorted.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(sorted.map((l) => l.id)));
-    }
+    if (selectedIds.size === sorted.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(sorted.map((l) => l.id)));
   };
 
   const handleBulkDelete = async () => {
     setBulkDeleting(true);
     const ids = Array.from(selectedIds);
     const { error } = await supabase.from("lots").delete().in("id", ids);
-    if (error) {
-      toast.error("Bulk delete failed: " + error.message);
-    } else {
-      toast.success(`Deleted ${ids.length} lot(s)`);
-      setSelectedIds(new Set());
-      onChanged();
-    }
+    if (error) toast.error("Bulk delete failed: " + error.message);
+    else { toast.success(`Deleted ${ids.length} lot(s)`); setSelectedIds(new Set()); onChanged(); }
     setBulkDeleting(false);
     setShowBulkConfirm(false);
   };
 
   const copyRow = (l: Lot) => {
-    const fields = [
-      l.capture_date, l.sale_date, l.source, (l as any).era ?? "", (l as any).cardback_code ?? "",
-      l.lot_ref, l.variant_code, l.grade_tier_code, l.variant_grade_key,
-      l.hammer_price_gbp, l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate, l.condition_notes,
-    ];
+    const fields = [l.capture_date, l.sale_date, l.source, (l as any).era ?? "", (l as any).cardback_code ?? "", l.lot_ref, l.variant_code, l.grade_tier_code, l.variant_grade_key, l.hammer_price_gbp, l.buyers_premium_gbp, l.total_paid_gbp, l.usd_to_gbp_rate, l.condition_notes];
     navigator.clipboard.writeText(fields.join("\t"));
     toast.success("Row copied to clipboard");
     onCopyRow?.(l);
@@ -215,41 +239,22 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
   const handleDelete = async () => {
     if (!deleteLot) return;
     const { error } = await supabase.from("lots").delete().eq("id", deleteLot.id);
-    if (error) {
-      toast.error("Delete failed: " + error.message);
-    } else {
-      toast.success("Lot deleted");
-      onChanged();
-    }
+    if (error) toast.error("Delete failed: " + error.message);
+    else { toast.success("Lot deleted"); onChanged(); }
     setDeleteLot(null);
   };
 
   const SortIcon = ({ col }: { col: SortKey }) => {
     if (sortKey !== col) return <ArrowDown className="w-2.5 h-2.5 opacity-20 inline ml-1" />;
-    return sortDir === "asc"
-      ? <ArrowUp className="w-2.5 h-2.5 text-primary inline ml-1" />
-      : <ArrowDown className="w-2.5 h-2.5 text-primary inline ml-1" />;
+    return sortDir === "asc" ? <ArrowUp className="w-2.5 h-2.5 text-primary inline ml-1" /> : <ArrowDown className="w-2.5 h-2.5 text-primary inline ml-1" />;
   };
 
   if (lots.length === 0) {
-    return (
-      <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">
-        NO RECORDS MATCH CURRENT FILTERS
-      </div>
-    );
+    return <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">NO RECORDS MATCH CURRENT FILTERS</div>;
   }
 
   const isUSD = currency === "USD";
   const sym = isUSD ? "$" : "£";
-
-  const COLS: { key: SortKey; label: string; align?: string }[] = [
-    { key: "sale_date", label: "SALE DATE" },
-    { key: "created_at", label: "DATE/TIME ADDED" },
-    { key: "variant_grade_key", label: "VARIANT-GRADE" },
-    { key: "total_paid_gbp", label: `TOTAL (${sym})${isUSD ? " (USD)" : ""}`, align: "text-right" },
-    { key: "hammer_price_gbp", label: `HAMMER${isUSD ? " (USD)" : ""}`, align: "text-right" },
-    { key: "buyers_premium_gbp", label: `BP${isUSD ? " (USD)" : ""}`, align: "text-right" },
-  ];
 
   const fmtPrice = (gbp: number, rate: number) => {
     if (isUSD) return `$${toUsd(gbp, rate).toLocaleString("en-US")}`;
@@ -259,158 +264,200 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
   const allSelected = selectedIds.size === sorted.length && sorted.length > 0;
   const someSelected = selectedIds.size > 0;
 
+  // All column IDs for the columns toggle
+  const ALL_COLS: ColId[] = ["sale_date", "created_at", "variant_grade", "total", "hammer", "bp", "cardback", "pop", "source", "lot_ref", "notes", "img", "act"];
+
+  // Hidden fields for expanded row
+  const getHiddenFields = (l: Lot) => {
+    const fields: { label: string; value: React.ReactNode }[] = [];
+    if (!colVisible("created_at")) fields.push({ label: "Added", value: `${new Date(l.created_at).toLocaleDateString("en-GB")} ${new Date(l.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}` });
+    if (!colVisible("hammer")) fields.push({ label: "Hammer", value: fmtPrice(Number(l.hammer_price_gbp), Number(l.usd_to_gbp_rate)) });
+    if (!colVisible("bp")) fields.push({ label: "BP", value: fmtPrice(Number(l.buyers_premium_gbp), Number(l.usd_to_gbp_rate)) });
+    if (!colVisible("pop")) fields.push({ label: "POP", value: <PopBadge variantCode={l.variant_code} /> });
+    if (!colVisible("cardback")) fields.push({ label: "Cardback", value: <><EraBadge era={(l as any).era ?? "UNKNOWN"} /> <span className="text-muted-foreground">{(l as any).cardback_code ?? "—"}</span></> });
+    if (!colVisible("source")) fields.push({ label: "Source", value: <SourceBadge source={l.source} /> });
+    if (!colVisible("lot_ref")) fields.push({ label: "Lot Ref", value: l.lot_url ? <a href={l.lot_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">{l.lot_ref} <ExternalLink className="w-3 h-3" /></a> : l.lot_ref });
+    if (!colVisible("notes")) fields.push({ label: "Notes", value: l.condition_notes || "—" });
+    return fields;
+  };
+
+  const handleRowClick = (l: Lot) => {
+    if (isMobile) {
+      setExpandedRowId((prev) => prev === l.id ? null : l.id);
+    } else {
+      onSelectLot?.(l);
+    }
+  };
+
+  // Count visible columns for colspan
+  const visibleColCount = ALL_COLS.filter(colVisible).length + 1; // +1 for checkbox
+
   return (
     <>
-      {someSelected && (
-        <div className="px-6 py-2 border-b border-border bg-secondary/30 flex items-center gap-3">
-          <span className="text-[10px] tracking-widest text-primary font-bold">
-            {selectedIds.size} SELECTED
-          </span>
-          <button
-            onClick={() => setShowBulkConfirm(true)}
-            className="text-[10px] tracking-widest px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors font-bold"
-          >
-            DELETE SELECTED
-          </button>
-          <button
-            onClick={() => setSelectedIds(new Set())}
-            className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-          >
-            CLEAR
-          </button>
+      {/* Columns toggle button */}
+      <div className="px-6 py-1.5 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {someSelected && (
+            <>
+              <span className="text-[10px] tracking-widest text-primary font-bold">{selectedIds.size} SELECTED</span>
+              <button onClick={() => setShowBulkConfirm(true)} className="text-[10px] tracking-widest px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors font-bold">DELETE SELECTED</button>
+              <button onClick={() => setSelectedIds(new Set())} className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors">CLEAR</button>
+            </>
+          )}
         </div>
-      )}
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="text-[10px] tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 px-2 py-1 rounded border border-border hover:border-primary/50">
+              <Columns3 className="w-3 h-3" /> COLUMNS
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-48 p-2 bg-card border-border">
+            <div className="space-y-1">
+              {ALL_COLS.map((col) => (
+                <label key={col} className="flex items-center gap-2 text-[10px] tracking-widest cursor-pointer hover:text-primary transition-colors py-0.5">
+                  <Checkbox
+                    checked={colVisible(col)}
+                    onCheckedChange={() => toggleCol(col)}
+                    className="border-muted-foreground h-3 w-3"
+                  />
+                  {COL_LABELS[col]}
+                </label>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
               <th className="px-3 py-2 w-8">
-                <Checkbox
-                  checked={allSelected}
-                  onCheckedChange={toggleSelectAll}
-                  className="border-muted-foreground"
-                />
+                <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} className="border-muted-foreground" />
               </th>
-              {COLS.map((col) => (
-                <th
-                  key={col.key}
-                  className={`px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors ${col.align ?? ""}`}
-                  onClick={() => toggleSort(col.key)}
-                >
-                  {col.label}<SortIcon col={col.key} />
-                </th>
-              ))}
-              <th className="px-3 py-2">ERA</th>
-              <th className="px-3 py-2">CARDBACK</th>
-              <th className="px-3 py-2">POP</th>
-              <th className="px-3 py-2">SOURCE</th>
-              <th className="px-3 py-2">LOT REF</th>
-              <th className="px-3 py-2">NOTES</th>
-              <th className="px-3 py-2">IMG</th>
-              <th className="px-3 py-2">ACT</th>
+              {colVisible("sale_date") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("sale_date")}>SALE DATE<SortIcon col="sale_date" /></th>}
+              {colVisible("created_at") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("created_at")}>DATE/TIME ADDED<SortIcon col="created_at" /></th>}
+              {colVisible("variant_grade") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("variant_grade_key")}>VARIANT-GRADE<SortIcon col="variant_grade_key" /></th>}
+              {colVisible("total") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("total_paid_gbp")}>TOTAL ({sym}){isUSD ? " (USD)" : ""}<SortIcon col="total_paid_gbp" /></th>}
+              {colVisible("hammer") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("hammer_price_gbp")}>HAMMER{isUSD ? " (USD)" : ""}<SortIcon col="hammer_price_gbp" /></th>}
+              {colVisible("bp") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("buyers_premium_gbp")}>BP{isUSD ? " (USD)" : ""}<SortIcon col="buyers_premium_gbp" /></th>}
+              {colVisible("cardback") && <th className="px-3 py-2">CARDBACK</th>}
+              {colVisible("pop") && <th className="px-3 py-2">POP</th>}
+              {colVisible("source") && <th className="px-3 py-2">SOURCE</th>}
+              {colVisible("lot_ref") && <th className="px-3 py-2">LOT REF</th>}
+              {colVisible("notes") && <th className="px-3 py-2">NOTES</th>}
+              {colVisible("img") && <th className="px-3 py-2">IMG</th>}
+              {colVisible("act") && <th className="px-3 py-2">ACT</th>}
             </tr>
           </thead>
           <tbody>
-            {sorted.map((l) => (
-              <tr
-                key={l.id}
-                onClick={() => onSelectLot?.(l)}
-                className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""} ${selectedIds.has(l.id) ? "bg-secondary/40" : ""}`}
-              >
-                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
-                  <Checkbox
-                    checked={selectedIds.has(l.id)}
-                    onCheckedChange={() => toggleSelect(l.id)}
-                    className="border-muted-foreground"
-                  />
-                </td>
-                <td className="px-3 py-2 whitespace-nowrap">
-                  {new Date(l.sale_date).toLocaleDateString("en-GB")}
-                </td>
-                <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
-                  {new Date(l.created_at).toLocaleDateString("en-GB")}{" "}
-                  <span className="text-[9px]">{new Date(l.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
-                </td>
-                <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>
-                <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
-                  {(l as any).price_status === "ESTIMATE_ONLY" ? (
-                    <span className="flex items-center justify-end gap-1.5">
-                      <span className="text-[8px] tracking-widest font-bold px-1 py-0.5 rounded bg-amber-500/20 text-amber-400">ESTIMATE ONLY</span>
-                      <span className="text-amber-400">
-                        {sym}{isUSD ? toUsd(Number((l as any).estimate_low_gbp ?? 0), Number(l.usd_to_gbp_rate)).toLocaleString() : Number((l as any).estimate_low_gbp ?? 0).toLocaleString("en-GB")}
-                        –{sym}{isUSD ? toUsd(Number((l as any).estimate_high_gbp ?? 0), Number(l.usd_to_gbp_rate)).toLocaleString() : Number((l as any).estimate_high_gbp ?? 0).toLocaleString("en-GB")}
-                      </span>
-                    </span>
-                  ) : (l as any).price_status === "UNSOLD" ? (
-                    <span className="flex items-center justify-end">
-                      <span className="text-[8px] tracking-widest font-bold px-1 py-0.5 rounded bg-muted text-muted-foreground">UNSOLD</span>
-                    </span>
-                  ) : (
-                    <>
-                      {fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
-                      {isUSD && <CurrencyBadge source={l.source} />}
-                    </>
+            {sorted.map((l) => {
+              const isExpanded = expandedRowId === l.id;
+              const hiddenFields = getHiddenFields(l);
+              return (
+                <React.Fragment key={l.id}>
+                  <tr
+                    onClick={() => handleRowClick(l)}
+                    className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""} ${selectedIds.has(l.id) ? "bg-secondary/40" : ""}`}
+                  >
+                    <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox checked={selectedIds.has(l.id)} onCheckedChange={() => toggleSelect(l.id)} className="border-muted-foreground" />
+                    </td>
+                    {colVisible("sale_date") && <td className="px-3 py-2 whitespace-nowrap">{new Date(l.sale_date).toLocaleDateString("en-GB")}</td>}
+                    {colVisible("created_at") && (
+                      <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
+                        {new Date(l.created_at).toLocaleDateString("en-GB")}{" "}
+                        <span className="text-[9px]">{new Date(l.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+                      </td>
+                    )}
+                    {colVisible("variant_grade") && <td className="px-3 py-2 text-primary font-bold whitespace-nowrap">{l.variant_grade_key}</td>}
+                    {colVisible("total") && (
+                      <td className="px-3 py-2 text-right text-primary font-bold whitespace-nowrap">
+                        {(l as any).price_status === "ESTIMATE_ONLY" ? (
+                          <span className="flex items-center justify-end gap-1.5">
+                            <span className="text-[8px] tracking-widest font-bold px-1 py-0.5 rounded bg-amber-500/20 text-amber-400">EST</span>
+                            <span className="text-amber-400">
+                              {sym}{isUSD ? toUsd(Number((l as any).estimate_low_gbp ?? 0), Number(l.usd_to_gbp_rate)).toLocaleString() : Number((l as any).estimate_low_gbp ?? 0).toLocaleString("en-GB")}
+                              –{sym}{isUSD ? toUsd(Number((l as any).estimate_high_gbp ?? 0), Number(l.usd_to_gbp_rate)).toLocaleString() : Number((l as any).estimate_high_gbp ?? 0).toLocaleString("en-GB")}
+                            </span>
+                          </span>
+                        ) : (l as any).price_status === "UNSOLD" ? (
+                          <span className="flex items-center justify-end">
+                            <span className="text-[8px] tracking-widest font-bold px-1 py-0.5 rounded bg-muted text-muted-foreground">UNSOLD</span>
+                          </span>
+                        ) : (
+                          <>{fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}{isUSD && <CurrencyBadge source={l.source} />}</>
+                        )}
+                      </td>
+                    )}
+                    {colVisible("hammer") && <td className="px-3 py-2 text-right whitespace-nowrap">{fmtPrice(Number(l.hammer_price_gbp), Number(l.usd_to_gbp_rate))}</td>}
+                    {colVisible("bp") && <td className="px-3 py-2 text-right whitespace-nowrap">{fmtPrice(Number(l.buyers_premium_gbp), Number(l.usd_to_gbp_rate))}</td>}
+                    {colVisible("cardback") && (
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <EraBadge era={(l as any).era ?? "UNKNOWN"} />
+                        <span className="ml-1.5 text-muted-foreground">{(l as any).cardback_code ?? "—"}</span>
+                      </td>
+                    )}
+                    {colVisible("pop") && <td className="px-3 py-2"><PopBadge variantCode={l.variant_code} /></td>}
+                    {colVisible("source") && <td className="px-3 py-2"><SourceBadge source={l.source} /></td>}
+                    {colVisible("lot_ref") && (
+                      <td className="px-3 py-2">
+                        {l.lot_url ? (
+                          <a href={l.lot_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline inline-flex items-center gap-1">
+                            {l.lot_ref} <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : l.lot_ref}
+                      </td>
+                    )}
+                    {colVisible("notes") && <td className="px-3 py-2 max-w-[200px] truncate" title={l.condition_notes}>{l.condition_notes}</td>}
+                    {colVisible("img") && (
+                      <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                        {(() => {
+                          const imgUrl = getLotImageUrl(l.image_urls);
+                          return imgUrl ? (
+                            <button onClick={() => setLightboxUrl(imgUrl)}>
+                              <img src={imgUrl} alt="lot" className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors"
+                                onError={(e) => { const t = e.currentTarget; t.style.display = "none"; const p = document.createElement("div"); p.className = "w-8 h-10 flex items-center justify-center text-center font-bold tracking-wider leading-tight"; p.style.cssText = "width:32px;height:40px;background:#1a1a1a;border:1px solid #C9A84C;color:#C9A84C;font-size:6px;display:flex;align-items:center;justify-content:center;"; p.textContent = "No Image"; t.parentElement?.appendChild(p); }}
+                              />
+                            </button>
+                          ) : <NoImagePlaceholder />;
+                        })()}
+                      </td>
+                    )}
+                    {colVisible("act") && (
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={(e) => { e.stopPropagation(); copyRow(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Copy row"><Copy className="w-3.5 h-3.5" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setEditLot(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Edit lot"><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteLot(l); }} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete lot"><Trash2 className="w-3.5 h-3.5" /></button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                  {/* Expanded row for mobile / hidden fields */}
+                  {isExpanded && hiddenFields.length > 0 && (
+                    <tr className="bg-secondary/20 border-b border-border/50">
+                      <td colSpan={visibleColCount} className="px-4 py-2">
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
+                          {hiddenFields.map((f) => (
+                            <div key={f.label} className="flex items-center gap-2">
+                              <span className="text-[9px] tracking-widest text-muted-foreground w-16 shrink-0">{f.label.toUpperCase()}</span>
+                              <span>{f.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-2 flex items-center gap-1.5">
+                          <button onClick={(e) => { e.stopPropagation(); copyRow(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Copy row"><Copy className="w-3.5 h-3.5" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setEditLot(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Edit lot"><Pencil className="w-3.5 h-3.5" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteLot(l); }} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete lot"><Trash2 className="w-3.5 h-3.5" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); onSelectLot?.(l); }} className="text-muted-foreground hover:text-primary transition-colors text-[9px] tracking-widest ml-2">VIEW DETAILS →</button>
+                        </div>
+                      </td>
+                    </tr>
                   )}
-                </td>
-                <td className="px-3 py-2 text-right whitespace-nowrap">
-                  {fmtPrice(Number(l.hammer_price_gbp), Number(l.usd_to_gbp_rate))}
-                </td>
-                <td className="px-3 py-2 text-right whitespace-nowrap">
-                  {fmtPrice(Number(l.buyers_premium_gbp), Number(l.usd_to_gbp_rate))}
-                </td>
-                <td className="px-3 py-2">
-                  <EraBadge era={(l as any).era ?? "UNKNOWN"} />
-                </td>
-                <td className="px-3 py-2 text-muted-foreground">{(l as any).cardback_code ?? "—"}</td>
-                <td className="px-3 py-2"><PopBadge variantCode={l.variant_code} /></td>
-                <td className="px-3 py-2"><SourceBadge source={l.source} /></td>
-                <td className="px-3 py-2">
-                  {l.lot_url ? (
-                    <a href={l.lot_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline inline-flex items-center gap-1">
-                      {l.lot_ref} <ExternalLink className="w-3 h-3" />
-                    </a>
-                  ) : l.lot_ref}
-                </td>
-                <td className="px-3 py-2 max-w-[200px] truncate" title={l.condition_notes}>{l.condition_notes}</td>
-                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
-                  {(() => {
-                    const imgUrl = getLotImageUrl(l.image_urls);
-                    return imgUrl ? (
-                      <button onClick={() => setLightboxUrl(imgUrl)}>
-                        <img
-                          src={imgUrl}
-                          alt="lot"
-                          className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors"
-                          onError={(e) => {
-                            const target = e.currentTarget;
-                            target.style.display = "none";
-                            const placeholder = document.createElement("div");
-                            placeholder.className = "w-8 h-10 flex items-center justify-center text-center font-bold tracking-wider leading-tight";
-                            placeholder.style.cssText = "width:32px;height:40px;background:#1a1a1a;border:1px solid #C9A84C;color:#C9A84C;font-size:6px;display:flex;align-items:center;justify-content:center;";
-                            placeholder.textContent = "No Image";
-                            target.parentElement?.appendChild(placeholder);
-                          }}
-                        />
-                      </button>
-                    ) : <NoImagePlaceholder />;
-                  })()}
-                </td>
-                <td className="px-3 py-2">
-                  <div className="flex items-center gap-1.5">
-                    <button onClick={(e) => { e.stopPropagation(); copyRow(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Copy row">
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setEditLot(l); }} className="text-muted-foreground hover:text-primary transition-colors" title="Edit lot">
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setDeleteLot(l); }} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete lot">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                </React.Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -421,12 +468,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
         <span>Grey = unknown</span>
       </div>
 
-      <LotFormModal
-        open={!!editLot}
-        onOpenChange={(o) => { if (!o) setEditLot(null); }}
-        onSaved={onChanged}
-        editLot={editLot}
-      />
+      <LotFormModal open={!!editLot} onOpenChange={(o) => { if (!o) setEditLot(null); }} onSaved={onChanged} editLot={editLot} />
 
       <AlertDialog open={!!deleteLot} onOpenChange={(o) => { if (!o) setDeleteLot(null); }}>
         <AlertDialogContent className="bg-card border-border">
@@ -438,9 +480,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="text-xs tracking-wider">CANCEL</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">
-              DELETE
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">DELETE</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -461,17 +501,10 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
       {lightboxUrl && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-pointer"
-          onClick={() => setLightboxUrl(null)}
-        >
-          <img
-            src={lightboxUrl}
-            alt="lot zoom"
-            className="max-w-[90vw] max-h-[90vh] object-contain border border-border rounded shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-          />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 cursor-pointer" onClick={() => setLightboxUrl(null)}>
+          <img src={lightboxUrl} alt="lot zoom" className="max-w-[90vw] max-h-[90vh] object-contain border border-border rounded shadow-lg" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </>
