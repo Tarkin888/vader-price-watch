@@ -279,7 +279,7 @@ const Index = () => {
       <Sheet open={showPriceTrend} onOpenChange={setShowPriceTrend}>
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto bg-background border-border p-0">
           <SheetHeader className="px-6 pt-4 pb-2">
-            <SheetTitle className="text-primary text-sm tracking-widest">PRICE TREND</SheetTitle>
+            <SheetTitle className="text-primary text-sm tracking-wider font-medium">Price Trend</SheetTitle>
           </SheetHeader>
           <PriceTrendChart lots={filtered} alwaysExpanded />
         </SheetContent>
