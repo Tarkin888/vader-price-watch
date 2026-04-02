@@ -36,10 +36,10 @@ const SessionLog = ({ copiedRows, onClear }: Props) => {
     <div>
       <div className="flex items-center gap-2 px-6 py-2 border-b border-border">
         <Button variant="outline" size="sm" onClick={copyAll} className="text-xs tracking-wider border-border hover:border-primary hover:text-primary">
-          <Copy className="w-3 h-3 mr-1" /> COPY ALL ({copiedRows.length})
+          <Copy className="w-3 h-3 mr-1" /> Copy All ({copiedRows.length})
         </Button>
         <Button variant="outline" size="sm" onClick={onClear} className="text-xs tracking-wider border-border hover:border-destructive hover:text-destructive">
-          <Trash2 className="w-3 h-3 mr-1" /> CLEAR
+          <Trash2 className="w-3 h-3 mr-1" /> Clear
         </Button>
       </div>
       <div className="overflow-x-auto">
