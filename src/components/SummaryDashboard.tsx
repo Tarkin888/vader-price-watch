@@ -139,7 +139,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
       {/* Charts grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="border border-border p-3">
-          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY SOURCE</div>
+          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Records by Source</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={bySource} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
