@@ -41,7 +41,7 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 );
 
 const ChartTitle = ({ children }: { children: React.ReactNode }) => (
-  <div className="text-[10px] tracking-[0.15em] uppercase text-primary/80 mb-2">{children}</div>
+  <div className="text-[10px] tracking-wider text-primary/80 mb-2 font-medium">{children}</div>
 );
 
 const NoData = ({ name }: { name: string }) => (
