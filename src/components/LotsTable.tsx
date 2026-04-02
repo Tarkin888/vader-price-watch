@@ -335,18 +335,18 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
               <th className="px-3 py-2 w-8">
                 <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} className="border-muted-foreground" />
               </th>
-              {colVisible("sale_date") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("sale_date")}>SALE DATE<SortIcon col="sale_date" /></th>}
-              {colVisible("created_at") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("created_at")}>DATE/TIME ADDED<SortIcon col="created_at" /></th>}
-              {colVisible("variant_grade") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("variant_grade_key")}>VARIANT-GRADE<SortIcon col="variant_grade_key" /></th>}
-              {colVisible("total") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("total_paid_gbp")}>TOTAL ({sym}){isUSD ? " (USD)" : ""}<SortIcon col="total_paid_gbp" /></th>}
-              {colVisible("hammer") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("hammer_price_gbp")}>HAMMER{isUSD ? " (USD)" : ""}<SortIcon col="hammer_price_gbp" /></th>}
+              {colVisible("sale_date") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("sale_date")}>Sale Date<SortIcon col="sale_date" /></th>}
+              {colVisible("created_at") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("created_at")}>Date/Time Added<SortIcon col="created_at" /></th>}
+              {colVisible("variant_grade") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("variant_grade_key")}>Variant-Grade<SortIcon col="variant_grade_key" /></th>}
+              {colVisible("total") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("total_paid_gbp")}>Total ({sym}){isUSD ? " (USD)" : ""}<SortIcon col="total_paid_gbp" /></th>}
+              {colVisible("hammer") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("hammer_price_gbp")}>Hammer{isUSD ? " (USD)" : ""}<SortIcon col="hammer_price_gbp" /></th>}
               {colVisible("bp") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("buyers_premium_gbp")}>BP{isUSD ? " (USD)" : ""}<SortIcon col="buyers_premium_gbp" /></th>}
-              {colVisible("cardback") && <th className="px-3 py-2">CARDBACK</th>}
-              {colVisible("pop") && <th className="px-3 py-2">POP</th>}
-              {colVisible("source") && <th className="px-3 py-2">SOURCE</th>}
-              {colVisible("lot_ref") && <th className="px-3 py-2">LOT REF</th>}
-              {colVisible("notes") && <th className="px-3 py-2">NOTES</th>}
-              {colVisible("img") && <th className="px-3 py-2">IMG</th>}
+              {colVisible("cardback") && <th className="px-3 py-2">Cardback</th>}
+              {colVisible("pop") && <th className="px-3 py-2">Pop</th>}
+              {colVisible("source") && <th className="px-3 py-2">Source</th>}
+              {colVisible("lot_ref") && <th className="px-3 py-2">Lot Ref</th>}
+              {colVisible("notes") && <th className="px-3 py-2">Notes</th>}
+              {colVisible("img") && <th className="px-3 py-2">Img</th>}
               {colVisible("act") && <th className="px-3 py-2">ACT</th>}
             </tr>
           </thead>
