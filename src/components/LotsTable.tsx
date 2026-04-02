@@ -347,7 +347,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
               {colVisible("lot_ref") && <th className="px-3 py-2">Lot Ref</th>}
               {colVisible("notes") && <th className="px-3 py-2">Notes</th>}
               {colVisible("img") && <th className="px-3 py-2">Img</th>}
-              {colVisible("act") && <th className="px-3 py-2">ACT</th>}
+              {colVisible("act") && <th className="px-3 py-2">Act</th>}
             </tr>
           </thead>
           <tbody>
