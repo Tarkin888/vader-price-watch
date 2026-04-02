@@ -37,7 +37,7 @@ const fmt = (n: number) => `£${n.toLocaleString("en-GB")}`;
 const fmtK = (n: number) => n >= 1000 ? `£${(n / 1000).toFixed(1)}k` : `£${n}`;
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-[11px] tracking-[0.2em] uppercase text-primary mb-3 font-bold">{children}</h3>
+  <h3 className="text-[11px] tracking-wider text-primary mb-3 font-medium">{children}</h3>
 );
 
 const ChartTitle = ({ children }: { children: React.ReactNode }) => (
