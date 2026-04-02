@@ -119,7 +119,7 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
         <div className="flex gap-1">
           <button
             onClick={() => setMode("line")}
-            className={`text-[10px] tracking-widest px-2 py-0.5 transition-colors ${mode === "line" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-2 py-0.5 transition-colors ${mode === "line" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             LINE
           </button>
