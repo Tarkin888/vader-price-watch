@@ -60,7 +60,7 @@ const ReferencePanel = () => {
     <div className="relative ml-auto">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-1 text-[10px] text-muted-foreground tracking-widest uppercase hover:text-primary transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1 text-[10px] text-muted-foreground tracking-wider hover:text-primary transition-colors"
       >
         {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
         REFERENCE PANEL
