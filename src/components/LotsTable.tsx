@@ -494,9 +494,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs tracking-wider">CANCEL</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs tracking-wider">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleBulkDelete} disabled={bulkDeleting} className="bg-destructive text-destructive-foreground text-xs tracking-wider hover:bg-destructive/90">
-              {bulkDeleting ? "DELETING..." : `DELETE ${selectedIds.size}`}
+              {bulkDeleting ? "Deleting..." : `Delete ${selectedIds.size}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

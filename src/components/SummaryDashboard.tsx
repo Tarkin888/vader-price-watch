@@ -185,11 +185,11 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
         </div>
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
-              <th className="px-3 py-1.5">DATE</th>
-              <th className="px-3 py-1.5">VARIANT-GRADE</th>
-              <th className="px-3 py-1.5">SOURCE</th>
-              <th className="px-3 py-1.5 text-right">TOTAL</th>
+            <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
+              <th className="px-3 py-1.5">Date</th>
+              <th className="px-3 py-1.5">Variant-Grade</th>
+              <th className="px-3 py-1.5">Source</th>
+              <th className="px-3 py-1.5 text-right">Total</th>
             </tr>
           </thead>
           <tbody>

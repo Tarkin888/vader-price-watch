@@ -125,21 +125,21 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            ADD LOT
+            Add Lot
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleImportClick}
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
             <Upload className="w-3.5 h-3.5" />
-            IMPORT CSV
+            Import CSV
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleExport}
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            EXPORT CSV ({filteredLots.length})
+            Export CSV ({filteredLots.length})
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -147,14 +147,14 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            BENCHMARK PANEL
+            Benchmark Panel
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={onShowPriceTrend}
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
             <TrendingUp className="w-3.5 h-3.5" />
-            PRICE TREND
+            Price Trend
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
