@@ -413,7 +413,7 @@ const Collection = () => {
                 ))}
               </div>
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST EXPENSIVE</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">Most Expensive</h3>
                 {mostExpensive && (
                   <div>
                     <div className="text-primary font-bold">{mostExpensive.description}</div>
