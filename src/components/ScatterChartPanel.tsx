@@ -234,7 +234,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
         {/* Cardback filter */}
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground">CARDBACK:</span>
+          <span className="text-muted-foreground">Cardback:</span>
           <select
             value={cardbackFilter}
             onChange={(e) => setCardbackFilter(e.target.value)}
