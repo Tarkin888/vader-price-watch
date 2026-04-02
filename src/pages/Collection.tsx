@@ -450,7 +450,7 @@ const Collection = () => {
       <AlertDialog open={!!deleteItem} onOpenChange={(o) => { if (!o) setDeleteItem(null); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-primary tracking-wider text-sm">CONFIRM DELETION</AlertDialogTitle>
+            <AlertDialogTitle className="text-primary tracking-wider text-sm">Confirm Deletion</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
               Delete <span className="text-primary font-bold">{deleteItem?.item_id}</span> — {deleteItem?.description}? This cannot be undone.
             </AlertDialogDescription>
