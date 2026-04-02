@@ -68,7 +68,7 @@ const ReferencePanel = () => {
       {open && (
         <div className="absolute right-0 top-full z-50 mt-1 w-[700px] border border-border bg-background shadow-lg rounded-md p-4 grid md:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-[10px] text-primary tracking-widest uppercase mb-2">
+            <h3 className="text-[10px] text-primary tracking-wider mb-2">
               Cardback Variant Codes
             </h3>
             <table className="w-full text-xs">
