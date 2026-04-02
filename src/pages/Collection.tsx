@@ -228,7 +228,7 @@ const Collection = () => {
               className="text-xs tracking-wider"
               onClick={() => setAddOpen(true)}
             >
-              <Plus className="w-3 h-3 mr-1" /> ADD ITEM
+              <Plus className="w-3 h-3 mr-1" /> Add Item
             </Button>
           </div>
         </div>
