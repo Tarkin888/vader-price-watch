@@ -511,5 +511,4 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
   );
 };
 
-import React from "react";
 export default LotsTable;
