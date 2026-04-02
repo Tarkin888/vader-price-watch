@@ -307,8 +307,8 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
         </div>
         <Popover>
           <PopoverTrigger asChild>
-            <button className="text-[10px] tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 px-2 py-1 rounded border border-border hover:border-primary/50">
-              <Columns3 className="w-3 h-3" /> COLUMNS
+            <button className="text-[10px] tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 px-2 py-1 rounded border border-border hover:border-primary/50">
+              <Columns3 className="w-3 h-3" /> Columns
             </button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-48 p-2 bg-card border-border">
