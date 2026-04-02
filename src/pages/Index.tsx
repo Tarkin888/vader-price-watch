@@ -194,33 +194,33 @@ const Index = () => {
       <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
         <div className="flex items-center gap-1">
           <span className="text-[11px] text-muted-foreground tracking-wider mr-3">
-            {quickStats.count} RECORDS
-            <span className="ml-2">AVG <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
-            <span className="ml-2">HIGH <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
+            {quickStats.count} records
+            <span className="ml-2">Avg <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
+            <span className="ml-2">High <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
           </span>
           <button
             onClick={() => changeTab("dashboard")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            DASHBOARD
+            Dashboard
           </button>
           <button
             onClick={() => changeTab("table")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            RESULTS
+            Results
           </button>
           <button
             onClick={() => changeTab("chart")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            PRICE CHART
+            Price Chart
           </button>
           <button
             onClick={() => changeTab("session")}
-            className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
-            SESSION LOG {copiedRows.length > 0 && `(${copiedRows.length})`}
+            Session Log {copiedRows.length > 0 && `(${copiedRows.length})`}
           </button>
         </div>
         <ToolsDropdown
