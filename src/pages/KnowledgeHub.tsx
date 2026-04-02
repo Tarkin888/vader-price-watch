@@ -259,8 +259,8 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 3: VARIANT SPOTLIGHTS ──── */}
-        <div ref={(el) => { sectionRefs.current["VARIANT SPOTLIGHTS"] = el; }}>
-          <SectionHeader title="VARIANT SPOTLIGHT CARDS" />
+        <div ref={(el) => { sectionRefs.current["Variant Spotlights"] = el; }}>
+          <SectionHeader title="Variant Spotlight Cards" />
           <div className="grid md:grid-cols-2 gap-4 mt-4">
             {SPOTLIGHT_CARDS.map((card) => (
               <div
