@@ -197,7 +197,7 @@ const KnowledgeHub = () => {
             {TIMELINE_NODES.map((node) => (
               <button
                 key={node.era}
-                onClick={() => { setActiveSection("CARDBACK TABLE"); setEraFilter(node.era); scrollToSection("CARDBACK TABLE"); }}
+                onClick={() => { setActiveSection("Cardback Table"); setEraFilter(node.era); scrollToSection("Cardback Table"); }}
                 className="relative z-10 flex flex-col items-center group"
               >
                 <div className="w-5 h-5 rounded-full border-2 border-primary bg-background group-hover:bg-primary/20 transition-colors shadow-[0_0_8px_hsl(43_50%_54%/0.4)]" />
