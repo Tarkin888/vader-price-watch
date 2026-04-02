@@ -371,7 +371,7 @@ const KnowledgeHub = () => {
             </div>
             {/* right – value ranking */}
             <div>
-              <h4 className="text-[10px] text-primary tracking-widest font-bold mb-2">RELATIVE VALUE RANKING BY ERA (RAW-NM, U.S. KENNER)</h4>
+              <h4 className="text-[10px] text-primary tracking-wider font-medium mb-2">Relative Value Ranking by Era (RAW-NM, U.S. Kenner)</h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
