@@ -314,7 +314,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
           <PopoverContent align="end" className="w-48 p-2 bg-card border-border">
             <div className="space-y-1">
               {ALL_COLS.map((col) => (
-                <label key={col} className="flex items-center gap-2 text-[10px] tracking-widest cursor-pointer hover:text-primary transition-colors py-0.5">
+                <label key={col} className="flex items-center gap-2 text-[10px] tracking-wider cursor-pointer hover:text-primary transition-colors py-0.5">
                   <Checkbox
                     checked={colVisible(col)}
                     onCheckedChange={() => toggleCol(col)}
