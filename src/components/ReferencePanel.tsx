@@ -63,7 +63,7 @@ const ReferencePanel = () => {
         className="flex items-center gap-1.5 px-3 py-1 text-[10px] text-muted-foreground tracking-wider hover:text-primary transition-colors"
       >
         {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-        REFERENCE PANEL
+        Reference Panel
       </button>
       {open && (
         <div className="absolute right-0 top-full z-50 mt-1 w-[700px] border border-border bg-background shadow-lg rounded-md p-4 grid md:grid-cols-2 gap-4">
