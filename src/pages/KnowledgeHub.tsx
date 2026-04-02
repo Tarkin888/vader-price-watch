@@ -210,8 +210,8 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 2: CARDBACK MASTER TABLE ──── */}
-        <div ref={(el) => { sectionRefs.current["CARDBACK TABLE"] = el; }}>
-          <SectionHeader title="CARDBACK MASTER TABLE" />
+        <div ref={(el) => { sectionRefs.current["Cardback Table"] = el; }}>
+          <SectionHeader title="Cardback Master Table" />
           {/* era filter pills */}
           <div className="flex gap-2 mt-4 mb-3">
             {ERA_FILTERS.map((e) => (
