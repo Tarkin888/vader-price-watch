@@ -286,7 +286,7 @@ const Collection = () => {
               onClick={() => setPrivacyMode(!privacyMode)}
             >
               {privacyMode ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
-              PRIVACY {privacyMode ? "ON" : "OFF"}
+              Privacy {privacyMode ? "On" : "Off"}
             </Button>
             {!privacyMode && (
               <Button
