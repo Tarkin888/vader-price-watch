@@ -216,9 +216,9 @@ const Collection = () => {
               My Collection — Personal Inventory
             </h1>
             <div className="mt-1 flex gap-6 text-xs text-muted-foreground tracking-wider">
-              <span>TOTAL ITEMS: <span className="text-primary">{items.length}</span></span>
-              <span>TOTAL COST: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
-              <span>PORTFOLIO VALUE: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
+              <span>Total Items: <span className="text-primary">{items.length}</span></span>
+              <span>Total Cost: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
+              <span>Portfolio Value: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
             </div>
           </div>
           <div className="flex items-center gap-2">
