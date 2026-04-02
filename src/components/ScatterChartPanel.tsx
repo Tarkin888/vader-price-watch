@@ -338,8 +338,8 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
       {/* Trend lines rendered as SVG overlay — simpler approach: use a separate mini chart */}
       {showTrend && Object.keys(trendLines).length > 0 && allPoints.length > 0 && (
-        <div className="text-[9px] text-muted-foreground tracking-widest pl-12">
-          TREND LINES ACTIVE — {Object.keys(trendLines).map((e) => {
+        <div className="text-[9px] text-muted-foreground tracking-wider pl-12">
+          Trend lines active — {Object.keys(trendLines).map((e) => {
             const tl = trendLines[e];
             if (!tl || tl.length < 2) return null;
             const slope = tl[1].y - tl[0].y;
