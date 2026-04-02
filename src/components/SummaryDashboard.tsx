@@ -165,7 +165,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
         </div>
 
         <div className="border border-border p-3">
-          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">AVG PRICE BY GRADE</div>
+          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Avg Price by Grade</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={avgByGrade} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
