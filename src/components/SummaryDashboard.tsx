@@ -140,12 +140,12 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
       </div>
 
       {/* Charts grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="border border-border p-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="border border-border p-3 min-h-[280px]">
           <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Records by Source</div>
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" height={240}>
             <BarChart data={bySource} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 50%, 54%, 0.1)" />
               <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} />
               <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={60} />
               <Tooltip contentStyle={TOOLTIP_STYLE} />
@@ -154,24 +154,24 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
           </ResponsiveContainer>
         </div>
 
-        <div className="border border-border p-3">
-          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Records by Variant</div>
-          <ResponsiveContainer width="100%" height={160}>
+        <div className="border border-border p-3 min-h-[280px]">
+          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Records by Variant (top 8)</div>
+          <ResponsiveContainer width="100%" height={240}>
             <BarChart data={byVariant} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 50%, 54%, 0.1)" />
               <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} />
-              <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={50} />
+              <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={80} />
               <Tooltip contentStyle={TOOLTIP_STYLE} />
               <Bar dataKey="count" fill="hsl(20, 60%, 55%)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="border border-border p-3">
+        <div className="border border-border p-3 min-h-[280px]">
           <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Avg Price by Grade</div>
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" height={240}>
             <BarChart data={avgByGrade} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 50%, 54%, 0.1)" />
               <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `£${v.toLocaleString()}`} />
               <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={60} />
               <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [fmt(v), "Avg"]} />
