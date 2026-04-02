@@ -313,12 +313,12 @@ const KnowledgeHub = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className={thCls}>SOURCE</th>
-                  <th className={thCls}>LOCATION</th>
-                  <th className={thCls}>CURRENCY</th>
-                  <th className={thCls}>BUYER'S PREMIUM</th>
-                  <th className={thCls}>BEST FOR</th>
-                  <th className={thCls}>NOTES</th>
+                  <th className={thCls}>Source</th>
+                  <th className={thCls}>Location</th>
+                  <th className={thCls}>Currency</th>
+                  <th className={thCls}>Buyer's Premium</th>
+                  <th className={thCls}>Best For</th>
+                  <th className={thCls}>Notes</th>
                 </tr>
               </thead>
               <tbody>
