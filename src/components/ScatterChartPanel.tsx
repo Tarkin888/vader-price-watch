@@ -215,7 +215,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
   return (
     <div className="border-b border-border px-6 py-4 space-y-4">
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-widest">
+      <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-wider">
         {/* Era toggles */}
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">ERA:</span>
