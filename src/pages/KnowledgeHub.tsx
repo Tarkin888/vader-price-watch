@@ -376,9 +376,9 @@ const KnowledgeHub = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr>
-                      <th className={thCls}>ERA</th>
-                      <th className={thCls}>HIGHEST VALUE</th>
-                      <th className={thCls}>REASON</th>
+                      <th className={thCls}>Era</th>
+                      <th className={thCls}>Highest Value</th>
+                      <th className={thCls}>Reason</th>
                     </tr>
                   </thead>
                   <tbody>
