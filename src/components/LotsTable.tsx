@@ -462,8 +462,8 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
         </table>
       </div>
 
-      <div className="px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-widest flex items-center gap-4">
-        <span><span className="text-primary">★ Gold</span> = confirmed POP</span>
+      <div className="px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-wider flex items-center gap-4">
+        <span><span className="text-primary">★ Gold</span> = confirmed Pop</span>
         <span><span className="text-amber-400">Amber</span> = estimated</span>
         <span>Grey = unknown</span>
       </div>
