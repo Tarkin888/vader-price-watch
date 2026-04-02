@@ -307,8 +307,8 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 5: AUCTION SOURCES ──── */}
-        <div ref={(el) => { sectionRefs.current["AUCTION SOURCES"] = el; }}>
-          <SectionHeader title="AUCTION SOURCE REFERENCE" />
+        <div ref={(el) => { sectionRefs.current["Auction Sources"] = el; }}>
+          <SectionHeader title="Auction Source Reference" />
           <div className="overflow-x-auto mt-4">
             <table className="w-full text-sm">
               <thead>
