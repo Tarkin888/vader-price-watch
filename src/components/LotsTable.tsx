@@ -488,7 +488,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
       <AlertDialog open={showBulkConfirm} onOpenChange={(o) => { if (!o) setShowBulkConfirm(false); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-primary tracking-wider text-sm">CONFIRM BULK DELETION</AlertDialogTitle>
+            <AlertDialogTitle className="text-primary tracking-wider text-sm">Confirm Bulk Deletion</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
               Delete <span className="text-primary font-bold">{selectedIds.size}</span> selected lot(s)? This cannot be undone.
             </AlertDialogDescription>
