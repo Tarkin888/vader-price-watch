@@ -189,8 +189,8 @@ const KnowledgeHub = () => {
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-12">
 
         {/* ──── SECTION 1: TIMELINE ──── */}
-        <div ref={(el) => { sectionRefs.current["TIMELINE"] = el; }}>
-          <SectionHeader title="CARDBACK TIMELINE" />
+        <div ref={(el) => { sectionRefs.current["Timeline"] = el; }}>
+          <SectionHeader title="Cardback Timeline" />
           <div className="relative flex items-center justify-between mt-6 mb-4 px-4">
             {/* gold line */}
             <div className="absolute top-1/2 left-0 right-0 h-px bg-primary/60" />
