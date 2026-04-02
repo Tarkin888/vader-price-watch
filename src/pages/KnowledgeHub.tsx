@@ -350,10 +350,10 @@ const KnowledgeHub = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr>
-                      <th className={thCls}>CODE</th>
-                      <th className={thCls}>GRADE</th>
-                      <th className={thCls}>DESCRIPTION</th>
-                      <th className={thCls}>PREMIUM vs RAW-NM</th>
+                      <th className={thCls}>Code</th>
+                      <th className={thCls}>Grade</th>
+                      <th className={thCls}>Description</th>
+                      <th className={thCls}>Premium vs RAW-NM</th>
                     </tr>
                   </thead>
                   <tbody>
