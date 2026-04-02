@@ -123,15 +123,15 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
       {/* Stats row */}
       <div className="flex gap-6 text-xs tracking-wider">
         <div>
-          <span className="text-muted-foreground">TOTAL RECORDS: </span>
+          <span className="text-muted-foreground">Total Records: </span>
           <span className="text-primary font-bold">{lots.length}</span>
         </div>
         <div>
-          <span className="text-muted-foreground">SOURCES: </span>
+          <span className="text-muted-foreground">Sources: </span>
           <span className="text-primary font-bold">{bySource.length}</span>
         </div>
         <div>
-          <span className="text-muted-foreground">VARIANTS: </span>
+          <span className="text-muted-foreground">Variants: </span>
           <span className="text-primary font-bold">{byVariant.length}</span>
         </div>
       </div>
