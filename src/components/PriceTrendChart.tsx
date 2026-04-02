@@ -125,7 +125,7 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
           </button>
           <button
             onClick={() => setMode("scatter")}
-            className={`text-[10px] tracking-widest px-2 py-0.5 transition-colors ${mode === "scatter" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            className={`text-[10px] tracking-wider px-2 py-0.5 transition-colors ${mode === "scatter" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
           >
             SCATTER
           </button>
