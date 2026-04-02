@@ -412,7 +412,7 @@ const KnowledgeHub = () => {
 /* ───────── helpers ───────── */
 
 const SectionHeader = ({ title }: { title: string }) => (
-  <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase border-b border-primary/40 pb-2 shadow-[0_2px_8px_hsl(43_50%_54%/0.15)]">
+  <h2 className="text-sm font-medium text-primary tracking-wider border-b border-primary/40 pb-2 shadow-[0_2px_8px_hsl(43_50%_54%/0.15)]">
     {title}
   </h2>
 );
