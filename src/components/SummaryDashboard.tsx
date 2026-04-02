@@ -60,7 +60,10 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
   const byVariant = useMemo(() => {
     const map: Record<string, number> = {};
     lots.forEach((l) => { map[l.variant_code] = (map[l.variant_code] || 0) + 1; });
-    return Object.entries(map).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+    return Object.entries(map)
+      .map(([name, count]) => ({ name: name.length > 10 ? name.slice(0, 10) + "…" : name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
   }, [lots]);
 
   const avgByGrade = useMemo(() => {
