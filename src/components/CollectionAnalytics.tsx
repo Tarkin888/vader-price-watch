@@ -415,11 +415,11 @@ export default function CollectionAnalytics({ items }: Props) {
               <thead>
                 <tr className="border-b border-border text-muted-foreground">
                   <th className="px-2 py-1.5 text-left">#</th>
-                  <th className="px-2 py-1.5 text-left">SOURCE</th>
-                  <th className="px-2 py-1.5 text-right">ITEMS</th>
-                  <th className="px-2 py-1.5 text-right">TOTAL</th>
-                  <th className="px-2 py-1.5 text-right">AVG</th>
-                  <th className="px-2 py-1.5 text-right">HIGHEST</th>
+                  <th className="px-2 py-1.5 text-left">Source</th>
+                  <th className="px-2 py-1.5 text-right">Items</th>
+                  <th className="px-2 py-1.5 text-right">Total</th>
+                  <th className="px-2 py-1.5 text-right">Avg</th>
+                  <th className="px-2 py-1.5 text-right">Highest</th>
                 </tr>
               </thead>
               <tbody>
