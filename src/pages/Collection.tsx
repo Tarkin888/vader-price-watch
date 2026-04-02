@@ -236,42 +236,13 @@ const Collection = () => {
 
       {/* Nav */}
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
-        <button
-          onClick={() => navigate("/")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          PRICE TRACKER
-        </button>
-        <button
-          onClick={() => navigate("/knowledge")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          KNOWLEDGE HUB
-        </button>
-        <button
-          className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary"
-        >
-          MY COLLECTION
-        </button>
+        <button onClick={() => navigate("/")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Price Tracker</button>
+        <button onClick={() => navigate("/knowledge")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Knowledge Hub</button>
+        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">My Collection</button>
         <span className="text-muted-foreground/30 mx-2">|</span>
-        <button
-          onClick={() => setSubTab("inventory")}
-          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-        >
-          INVENTORY
-        </button>
-        <button
-          onClick={() => setSubTab("analytics")}
-          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-        >
-          ANALYTICS
-        </button>
-        <button
-          onClick={() => setSubTab("gallery")}
-          className={`text-[10px] tracking-widest px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-        >
-          PHOTO GALLERY
-        </button>
+        <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Inventory</button>
+        <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Analytics</button>
+        <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>
       </div>
 
       {subTab === "analytics" ? (
