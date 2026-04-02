@@ -289,8 +289,8 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
       {/* Chart */}
       {allPoints.length === 0 ? (
-        <div className="py-12 text-center text-muted-foreground text-[10px] tracking-widest">
-          NO DATA FOR SELECTED FILTERS
+        <div className="py-12 text-center text-muted-foreground text-[10px] tracking-wider">
+          No data for selected filters
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={360}>
