@@ -113,7 +113,7 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
       {(alwaysExpanded || expanded) && lots.length > 0 && (
       <div className="px-6 py-4">
       <div className="flex items-center justify-between mb-2">
-        <div className="text-[10px] text-muted-foreground tracking-widest uppercase">
+        <div className="text-[10px] text-muted-foreground tracking-wider font-medium">
           {mode === "line" ? "Price Trend by Variant" : "Scatter Plot — All Lots"}
         </div>
         <div className="flex gap-1">
