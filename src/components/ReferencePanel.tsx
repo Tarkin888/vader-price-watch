@@ -97,7 +97,7 @@ const ReferencePanel = () => {
             </table>
           </div>
           <div>
-            <h3 className="text-[10px] text-primary tracking-widest uppercase mb-2">
+            <h3 className="text-[10px] text-primary tracking-wider mb-2">
               Grade Tier Codes
             </h3>
             <table className="w-full text-xs">
