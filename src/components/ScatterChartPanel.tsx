@@ -249,7 +249,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
 
         {/* Grade filter */}
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground">GRADE:</span>
+          <span className="text-muted-foreground">Grade:</span>
           <select
             value={gradeFilter}
             onChange={(e) => setGradeFilter(e.target.value)}
