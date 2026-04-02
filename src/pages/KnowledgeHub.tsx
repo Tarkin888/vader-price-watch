@@ -340,8 +340,8 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 6: GRADES & VALUE ──── */}
-        <div ref={(el) => { sectionRefs.current["GRADES & VALUE"] = el; }}>
-          <SectionHeader title="GRADE TIER & VALUE FRAMEWORK" />
+        <div ref={(el) => { sectionRefs.current["Grades & Value"] = el; }}>
+          <SectionHeader title="Grade Tier & Value Framework" />
           <div className="grid lg:grid-cols-2 gap-6 mt-4">
             {/* left – grade reference */}
             <div>
