@@ -539,7 +539,7 @@ export default function CollectionAnalytics({ items }: Props) {
       <SectionTitle>P&L Tracker</SectionTitle>
       {pnlItems.length === 0 ? (
         <div className="border border-primary/30 rounded p-6 bg-card text-center">
-          <div className="text-primary text-sm tracking-wider font-bold mb-1">UNLOCK P&L TRACKING</div>
+          <div className="text-primary text-sm tracking-wider font-medium mb-1">Unlock P&L Tracking</div>
           <div className="text-muted-foreground text-xs tracking-wider">
             Add estimated values to your items in the Inventory view to unlock P&L tracking.
           </div>

@@ -102,10 +102,10 @@ const ReferencePanel = () => {
             </h3>
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-border text-muted-foreground tracking-widest">
-                  <th className="py-1 text-left">CODE</th>
-                  <th className="py-1 text-left">DESCRIPTION</th>
-                  <th className="py-1 text-left">PREMIUM vs RAW-NM</th>
+                <tr className="border-b border-border text-muted-foreground tracking-wider">
+                  <th className="py-1 text-left">Code</th>
+                  <th className="py-1 text-left">Description</th>
+                  <th className="py-1 text-left">Premium vs RAW-NM</th>
                 </tr>
               </thead>
               <tbody>
