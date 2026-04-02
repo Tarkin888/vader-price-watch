@@ -218,7 +218,7 @@ const KnowledgeHub = () => {
               <button
                 key={e}
                 onClick={() => setEraFilter(e)}
-                className={`text-[10px] tracking-widest px-3 py-1 border transition-colors ${
+                className={`text-[10px] tracking-wider px-3 py-1 border transition-colors ${
                   eraFilter === e
                     ? "border-primary text-primary bg-primary/10"
                     : "border-border text-muted-foreground hover:text-primary hover:border-primary/50"
