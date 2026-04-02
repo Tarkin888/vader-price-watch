@@ -473,7 +473,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
       <AlertDialog open={!!deleteLot} onOpenChange={(o) => { if (!o) setDeleteLot(null); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-primary tracking-wider text-sm">CONFIRM DELETION</AlertDialogTitle>
+            <AlertDialogTitle className="text-primary tracking-wider text-sm">Confirm Deletion</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
               Delete lot <span className="text-primary font-bold">{deleteLot?.variant_grade_key}</span> ({deleteLot?.lot_ref})? This cannot be undone.
             </AlertDialogDescription>
