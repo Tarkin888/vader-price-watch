@@ -299,9 +299,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
         <div className="flex items-center gap-3">
           {someSelected && (
             <>
-              <span className="text-[10px] tracking-widest text-primary font-bold">{selectedIds.size} SELECTED</span>
-              <button onClick={() => setShowBulkConfirm(true)} className="text-[10px] tracking-widest px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors font-bold">DELETE SELECTED</button>
-              <button onClick={() => setSelectedIds(new Set())} className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors">CLEAR</button>
+              <span className="text-[10px] tracking-wider text-primary font-bold">{selectedIds.size} selected</span>
+              <button onClick={() => setShowBulkConfirm(true)} className="text-[10px] tracking-wider px-3 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors font-bold">Delete Selected</button>
+              <button onClick={() => setSelectedIds(new Set())} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Clear</button>
             </>
           )}
         </div>
