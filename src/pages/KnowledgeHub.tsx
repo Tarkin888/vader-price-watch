@@ -155,18 +155,18 @@ const KnowledgeHub = () => {
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
         <button
           onClick={() => navigate("/")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          PRICE TRACKER
+          Price Tracker
         </button>
-        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary">
-          KNOWLEDGE HUB
+        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">
+          Knowledge Hub
         </button>
         <button
           onClick={() => navigate("/collection")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          MY COLLECTION
+          My Collection
         </button>
       </div>
 
