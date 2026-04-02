@@ -270,7 +270,7 @@ const ScatterChartPanel = ({ lots, currency }: Props) => {
             onChange={() => setShowTrend(!showTrend)}
             className="accent-primary w-3 h-3"
           />
-          <span className="text-muted-foreground">TREND LINE</span>
+          <span className="text-muted-foreground">Trend Line</span>
         </label>
 
         {/* Date range */}
