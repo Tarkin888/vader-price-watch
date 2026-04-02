@@ -199,8 +199,8 @@ const Collection = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <span className="text-primary text-sm tracking-widest" style={{ animation: "flicker 2s infinite" }}>
-          LOADING COLLECTION...
+        <span className="text-primary text-sm tracking-wider" style={{ animation: "flicker 2s infinite" }}>
+          Loading collection...
         </span>
       </div>
     );

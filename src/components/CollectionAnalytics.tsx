@@ -248,7 +248,7 @@ export default function CollectionAnalytics({ items }: Props) {
   if (items.length === 0) {
     return (
       <div className="p-6 text-center text-muted-foreground text-sm tracking-wider">
-        NO ITEMS IN COLLECTION — ADD ITEMS TO UNLOCK ANALYTICS
+        No items in collection — add items to unlock analytics
       </div>
     );
   }
