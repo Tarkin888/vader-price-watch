@@ -53,7 +53,7 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
           </div>
           {pctChange !== null && (
             <div>
-              <div className="text-[9px] text-muted-foreground tracking-widest">RECENT Δ</div>
+              <div className="text-[9px] text-muted-foreground tracking-wider">Recent Δ</div>
               <div className={`font-bold text-xs ${pctChange >= 0 ? "text-green-500" : "text-destructive"}`}>
                 {pctChange >= 0 ? "+" : ""}
                 {pctChange.toFixed(1)}%
