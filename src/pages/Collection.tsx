@@ -422,7 +422,7 @@ const Collection = () => {
                 )}
               </div>
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">MOST RECENT</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">Most Recent</h3>
                 {mostRecent && (
                   <div>
                     <div className="text-primary font-bold">{mostRecent.description}</div>
