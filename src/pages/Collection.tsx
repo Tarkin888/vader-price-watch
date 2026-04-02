@@ -392,10 +392,10 @@ const Collection = () => {
 
           {/* Stats Panel */}
           <div className="border-t border-border px-6 py-4">
-            <h2 className="text-[10px] text-muted-foreground tracking-widest uppercase mb-3">COLLECTION STATS</h2>
+            <h2 className="text-[10px] text-muted-foreground tracking-wider mb-3">Collection Stats</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div>
-                <h3 className="text-[10px] text-muted-foreground tracking-widest mb-1">BY CATEGORY</h3>
+                <h3 className="text-[10px] text-muted-foreground tracking-wider mb-1">By Category</h3>
                 {categoryBreakdown.map(([cat, count]) => (
                   <div key={cat} className="flex justify-between">
                     <span>{cat}</span>
