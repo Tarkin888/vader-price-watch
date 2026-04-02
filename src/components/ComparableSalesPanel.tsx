@@ -48,7 +48,7 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
         </div>
         <div className="flex gap-4 mt-2">
           <div>
-            <div className="text-[9px] text-muted-foreground tracking-widest">AVG PRICE</div>
+            <div className="text-[9px] text-muted-foreground tracking-wider">Avg Price</div>
             <div className="text-primary font-bold text-xs">{fmt(avgPrice)}</div>
           </div>
           {pctChange !== null && (
