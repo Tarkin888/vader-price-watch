@@ -171,20 +171,20 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} currency={filters.currency} onCurrencyToggle={() => updateFilters({ ...filters, currency: filters.currency === "GBP" ? "USD" : "GBP" })} />
       <div className="flex items-center gap-1 border-b border-border px-6 py-2">
-        <button className="text-[10px] tracking-widest px-3 py-1 text-primary border-b border-primary" aria-current="page">
-          PRICE TRACKER
+        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary" aria-current="page">
+          Price Tracker
         </button>
         <button
           onClick={() => navigate("/knowledge")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          KNOWLEDGE HUB
+          Knowledge Hub
         </button>
         <button
           onClick={() => navigate("/collection")}
-          className="text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
         >
-          MY COLLECTION
+          My Collection
         </button>
         <ReferencePanel />
       </div>
