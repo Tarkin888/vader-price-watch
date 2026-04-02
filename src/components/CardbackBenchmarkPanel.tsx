@@ -186,7 +186,7 @@ const CardbackBenchmarkPanel = ({ allLots, currency, onSelectCardback, alwaysExp
 
                     {/* Median */}
                     <div className="flex justify-between text-[10px] tracking-wider mb-1">
-                      <span className="text-muted-foreground">MEDIAN</span>
+                      <span className="text-muted-foreground">Median</span>
                       <span className="text-primary font-bold">{fmtPrice(med, isUSD)}</span>
                     </div>
 
