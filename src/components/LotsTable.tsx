@@ -331,7 +331,7 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-widest text-left">
+            <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
               <th className="px-3 py-2 w-8">
                 <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} className="border-muted-foreground" />
               </th>
