@@ -180,8 +180,8 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
 
       {/* Recent Sales */}
       <div className="border border-border">
-        <div className="text-[10px] text-muted-foreground tracking-widest px-3 py-2 border-b border-border">
-          5 MOST RECENT SALES
+        <div className="text-[10px] text-muted-foreground tracking-wider font-medium px-3 py-2 border-b border-border">
+          5 Most Recent Sales
         </div>
         <table className="w-full text-xs">
           <thead>
