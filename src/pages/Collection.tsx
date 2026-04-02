@@ -297,7 +297,7 @@ const Collection = () => {
                 disabled={bulkCalcing || items.length === 0}
               >
                 <Calculator className="w-3 h-3 mr-1" />
-                {bulkCalcing ? "CALCULATING..." : "1-YR AVG ALL"}
+                {bulkCalcing ? "Calculating..." : "1-Yr Avg All"}
               </Button>
             )}
           </div>
