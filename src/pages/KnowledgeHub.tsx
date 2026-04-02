@@ -281,11 +281,11 @@ const KnowledgeHub = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className={thCls}>CODE</th>
-                  <th className={thCls}>MARKET</th>
-                  <th className={thCls}>CARDBACKS KNOWN</th>
-                  <th className={thCls}>KEY FEATURES</th>
-                  <th className={thCls}>BEST AUCTION SOURCE</th>
+                  <th className={thCls}>Code</th>
+                  <th className={thCls}>Market</th>
+                  <th className={thCls}>Cardbacks Known</th>
+                  <th className={thCls}>Key Features</th>
+                  <th className={thCls}>Best Auction Source</th>
                 </tr>
               </thead>
               <tbody>
