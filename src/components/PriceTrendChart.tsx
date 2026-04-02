@@ -105,8 +105,8 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
       )}
 
       {(alwaysExpanded || expanded) && lots.length === 0 && (
-        <div className="px-6 py-4 text-center text-muted-foreground text-[10px] tracking-widest">
-          NO DATA FOR CHART
+        <div className="px-6 py-4 text-center text-muted-foreground text-[10px] tracking-wider">
+          No data for chart
         </div>
       )}
 
