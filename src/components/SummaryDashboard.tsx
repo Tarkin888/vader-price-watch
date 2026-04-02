@@ -152,7 +152,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
         </div>
 
         <div className="border border-border p-3">
-          <div className="text-[10px] text-muted-foreground tracking-widest mb-2">RECORDS BY VARIANT</div>
+          <div className="text-[10px] text-muted-foreground tracking-wider font-medium mb-2">Records by Variant</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={byVariant} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
