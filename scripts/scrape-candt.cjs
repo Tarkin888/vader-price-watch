@@ -17,9 +17,9 @@
  *   node scripts/scrape-candt.js
  */
 
-import { chromium } from "playwright";
-import { createClient } from "@supabase/supabase-js";
-import "dotenv/config";
+const { chromium } = require("playwright");
+const { createClient } = require("@supabase/supabase-js");
+require("dotenv/config");
 
 // ─── Config ────────────────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL;
