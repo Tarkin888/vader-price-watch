@@ -345,7 +345,7 @@ const KnowledgeHub = () => {
           <div className="grid lg:grid-cols-2 gap-6 mt-4">
             {/* left – grade reference */}
             <div>
-              <h4 className="text-[10px] text-primary tracking-widest font-bold mb-2">GRADE TIER REFERENCE</h4>
+              <h4 className="text-[10px] text-primary tracking-wider font-medium mb-2">Grade Tier Reference</h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
