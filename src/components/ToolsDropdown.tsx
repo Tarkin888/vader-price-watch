@@ -118,7 +118,7 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${reclassifying ? "animate-spin" : ""}`} />
-            {reclassifying ? "RE-CLASSIFYING..." : "RE-CLASSIFY UNKNOWNS"}
+            {reclassifying ? "Re-classifying..." : "Re-classify Unknowns"}
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setAddOpen(true)}
