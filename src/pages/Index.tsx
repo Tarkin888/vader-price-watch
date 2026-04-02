@@ -160,8 +160,8 @@ const Index = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <span className="text-primary text-sm tracking-widest" style={{ animation: "flicker 2s infinite" }}>
-          LOADING IMPERIAL DATABASE...
+        <span className="text-primary text-sm tracking-wider" style={{ animation: "flicker 2s infinite" }}>
+          Loading Imperial Database...
         </span>
       </div>
     );
