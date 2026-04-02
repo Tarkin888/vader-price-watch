@@ -106,9 +106,9 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-1.5 text-[10px] tracking-widest px-3 py-1 text-muted-foreground hover:text-primary transition-colors border border-border rounded">
+          <button className="flex items-center gap-1.5 text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors border border-border rounded">
             <Wrench className="w-3.5 h-3.5" />
-            TOOLS
+            Tools
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-card border-border min-w-[180px]">
