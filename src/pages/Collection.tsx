@@ -210,16 +210,16 @@ const Collection = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b border-border px-6 py-5">
-        <div className="flex items-center justify-between">
+      <header className="border-b border-border px-4 md:px-6 py-3 md:py-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-primary tracking-wider">
-              My Collection — Personal Inventory
+            <h1 className="text-lg md:text-2xl font-bold text-primary tracking-wider">
+              My Collection
             </h1>
-            <div className="mt-1 flex gap-6 text-xs text-muted-foreground tracking-wider">
-              <span>Total Items: <span className="text-primary">{items.length}</span></span>
-              <span>Total Cost: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
-              <span>Portfolio Value: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
+            <div className="mt-1 flex flex-wrap gap-3 md:gap-6 text-xs text-muted-foreground tracking-wider">
+              <span>Items: <span className="text-primary">{items.length}</span></span>
+              <span>Cost: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
+              <span>Value: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -235,8 +235,8 @@ const Collection = () => {
         </div>
       </header>
 
-      {/* Nav */}
-      <div className="flex items-center gap-1 border-b border-border px-6 py-2">
+      {/* Desktop Nav */}
+      <div className="hidden md:flex items-center gap-1 border-b border-border px-6 py-2">
         <button onClick={() => navigate("/")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Price Tracker</button>
         <button onClick={() => navigate("/knowledge")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Knowledge Hub</button>
         <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">My Collection</button>
@@ -245,6 +245,24 @@ const Collection = () => {
         <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Analytics</button>
         <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>
       </div>
+      {/* Mobile hamburger */}
+      <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
+        <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="text-muted-foreground hover:text-primary transition-colors">
+          {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "inventory" ? "text-primary" : "text-muted-foreground"}`}>Inventory</button>
+          <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "analytics" ? "text-primary" : "text-muted-foreground"}`}>Analytics</button>
+          <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "gallery" ? "text-primary" : "text-muted-foreground"}`}>Gallery</button>
+        </div>
+      </div>
+      {mobileNavOpen && (
+        <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
+          <button onClick={() => { setMobileNavOpen(false); navigate("/"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Price Tracker</button>
+          <button onClick={() => { setMobileNavOpen(false); navigate("/knowledge"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Knowledge Hub</button>
+          <button className="text-[11px] tracking-wider px-3 py-2 text-primary text-left">My Collection</button>
+        </div>
+      )}
 
       {subTab === "analytics" ? (
         <CollectionAnalytics items={items} />
