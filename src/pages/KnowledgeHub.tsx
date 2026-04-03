@@ -119,6 +119,7 @@ const KnowledgeHub = () => {
   const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>("Timeline");
   const [eraFilter, setEraFilter] = useState<string>("All");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const filteredMaster = eraFilter === "All" ? MASTER_TABLE : MASTER_TABLE.filter((r) => r.era === eraFilter);
 
