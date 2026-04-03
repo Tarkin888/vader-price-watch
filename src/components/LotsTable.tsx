@@ -308,10 +308,73 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP", 
   // Count visible columns for colspan
   const visibleColCount = ALL_COLS.filter(colVisible).length + 1; // +1 for checkbox
 
+  // Check if truly mobile (<768px)
+  const isMobileCard = typeof window !== "undefined" && window.innerWidth < 768;
+
   return (
     <>
       {/* Columns toggle button */}
-      <div className="px-6 py-1.5 border-b border-border flex items-center justify-between">
+      <div className="px-4 md:px-6 py-1.5 border-b border-border flex items-center justify-between">
+
+      {/* Mobile card layout */}
+      {isMobileCard ? (
+        <div className="px-3 py-2 space-y-2">
+          {sorted.map((l) => {
+            const isExpanded = expandedRowId === l.id;
+            const imgUrl = getLotImageUrl(l.image_urls);
+            return (
+              <div
+                key={l.id}
+                ref={l.id === flashId ? highlightRef : undefined}
+                onClick={() => setExpandedRowId(isExpanded ? null : l.id)}
+                className={`border border-border rounded p-3 cursor-pointer transition-colors hover:bg-secondary/50 ${l.id === flashId ? "animate-pulse bg-primary/20" : ""}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-primary font-bold text-xs">{l.variant_grade_key}</div>
+                    <div className="text-[10px] text-muted-foreground">{new Date(l.sale_date).toLocaleDateString("en-GB")}</div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-primary font-bold text-xs">
+                      {(l as any).price_status === "ESTIMATE_ONLY" ? (
+                        <span className="text-amber-400 text-[10px]">EST {sym}{Number((l as any).estimate_low_gbp ?? 0).toLocaleString()}–{sym}{Number((l as any).estimate_high_gbp ?? 0).toLocaleString()}</span>
+                      ) : (l as any).price_status === "UNSOLD" ? (
+                        <span className="text-muted-foreground text-[10px]">UNSOLD</span>
+                      ) : fmtPrice(Number(l.total_paid_gbp), Number(l.usd_to_gbp_rate))}
+                    </div>
+                  </div>
+                  <SourceBadge source={l.source} size="sm" className="scale-[0.5] origin-right shrink-0" />
+                </div>
+                {isExpanded && (
+                  <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
+                    {imgUrl && (
+                      <img src={imgUrl} alt="lot" className="w-full max-w-[200px] h-auto object-cover border border-border rounded" />
+                    )}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                      <div><span className="text-muted-foreground">Era:</span> <EraBadge era={(l as any).era ?? "UNKNOWN"} /></div>
+                      <div><span className="text-muted-foreground">Cardback:</span> <span>{(l as any).cardback_code ?? "—"}</span></div>
+                      <div><span className="text-muted-foreground">Hammer:</span> {fmtPrice(Number(l.hammer_price_gbp), Number(l.usd_to_gbp_rate))}</div>
+                      <div><span className="text-muted-foreground">BP:</span> {fmtPrice(Number(l.buyers_premium_gbp), Number(l.usd_to_gbp_rate))}</div>
+                      <div><span className="text-muted-foreground">Pop:</span> <PopBadge variantCode={l.variant_code} /></div>
+                      <div><span className="text-muted-foreground">Lot:</span> {l.lot_url ? <a href={l.lot_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>{l.lot_ref}</a> : l.lot_ref}</div>
+                    </div>
+                    {l.condition_notes && (
+                      <div className="text-[10px] text-muted-foreground">{l.condition_notes}</div>
+                    )}
+                    <div className="flex items-center gap-2 pt-1">
+                      <button onClick={(e) => { e.stopPropagation(); copyRow(l); }} className="text-muted-foreground hover:text-primary transition-colors"><Copy className="w-3.5 h-3.5" /></button>
+                      <button onClick={(e) => { e.stopPropagation(); setEditLot(l); }} className="text-muted-foreground hover:text-primary transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteLot(l); }} className="text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={(e) => { e.stopPropagation(); onSelectLot?.(l); }} className="text-muted-foreground hover:text-primary transition-colors text-[9px] tracking-wider ml-auto">View Details →</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+      /* Desktop table */
         <div className="flex items-center gap-3">
           {someSelected && (
             <>
