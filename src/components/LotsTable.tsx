@@ -373,8 +373,9 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP", 
               return (
                 <React.Fragment key={l.id}>
                   <tr
+                    ref={l.id === flashId ? highlightRef : undefined}
                     onClick={() => handleRowClick(l)}
-                    className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""} ${selectedIds.has(l.id) ? "bg-secondary/40" : ""}`}
+                    className={`border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer ${Number(l.total_paid_gbp) >= NOTABLE_THRESHOLD ? "border-l-2 border-l-primary" : ""} ${selectedIds.has(l.id) ? "bg-secondary/40" : ""} ${l.id === flashId ? "animate-pulse bg-primary/20" : ""}`}
                   >
                     <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                       <Checkbox checked={selectedIds.has(l.id)} onCheckedChange={() => toggleSelect(l.id)} className="border-muted-foreground" />
