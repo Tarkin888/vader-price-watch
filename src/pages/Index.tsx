@@ -11,7 +11,7 @@ import ToolsDropdown from "@/components/ToolsDropdown";
 import SessionLog from "@/components/SessionLog";
 import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
-import ComparableSalesPanel from "@/components/ComparableSalesPanel";
+
 import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useRef } from "react";

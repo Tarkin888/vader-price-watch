@@ -538,6 +538,14 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
                           </td>
                         </tr>
                       )}
+                      {/* Inline Comparable Sales */}
+                      {comparableLotId === l.id && (
+                        <tr className="border-b border-border">
+                          <td colSpan={visibleColCount} className="p-0">
+                            <InlineComparableSales lot={l} allLots={allLots ?? lots} onClose={() => setComparableLotId(null)} fmtPrice={fmtPrice} />
+                          </td>
+                        </tr>
+                      )}
                     </React.Fragment>
                   );
                 })}
