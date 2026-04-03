@@ -280,7 +280,7 @@ const Collection = () => {
                   value={filters.search}
                   onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                   placeholder="Search items..."
-                  className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-44"
+                  className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-full md:w-44"
                 />
               </div>
             </div>
