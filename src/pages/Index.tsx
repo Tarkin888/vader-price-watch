@@ -58,7 +58,6 @@ const Index = () => {
     }, { replace: true });
   }, [setSearchParams]);
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
-  const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [highlightLotId, setHighlightLotId] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
