@@ -271,7 +271,7 @@ const Collection = () => {
       ) : (
         <>
           {/* Filters */}
-          <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
+          <div className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-end gap-3 px-4 md:px-6 py-3 border-b border-border">
             <div className="flex flex-col gap-1">
               <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Search</label>
               <div className="relative">
