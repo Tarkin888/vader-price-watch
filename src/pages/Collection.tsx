@@ -321,8 +321,45 @@ const Collection = () => {
             )}
           </div>
 
-          {/* Table */}
-          <div className="flex-1 overflow-x-auto">
+          {/* Mobile card layout */}
+          <div className="md:hidden flex-1 px-3 py-2 space-y-2">
+            {filtered.map((item) => {
+              const pnl = getPnl(item);
+              return (
+                <div key={item.id} className="border border-border rounded p-3">
+                  <div className="flex gap-3">
+                    {item.front_image_url && (
+                      <img src={item.front_image_url} alt="front" className="w-16 h-20 object-cover border border-border rounded shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-primary font-bold text-xs truncate">{item.description}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">{item.category} • {item.grading}</div>
+                      {!privacyMode && (
+                        <div className="flex gap-3 mt-1 text-[10px]">
+                          <span>Cost: <span className="text-foreground">£{Number(item.purchase_price).toLocaleString("en-GB")}</span></span>
+                          {pnl != null && (
+                            <span className={`font-bold ${getPnlColor(pnl, item)}`}>
+                              {pnl >= 0 ? "+" : ""}£{pnl.toLocaleString("en-GB")}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 shrink-0">
+                      <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary"><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div className="py-12 text-center text-muted-foreground text-sm tracking-wider">No items match current filters</div>
+            )}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block flex-1 overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
@@ -348,20 +385,10 @@ const Collection = () => {
                     <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors" style={{ height: "7rem" }}>
                       <td className="px-1.5 py-2 text-muted-foreground whitespace-nowrap align-middle">{item.item_id}</td>
                       <td className="px-1.5 py-2 align-middle">
-                        <ImageDropCell
-                          imageUrl={item.front_image_url || ""}
-                          itemId={item.id}
-                          field="front_image_url"
-                          onUpdated={load}
-                        />
+                        <ImageDropCell imageUrl={item.front_image_url || ""} itemId={item.id} field="front_image_url" onUpdated={load} />
                       </td>
                       <td className="px-1.5 py-2 align-middle">
-                        <ImageDropCell
-                          imageUrl={item.back_image_url || ""}
-                          itemId={item.id}
-                          field="back_image_url"
-                          onUpdated={load}
-                        />
+                        <ImageDropCell imageUrl={item.back_image_url || ""} itemId={item.id} field="back_image_url" onUpdated={load} />
                       </td>
                       <td className="px-1.5 py-2 text-primary font-bold max-w-[200px] truncate align-middle" title={item.description}>{item.description}</td>
                       <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.category}</td>
@@ -403,9 +430,7 @@ const Collection = () => {
               </tbody>
             </table>
             {filtered.length === 0 && (
-              <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">
-                NO ITEMS MATCH CURRENT FILTERS
-              </div>
+              <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">No items match current filters</div>
             )}
           </div>
 
