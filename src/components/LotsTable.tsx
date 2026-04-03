@@ -481,6 +481,11 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
                     </div>
                   </div>
                 )}
+                {comparableLotId === l.id && (
+                  <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                    <InlineComparableSales lot={l} allLots={allLots ?? lots} onClose={() => setComparableLotId(null)} fmtPrice={fmtPrice} />
+                  </div>
+                )}
               </div>
             );
           })}
