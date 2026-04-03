@@ -11,7 +11,7 @@ import ToolsDropdown from "@/components/ToolsDropdown";
 import SessionLog from "@/components/SessionLog";
 import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
-import ComparableSalesPanel from "@/components/ComparableSalesPanel";
+
 import CardbackBenchmarkPanel from "@/components/CardbackBenchmarkPanel";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useRef } from "react";
@@ -58,7 +58,6 @@ const Index = () => {
     }, { replace: true });
   }, [setSearchParams]);
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
-  const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [highlightLotId, setHighlightLotId] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -266,7 +265,7 @@ const Index = () => {
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
-            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} highlightLotId={highlightLotId} />
+            <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} onCopyRow={handleCopyRow} currency={filters.currency} highlightLotId={highlightLotId} />
           </>
         ) : activeTab === "chart" ? (
           <ScatterChartPanel lots={lots} currency={filters.currency} />
@@ -275,13 +274,6 @@ const Index = () => {
         )}
       </div>
 
-      {selectedLot && (
-        <ComparableSalesPanel
-          lot={selectedLot}
-          allLots={lots}
-          onClose={() => setSelectedLot(null)}
-        />
-      )}
 
       {/* Benchmark Panel slide-in */}
       <Sheet open={showBenchmark} onOpenChange={setShowBenchmark}>
