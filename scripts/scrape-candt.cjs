@@ -458,49 +458,61 @@ async function scrapeCatalogue(page, catalogueId, stats) {
       try {
         await sleep(1500, 3000);
         await page.goto(lot.lotUrl, { waitUntil: "domcontentloaded", timeout: 20000 });
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(1000);
 
-        const detail = await page.evaluate((base) => {
-          // Extract condition text — look for description paragraphs
-          let notes = "";
-          const paras = document.querySelectorAll("p, .description, [class*='description']");
-          for (const p of paras) {
-            const text = p.textContent?.trim() || "";
-            if (text.length < 20) continue;
-            const lower = text.toLowerCase();
-            // Skip boilerplate
-            if (/cookies|payment|buyer.*premium|privacy|terms|bidding/i.test(lower)) continue;
-            if (/endeavoured|sold as is/i.test(lower)) continue;
-            if (text.length > notes.length) notes = text;
-          }
-
-          // Extract lot images — only actual lot photos
-          const images = [];
-          const imgEls = document.querySelectorAll('img[src*="/images/lot/"]');
-          for (const img of imgEls) {
-            let src = img.getAttribute("src") || "";
-            if (!src || /spinner|settings/i.test(src)) continue;
-            if (!src.startsWith("http")) src = base + src;
-            // Prefer large versions
-            src = src.replace(/_s\.jpg/, "_l.jpg").replace(/_m\.jpg/, "_l.jpg");
-            if (!images.includes(src)) images.push(src);
-          }
-
-          // Also check linked images (xl versions)
-          const imgLinks = document.querySelectorAll('a[href*="/images/lot/"]');
-          for (const link of imgLinks) {
-            let href = link.getAttribute("href") || "";
-            if (!href.startsWith("http")) href = base + href;
-            if (/_xl\.jpg/.test(href) && !images.includes(href)) {
-              images.unshift(href); // xl goes first
+        let detail = null;
+        try {
+          detail = await page.evaluate((base) => {
+            // Extract condition text — look for description paragraphs
+            let notes = "";
+            const paras = document.querySelectorAll("p, .description, [class*='description']");
+            for (const p of paras) {
+              const text = p.textContent?.trim() || "";
+              if (text.length < 20) continue;
+              const lower = text.toLowerCase();
+              // Skip boilerplate
+              if (/cookies|payment|buyer.*premium|privacy|terms|bidding/i.test(lower)) continue;
+              if (/endeavoured|sold as is/i.test(lower)) continue;
+              if (text.length > notes.length) notes = text;
             }
+
+            // Extract lot images — only actual lot photos
+            const images = [];
+            const imgEls = document.querySelectorAll('img[src*="/images/lot/"]');
+            for (const img of imgEls) {
+              let src = img.getAttribute("src") || "";
+              if (!src || /spinner|settings/i.test(src)) continue;
+              if (!src.startsWith("http")) src = base + src;
+              // Prefer large versions
+              src = src.replace(/_s\.jpg/, "_l.jpg").replace(/_m\.jpg/, "_l.jpg");
+              if (!images.includes(src)) images.push(src);
+            }
+
+            // Also check linked images (xl versions)
+            const imgLinks = document.querySelectorAll('a[href*="/images/lot/"]');
+            for (const link of imgLinks) {
+              let href = link.getAttribute("href") || "";
+              if (!href.startsWith("http")) href = base + href;
+              if (/_xl\.jpg/.test(href) && !images.includes(href)) {
+                images.unshift(href); // xl goes first
+              }
+            }
+
+            return { notes, images };
+          }, BASE);
+        } catch (evalErr) {
+          const msg = evalErr.message || "";
+          if (/execution context was destroyed|navigating/i.test(msg)) {
+            console.warn(`    ⚠ Context destroyed for lot ${lot.lotRef}, skipping detail extraction`);
+          } else {
+            console.warn(`    ⚠ Evaluate failed for lot ${lot.lotRef}: ${msg}`);
           }
+        }
 
-          return { notes, images };
-        }, BASE);
-
-        conditionNotes = detail.notes;
-        detailImages = detail.images;
+        if (detail) {
+          conditionNotes = detail.notes;
+          detailImages = detail.images;
+        }
       } catch (e) {
         console.warn(`    ⚠ Failed to load detail page for lot ${lot.lotRef}: ${e.message}`);
       }
@@ -509,7 +521,7 @@ async function scrapeCatalogue(page, catalogueId, stats) {
       const searchPageUrl = `${BASE}/auctions/catalog/id/${catalogueId}?q=darth+vader&page=${pageNum}`;
       try {
         await page.goto(searchPageUrl, { waitUntil: "domcontentloaded", timeout: 20000 });
-        await page.waitForTimeout(1500);
+        await page.waitForTimeout(1000);
       } catch (e) {
         // If we can't get back, just continue — worst case we re-scrape from top
       }
