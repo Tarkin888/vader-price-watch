@@ -399,7 +399,7 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
                       <button onClick={(e) => { e.stopPropagation(); copyRow(l); }} className="text-muted-foreground hover:text-primary transition-colors"><Copy className="w-3.5 h-3.5" /></button>
                       <button onClick={(e) => { e.stopPropagation(); setEditLot(l); }} className="text-muted-foreground hover:text-primary transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
                       <button onClick={(e) => { e.stopPropagation(); setDeleteLot(l); }} className="text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                      <button onClick={(e) => { e.stopPropagation(); onSelectLot?.(l); }} className="text-muted-foreground hover:text-primary transition-colors text-[9px] tracking-wider ml-auto">View Details →</button>
+                      <button onClick={(e) => { e.stopPropagation(); setComparableLotId(l.id); }} className="text-muted-foreground hover:text-primary transition-colors text-[9px] tracking-wider ml-auto">Comparables →</button>
                     </div>
                   </div>
                 )}
