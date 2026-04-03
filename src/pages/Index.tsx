@@ -236,7 +236,15 @@ const Index = () => {
       </div>
       <div className="flex-1">
         {activeTab === "dashboard" ? (
-          <SummaryDashboard lots={filtered} allLots={lots} />
+          <SummaryDashboard
+            lots={filtered}
+            allLots={lots}
+            onLotClick={(lotId) => {
+              setHighlightLotId(lotId);
+              changeTab("table");
+            }}
+            onViewResults={() => changeTab("table")}
+          />
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
