@@ -58,6 +58,7 @@ const Index = () => {
   }, [setSearchParams]);
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
+  const [highlightLotId, setHighlightLotId] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
   const [filters, setFilters] = useState<Filters>(() => ({
@@ -235,11 +236,19 @@ const Index = () => {
       </div>
       <div className="flex-1">
         {activeTab === "dashboard" ? (
-          <SummaryDashboard lots={filtered} allLots={lots} />
+          <SummaryDashboard
+            lots={filtered}
+            allLots={lots}
+            onLotClick={(lotId) => {
+              setHighlightLotId(lotId);
+              changeTab("table");
+            }}
+            onViewResults={() => changeTab("table")}
+          />
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
-            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} />
+            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} highlightLotId={highlightLotId} />
           </>
         ) : activeTab === "chart" ? (
           <ScatterChartPanel lots={lots} currency={filters.currency} />
