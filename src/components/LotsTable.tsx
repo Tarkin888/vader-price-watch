@@ -542,20 +542,18 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP", 
         </table>
       </div>
 
-      <div className="px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-wider flex items-center gap-4">
+      <div className="px-4 md:px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-wider flex items-center gap-4">
         <span><span className="text-primary">★ Gold</span> = confirmed Pop</span>
         <span><span className="text-amber-400">Amber</span> = estimated</span>
         <span>Grey = unknown</span>
       </div>
+      )}
 
-      <LotFormModal open={!!editLot} onOpenChange={(o) => { if (!o) setEditLot(null); }} onSaved={onChanged} editLot={editLot} />
-
-      <AlertDialog open={!!deleteLot} onOpenChange={(o) => { if (!o) setDeleteLot(null); }}>
-        <AlertDialogContent className="bg-card border-border">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-primary tracking-wider text-sm">Confirm Deletion</AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground text-xs tracking-wider">
-              Delete lot <span className="text-primary font-bold">{deleteLot?.variant_grade_key}</span> ({deleteLot?.lot_ref})? This cannot be undone.
+      <div className="px-4 md:px-6 py-1.5 border-b border-border text-[9px] text-muted-foreground tracking-wider flex items-center gap-4">
+        <span><span className="text-primary">★ Gold</span> = confirmed Pop</span>
+        <span><span className="text-amber-400">Amber</span> = estimated</span>
+        <span>Grey = unknown</span>
+      </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
