@@ -10,14 +10,6 @@ import {
 } from "recharts";
 import type { Lot } from "@/lib/db";
 import SourceBadge from "@/components/SourceBadge";
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import type { Lot } from "@/lib/db";
 
 const TOOLTIP_STYLE = {
   backgroundColor: "hsl(50, 14%, 6%)",
