@@ -66,6 +66,7 @@ interface LotsTableProps {
   onCopyRow?: (lot: Lot) => void;
   onSelectLot?: (lot: Lot) => void;
   currency?: Currency;
+  highlightLotId?: string | null;
 }
 
 /* ── constants ── */
