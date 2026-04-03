@@ -302,7 +302,7 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
     if (isMobile) {
       setExpandedRowId((prev) => prev === l.id ? null : l.id);
     } else {
-      onSelectLot?.(l);
+      setComparableLotId((prev) => prev === l.id ? null : l.id);
     }
   };
 
