@@ -61,6 +61,7 @@ const Index = () => {
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [highlightLotId, setHighlightLotId] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
   const [filters, setFilters] = useState<Filters>(() => ({
     source: searchParams.get("source") || null,
