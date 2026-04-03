@@ -131,7 +131,7 @@ const COL_LABELS: Record<ColId, string> = {
 };
 
 /* ── main component ── */
-const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP", highlightLotId }: LotsTableProps) => {
+const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", highlightLotId }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("sale_date");
