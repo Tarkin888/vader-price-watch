@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Menu, X } from "lucide-react";
 
 /* ───────── data ───────── */
 
@@ -118,6 +119,7 @@ const KnowledgeHub = () => {
   const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>("Timeline");
   const [eraFilter, setEraFilter] = useState<string>("All");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const filteredMaster = eraFilter === "All" ? MASTER_TABLE : MASTER_TABLE.filter((r) => r.era === eraFilter);
 
@@ -132,8 +134,8 @@ const KnowledgeHub = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* header placeholder — reuse the same header */}
-      <header className="border-b border-border px-6 py-5">
-        <div className="flex items-start justify-between">
+      <header className="border-b border-border px-4 md:px-6 py-5">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-2">
           <div>
             <div className="flex items-baseline gap-3">
               <h1 className="text-xl md:text-2xl font-bold text-primary tracking-wider">
@@ -141,7 +143,7 @@ const KnowledgeHub = () => {
               </h1>
               <span className="text-[10px] text-muted-foreground tracking-widest">v4.0 | March 2026</span>
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground tracking-wider leading-relaxed">
+            <p className="mt-1 text-[11px] text-muted-foreground tracking-wider leading-relaxed hidden md:block">
               SW 12/20/21 &nbsp;•&nbsp; ESB 31/32/41/45/47/48 &nbsp;•&nbsp; ROTJ 48/65/77/79 &nbsp;•&nbsp; POTF 92
               <br />
               C&T &nbsp;•&nbsp; Hake's &nbsp;•&nbsp; Heritage &nbsp;•&nbsp; LCG &nbsp;•&nbsp; Vectis
@@ -151,24 +153,25 @@ const KnowledgeHub = () => {
         </div>
       </header>
 
-      {/* top nav */}
-      <div className="flex items-center gap-1 border-b border-border px-6 py-2">
-        <button
-          onClick={() => navigate("/")}
-          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          Price Tracker
-        </button>
-        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">
-          Knowledge Hub
-        </button>
-        <button
-          onClick={() => navigate("/collection")}
-          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          My Collection
+      {/* Desktop nav */}
+      <div className="hidden md:flex items-center gap-1 border-b border-border px-6 py-2">
+        <button onClick={() => navigate("/")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Price Tracker</button>
+        <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">Knowledge Hub</button>
+        <button onClick={() => navigate("/collection")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">My Collection</button>
+      </div>
+      {/* Mobile hamburger */}
+      <div className="md:hidden flex items-center border-b border-border px-4 py-2">
+        <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="text-muted-foreground hover:text-primary transition-colors">
+          {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
+      {mobileNavOpen && (
+        <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
+          <button onClick={() => { setMobileNavOpen(false); navigate("/"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Price Tracker</button>
+          <button className="text-[11px] tracking-wider px-3 py-2 text-primary text-left">Knowledge Hub</button>
+          <button onClick={() => { setMobileNavOpen(false); navigate("/collection"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">My Collection</button>
+        </div>
+      )}
 
       {/* sub-nav */}
       <div className="flex items-center gap-1 border-b border-border px-6 py-2 overflow-x-auto">
@@ -186,7 +189,7 @@ const KnowledgeHub = () => {
       </div>
 
       {/* content */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-12">
+      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-12">
 
         {/* ──── SECTION 1: TIMELINE ──── */}
         <div ref={(el) => { sectionRefs.current["Timeline"] = el; }}>

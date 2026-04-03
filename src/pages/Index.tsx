@@ -17,6 +17,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Menu, X } from "lucide-react";
 
 function calcQuickStats(lots: Lot[], isUSD: boolean) {
   const priced = lots.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
@@ -60,6 +61,7 @@ const Index = () => {
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [highlightLotId, setHighlightLotId] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
   const [filters, setFilters] = useState<Filters>(() => ({
     source: searchParams.get("source") || null,
@@ -171,7 +173,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header totalRecords={lots.length} lastScrapeDate={lastScrape} currency={filters.currency} onCurrencyToggle={() => updateFilters({ ...filters, currency: filters.currency === "GBP" ? "USD" : "GBP" })} />
-      <div className="flex items-center gap-1 border-b border-border px-6 py-2">
+      <div className="hidden md:flex items-center gap-1 border-b border-border px-6 py-2">
         <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary" aria-current="page">
           Price Tracker
         </button>
@@ -189,40 +191,56 @@ const Index = () => {
         </button>
         <ReferencePanel />
       </div>
+      {/* Mobile hamburger */}
+      <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
+        <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="text-muted-foreground hover:text-primary transition-colors">
+          {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+        <ReferencePanel />
+      </div>
+      {mobileNavOpen && (
+        <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
+          <button className="text-[11px] tracking-wider px-3 py-2 text-primary text-left" aria-current="page">Price Tracker</button>
+          <button onClick={() => { setMobileNavOpen(false); navigate("/knowledge"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Knowledge Hub</button>
+          <button onClick={() => { setMobileNavOpen(false); navigate("/collection"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">My Collection</button>
+        </div>
+      )}
       <FilterBar filters={filters} onChange={updateFilters} />
 
       {/* Tab bar with inline stats */}
-      <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
-        <div className="flex items-center gap-1">
-          <span className="text-[11px] text-muted-foreground tracking-wider mr-3">
+      <div ref={resultsRef} className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border px-4 md:px-6 py-2 gap-1 md:gap-0">
+        <div className="flex flex-col md:flex-row md:items-center gap-1">
+          <span className="text-[11px] text-muted-foreground tracking-wider md:mr-3">
             {quickStats.count} records
             <span className="ml-2">Avg <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
             <span className="ml-2">High <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
           </span>
-          <button
-            onClick={() => changeTab("dashboard")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => changeTab("table")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Results
-          </button>
-          <button
-            onClick={() => changeTab("chart")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Price Chart
-          </button>
-          <button
-            onClick={() => changeTab("session")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Session Log {copiedRows.length > 0 && `(${copiedRows.length})`}
-          </button>
+          <div className="flex items-center gap-1 overflow-x-auto">
+            <button
+              onClick={() => changeTab("dashboard")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => changeTab("table")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Results
+            </button>
+            <button
+              onClick={() => changeTab("chart")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Price Chart
+            </button>
+            <button
+              onClick={() => changeTab("session")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Session Log {copiedRows.length > 0 && `(${copiedRows.length})`}
+            </button>
+          </div>
         </div>
         <ToolsDropdown
           onReclassify={handleReclassify}

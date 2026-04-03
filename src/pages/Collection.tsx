@@ -4,7 +4,7 @@ import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type
 import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
 import CollectionPhotoGallery from "@/components/CollectionPhotoGallery";
-import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
@@ -34,6 +34,7 @@ const Collection = () => {
   const [subTab, setSubTab] = useState<"inventory" | "analytics" | "gallery">("inventory");
   const [privacyMode, setPrivacyMode] = useState(false);
   const [bulkCalcing, setBulkCalcing] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -209,16 +210,16 @@ const Collection = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b border-border px-6 py-5">
-        <div className="flex items-center justify-between">
+      <header className="border-b border-border px-4 md:px-6 py-3 md:py-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-primary tracking-wider">
-              My Collection — Personal Inventory
+            <h1 className="text-lg md:text-2xl font-bold text-primary tracking-wider">
+              My Collection
             </h1>
-            <div className="mt-1 flex gap-6 text-xs text-muted-foreground tracking-wider">
-              <span>Total Items: <span className="text-primary">{items.length}</span></span>
-              <span>Total Cost: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
-              <span>Portfolio Value: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
+            <div className="mt-1 flex flex-wrap gap-3 md:gap-6 text-xs text-muted-foreground tracking-wider">
+              <span>Items: <span className="text-primary">{items.length}</span></span>
+              <span>Cost: <span className="text-primary">£{totalCost.toLocaleString("en-GB")}</span></span>
+              <span>Value: <span className="text-primary">£{portfolioValue.toLocaleString("en-GB")}</span></span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -234,8 +235,8 @@ const Collection = () => {
         </div>
       </header>
 
-      {/* Nav */}
-      <div className="flex items-center gap-1 border-b border-border px-6 py-2">
+      {/* Desktop Nav */}
+      <div className="hidden md:flex items-center gap-1 border-b border-border px-6 py-2">
         <button onClick={() => navigate("/")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Price Tracker</button>
         <button onClick={() => navigate("/knowledge")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Knowledge Hub</button>
         <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">My Collection</button>
@@ -244,6 +245,24 @@ const Collection = () => {
         <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Analytics</button>
         <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>
       </div>
+      {/* Mobile hamburger */}
+      <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
+        <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="text-muted-foreground hover:text-primary transition-colors">
+          {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "inventory" ? "text-primary" : "text-muted-foreground"}`}>Inventory</button>
+          <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "analytics" ? "text-primary" : "text-muted-foreground"}`}>Analytics</button>
+          <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "gallery" ? "text-primary" : "text-muted-foreground"}`}>Gallery</button>
+        </div>
+      </div>
+      {mobileNavOpen && (
+        <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
+          <button onClick={() => { setMobileNavOpen(false); navigate("/"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Price Tracker</button>
+          <button onClick={() => { setMobileNavOpen(false); navigate("/knowledge"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Knowledge Hub</button>
+          <button className="text-[11px] tracking-wider px-3 py-2 text-primary text-left">My Collection</button>
+        </div>
+      )}
 
       {subTab === "analytics" ? (
         <CollectionAnalytics items={items} />
@@ -252,7 +271,7 @@ const Collection = () => {
       ) : (
         <>
           {/* Filters */}
-          <div className="flex flex-wrap items-end gap-3 px-6 py-3 border-b border-border">
+          <div className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-end gap-3 px-4 md:px-6 py-3 border-b border-border">
             <div className="flex flex-col gap-1">
               <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Search</label>
               <div className="relative">
@@ -261,7 +280,7 @@ const Collection = () => {
                   value={filters.search}
                   onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                   placeholder="Search items..."
-                  className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-44"
+                  className="bg-secondary border-border text-xs tracking-wider pl-7 h-8 w-full md:w-44"
                 />
               </div>
             </div>
@@ -302,8 +321,45 @@ const Collection = () => {
             )}
           </div>
 
-          {/* Table */}
-          <div className="flex-1 overflow-x-auto">
+          {/* Mobile card layout */}
+          <div className="md:hidden flex-1 px-3 py-2 space-y-2">
+            {filtered.map((item) => {
+              const pnl = getPnl(item);
+              return (
+                <div key={item.id} className="border border-border rounded p-3">
+                  <div className="flex gap-3">
+                    {item.front_image_url && (
+                      <img src={item.front_image_url} alt="front" className="w-16 h-20 object-cover border border-border rounded shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-primary font-bold text-xs truncate">{item.description}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">{item.category} • {item.grading}</div>
+                      {!privacyMode && (
+                        <div className="flex gap-3 mt-1 text-[10px]">
+                          <span>Cost: <span className="text-foreground">£{Number(item.purchase_price).toLocaleString("en-GB")}</span></span>
+                          {pnl != null && (
+                            <span className={`font-bold ${getPnlColor(pnl, item)}`}>
+                              {pnl >= 0 ? "+" : ""}£{pnl.toLocaleString("en-GB")}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 shrink-0">
+                      <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary"><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div className="py-12 text-center text-muted-foreground text-sm tracking-wider">No items match current filters</div>
+            )}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block flex-1 overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
@@ -329,20 +385,10 @@ const Collection = () => {
                     <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors" style={{ height: "7rem" }}>
                       <td className="px-1.5 py-2 text-muted-foreground whitespace-nowrap align-middle">{item.item_id}</td>
                       <td className="px-1.5 py-2 align-middle">
-                        <ImageDropCell
-                          imageUrl={item.front_image_url || ""}
-                          itemId={item.id}
-                          field="front_image_url"
-                          onUpdated={load}
-                        />
+                        <ImageDropCell imageUrl={item.front_image_url || ""} itemId={item.id} field="front_image_url" onUpdated={load} />
                       </td>
                       <td className="px-1.5 py-2 align-middle">
-                        <ImageDropCell
-                          imageUrl={item.back_image_url || ""}
-                          itemId={item.id}
-                          field="back_image_url"
-                          onUpdated={load}
-                        />
+                        <ImageDropCell imageUrl={item.back_image_url || ""} itemId={item.id} field="back_image_url" onUpdated={load} />
                       </td>
                       <td className="px-1.5 py-2 text-primary font-bold max-w-[200px] truncate align-middle" title={item.description}>{item.description}</td>
                       <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.category}</td>
@@ -384,9 +430,7 @@ const Collection = () => {
               </tbody>
             </table>
             {filtered.length === 0 && (
-              <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">
-                NO ITEMS MATCH CURRENT FILTERS
-              </div>
+              <div className="px-6 py-12 text-center text-muted-foreground text-sm tracking-wider">No items match current filters</div>
             )}
           </div>
 

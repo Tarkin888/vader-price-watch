@@ -10,19 +10,21 @@ interface HeaderProps {
 
 const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyToggle }: HeaderProps) => {
   return (
-    <header className="border-b border-border px-6 flex items-center justify-between h-[60px]">
-      <div className="flex items-baseline gap-3">
+    <header className="border-b border-border px-4 md:px-6 flex flex-col md:flex-row md:items-center justify-between py-2 md:py-0 md:h-[60px] gap-1 md:gap-0">
+      <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-3">
         <Link to="/" className="cursor-pointer">
           <h1 className="text-base md:text-lg font-bold text-primary tracking-widest">
             IMPERIAL PRICE TERMINAL
           </h1>
         </Link>
-        <span className="text-[10px] text-muted-foreground tracking-widest">
-          v4.0
-        </span>
-        <span className="text-[10px] text-muted-foreground tracking-wider">
-          {totalRecords} Records • Last scrape: {lastScrapeDate ?? "N/A"}
-        </span>
+        <div className="flex items-baseline gap-2">
+          <span className="text-[10px] text-muted-foreground tracking-widest">
+            v4.0
+          </span>
+          <span className="text-[10px] text-muted-foreground tracking-wider">
+            {totalRecords} Records • Last scrape: {lastScrapeDate ?? "N/A"}
+          </span>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         {onCurrencyToggle && (
