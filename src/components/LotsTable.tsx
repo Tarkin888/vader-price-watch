@@ -131,7 +131,7 @@ const COL_LABELS: Record<ColId, string> = {
 };
 
 /* ── main component ── */
-const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }: LotsTableProps) => {
+const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP", highlightLotId }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
   const [deleteLot, setDeleteLot] = useState<Lot | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("sale_date");
@@ -142,6 +142,21 @@ const LotsTable = ({ lots, onChanged, onCopyRow, onSelectLot, currency = "GBP" }
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [hiddenCols, setHiddenCols] = useState<Set<ColId>>(new Set(DEFAULT_HIDDEN));
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const highlightRef = useRef<HTMLTableRowElement>(null);
+
+  useEffect(() => {
+    if (highlightLotId) {
+      setFlashId(highlightLotId);
+      // Scroll after a brief delay to let the DOM render
+      setTimeout(() => {
+        highlightRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+      // Clear flash after animation
+      const timer = setTimeout(() => setFlashId(null), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightLotId]);
 
   const isMobile = useIsMobile();
   const isNarrow = typeof window !== "undefined" && window.innerWidth < 1024;
