@@ -130,6 +130,84 @@ const COL_LABELS: Record<ColId, string> = {
   act: "Actions",
 };
 
+/* ── Inline Comparable Sales ── */
+function InlineComparableSales({ lot, allLots, onClose, fmtPrice }: {
+  lot: Lot;
+  allLots: Lot[];
+  onClose: () => void;
+  fmtPrice: (gbp: number, rate: number) => string;
+}) {
+  const comparables = useMemo(() => {
+    return allLots
+      .filter((l) => l.variant_grade_key === lot.variant_grade_key && l.id !== lot.id)
+      .sort((a, b) => b.sale_date.localeCompare(a.sale_date));
+  }, [lot, allLots]);
+
+  const allSales = useMemo(() => {
+    const all = [lot, ...comparables].sort((a, b) => b.sale_date.localeCompare(a.sale_date));
+    const avg = all.reduce((s, l) => s + Number(l.total_paid_gbp), 0) / all.length;
+    let pct: number | null = null;
+    if (all.length >= 2) {
+      const newest = Number(all[0].total_paid_gbp);
+      const second = Number(all[1].total_paid_gbp);
+      if (second > 0) pct = ((newest - second) / second) * 100;
+    }
+    return { avg, pct };
+  }, [lot, comparables]);
+
+  return (
+    <div className="bg-secondary/30 border-t border-border px-4 py-3">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div className="text-primary font-bold text-xs tracking-wider">{lot.variant_grade_key}</div>
+          <div className="text-[10px] text-muted-foreground tracking-wider mt-0.5">
+            {lot.lot_ref} · {new Date(lot.sale_date).toLocaleDateString("en-GB")} · <SourceBadge source={lot.source} size="sm" />
+            <span className="ml-2">{fmtPrice(Number(lot.total_paid_gbp), Number(lot.usd_to_gbp_rate))}</span>
+          </div>
+          <div className="flex gap-4 mt-1.5">
+            <div>
+              <span className="text-[9px] text-muted-foreground tracking-wider">Avg Price </span>
+              <span className="text-primary font-bold text-xs">{fmtPrice(allSales.avg, Number(lot.usd_to_gbp_rate))}</span>
+            </div>
+            {allSales.pct !== null && (
+              <div>
+                <span className="text-[9px] text-muted-foreground tracking-wider">Recent Δ </span>
+                <span className={`font-bold text-xs ${allSales.pct >= 0 ? "text-green-500" : "text-destructive"}`}>
+                  {allSales.pct >= 0 ? "+" : ""}{allSales.pct.toFixed(1)}%
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-muted-foreground hover:text-primary transition-colors p-1">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+      {comparables.length === 0 ? (
+        <div className="text-center text-muted-foreground text-[10px] tracking-wider py-4">
+          No other sales for this variant-grade
+        </div>
+      ) : (
+        <div className="space-y-1">
+          <div className="text-[9px] text-muted-foreground tracking-widest mb-1">COMPARABLE SALES ({comparables.length})</div>
+          {comparables.map((c) => (
+            <div key={c.id} className="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-secondary/50 transition-colors">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-[10px] text-muted-foreground shrink-0">{new Date(c.sale_date).toLocaleDateString("en-GB")}</span>
+                <SourceBadge source={c.source} size="sm" />
+                <span className="text-[10px] text-muted-foreground truncate">{c.lot_ref}</span>
+              </div>
+              <span className="text-primary font-bold text-xs shrink-0">
+                {fmtPrice(Number(c.total_paid_gbp), Number(c.usd_to_gbp_rate))}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── main component ── */
 const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", highlightLotId }: LotsTableProps) => {
   const [editLot, setEditLot] = useState<Lot | null>(null);
