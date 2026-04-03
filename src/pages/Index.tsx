@@ -208,37 +208,39 @@ const Index = () => {
       <FilterBar filters={filters} onChange={updateFilters} />
 
       {/* Tab bar with inline stats */}
-      <div ref={resultsRef} className="flex items-center justify-between border-b border-border px-6 py-2">
-        <div className="flex items-center gap-1">
-          <span className="text-[11px] text-muted-foreground tracking-wider mr-3">
+      <div ref={resultsRef} className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border px-4 md:px-6 py-2 gap-1 md:gap-0">
+        <div className="flex flex-col md:flex-row md:items-center gap-1">
+          <span className="text-[11px] text-muted-foreground tracking-wider md:mr-3">
             {quickStats.count} records
             <span className="ml-2">Avg <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
             <span className="ml-2">High <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
           </span>
-          <button
-            onClick={() => changeTab("dashboard")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => changeTab("table")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Results
-          </button>
-          <button
-            onClick={() => changeTab("chart")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Price Chart
-          </button>
-          <button
-            onClick={() => changeTab("session")}
-            className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-          >
-            Session Log {copiedRows.length > 0 && `(${copiedRows.length})`}
-          </button>
+          <div className="flex items-center gap-1 overflow-x-auto">
+            <button
+              onClick={() => changeTab("dashboard")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "dashboard" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => changeTab("table")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Results
+            </button>
+            <button
+              onClick={() => changeTab("chart")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Price Chart
+            </button>
+            <button
+              onClick={() => changeTab("session")}
+              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
+            >
+              Session Log {copiedRows.length > 0 && `(${copiedRows.length})`}
+            </button>
+          </div>
         </div>
         <ToolsDropdown
           onReclassify={handleReclassify}
