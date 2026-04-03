@@ -17,6 +17,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Menu, X } from "lucide-react";
 
 function calcQuickStats(lots: Lot[], isUSD: boolean) {
   const priced = lots.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
