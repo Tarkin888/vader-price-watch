@@ -143,6 +143,7 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
   const [hiddenCols, setHiddenCols] = useState<Set<ColId>>(new Set(DEFAULT_HIDDEN));
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
   const [flashId, setFlashId] = useState<string | null>(null);
+  const [comparableLotId, setComparableLotId] = useState<string | null>(null);
   const highlightRef = useRef<HTMLTableRowElement>(null);
 
   useEffect(() => {
