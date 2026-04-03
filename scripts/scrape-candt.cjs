@@ -435,7 +435,7 @@ async function scrapeCatalogue(page, catalogueId, stats) {
       }
 
       // MOC filter
-      if (!isMocLot(lot.title)) {
+      if (!isMocLot(lot.title, "", { source: "CandT" })) {
         stats.filtered++;
         continue;
       }
