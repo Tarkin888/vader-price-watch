@@ -274,13 +274,6 @@ const Index = () => {
         )}
       </div>
 
-      {selectedLot && (
-        <ComparableSalesPanel
-          lot={selectedLot}
-          allLots={lots}
-          onClose={() => setSelectedLot(null)}
-        />
-      )}
 
       {/* Benchmark Panel slide-in */}
       <Sheet open={showBenchmark} onOpenChange={setShowBenchmark}>
