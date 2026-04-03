@@ -34,6 +34,7 @@ const Collection = () => {
   const [subTab, setSubTab] = useState<"inventory" | "analytics" | "gallery">("inventory");
   const [privacyMode, setPrivacyMode] = useState(false);
   const [bulkCalcing, setBulkCalcing] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
