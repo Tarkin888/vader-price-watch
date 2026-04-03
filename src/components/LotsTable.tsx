@@ -62,9 +62,9 @@ type ColId = "sale_date" | "created_at" | "variant_grade" | "total" | "hammer" |
 
 interface LotsTableProps {
   lots: Lot[];
+  allLots?: Lot[];
   onChanged: () => void;
   onCopyRow?: (lot: Lot) => void;
-  onSelectLot?: (lot: Lot) => void;
   currency?: Currency;
   highlightLotId?: string | null;
 }
