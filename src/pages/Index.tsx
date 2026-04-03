@@ -58,6 +58,7 @@ const Index = () => {
   }, [setSearchParams]);
   const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
+  const [highlightLotId, setHighlightLotId] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
   const [filters, setFilters] = useState<Filters>(() => ({
