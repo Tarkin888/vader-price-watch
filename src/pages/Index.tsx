@@ -248,7 +248,7 @@ const Index = () => {
         ) : activeTab === "table" ? (
           <>
             <NotableSalesBanner lots={filtered} />
-            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} />
+            <LotsTable lots={filtered} onChanged={loadLots} onCopyRow={handleCopyRow} onSelectLot={setSelectedLot} currency={filters.currency} highlightLotId={highlightLotId} />
           </>
         ) : activeTab === "chart" ? (
           <ScatterChartPanel lots={lots} currency={filters.currency} />
