@@ -85,11 +85,19 @@ function hasCardbackEvidence(text) {
   return false;
 }
 
-function isMocLot(title, description = "") {
+function isMocLot(title, description = "", { source = "" } = {}) {
   const combined = `${title} ${description}`.toLowerCase();
   if (!combined.includes("darth vader")) return false;
   if (MOC_REJECT_PATTERNS.some((kw) => combined.includes(kw))) return false;
   if (TRAILING_COUNT_RE.test(title.trim())) return false;
+
+  // C&T lots have brief titles — relax to only require a carded-figure keyword
+  if (source === "CandT") {
+    const CANDT_MOC_KEYWORDS = ["carded", "moc", "card", "mint", "sealed", "figure"];
+    return CANDT_MOC_KEYWORDS.some((kw) => combined.includes(kw));
+  }
+
+  // Stricter logic for other sources
   const hasGrading = GRADING_KEYWORDS.some((kw) => combined.includes(kw));
   if (hasGrading && !hasCardbackEvidence(combined)) return false;
   if (!hasCardbackEvidence(combined) && !hasGrading) return false;
@@ -427,7 +435,7 @@ async function scrapeCatalogue(page, catalogueId, stats) {
       }
 
       // MOC filter
-      if (!isMocLot(lot.title)) {
+      if (!isMocLot(lot.title, "", { source: "CandT" })) {
         stats.filtered++;
         continue;
       }
