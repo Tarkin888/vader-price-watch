@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ThemeToggle from "@/components/ThemeToggle";
+import ResearchLibrary from "@/components/ResearchLibrary";
 import { Menu, X } from "lucide-react";
 
 /* ───────── data ───────── */
@@ -101,7 +102,7 @@ const VALUE_RANKING = [
   { era: "POTF", highest: "POTF-92", reason: "Coin included; last vintage run; strong demand for complete examples" },
 ];
 
-const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value"] as const;
+const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value", "Research Library"] as const;
 
 const ERA_ROW_BG: Record<string, string> = {
   SW: "rgba(30, 58, 95, 0.18)",
@@ -397,6 +398,19 @@ const KnowledgeHub = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* ──── SECTION 7: RESEARCH LIBRARY ──── */}
+        <div ref={(el) => { sectionRefs.current["Research Library"] = el; }}>
+          {activeSection === "Research Library" && <ResearchLibrary />}
+          {activeSection !== "Research Library" && (
+            <>
+              <SectionHeader title="Research Library" />
+              <p className="text-xs text-muted-foreground mt-3">
+                Select <button onClick={() => setActiveSection("Research Library")} className="text-primary hover:text-primary/80 underline transition-colors">Research Library</button> from the sub-nav to browse curated reference articles.
+              </p>
+            </>
+          )}
         </div>
 
         {/* ──── FOOTER NOTE ──── */}
