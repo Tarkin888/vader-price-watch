@@ -102,7 +102,7 @@ const VALUE_RANKING = [
   { era: "POTF", highest: "POTF-92", reason: "Coin included; last vintage run; strong demand for complete examples" },
 ];
 
-const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value"] as const;
+const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value", "Research Library"] as const;
 
 const ERA_ROW_BG: Record<string, string> = {
   SW: "rgba(30, 58, 95, 0.18)",
