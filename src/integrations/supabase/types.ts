@@ -68,6 +68,54 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_articles: {
+        Row: {
+          category: string
+          confidence: string | null
+          content_md: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          image_urls: string[] | null
+          is_published: boolean | null
+          last_researched: string | null
+          slug: string
+          source_urls: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          confidence?: string | null
+          content_md?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_urls?: string[] | null
+          is_published?: boolean | null
+          last_researched?: string | null
+          slug: string
+          source_urls?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          confidence?: string | null
+          content_md?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_urls?: string[] | null
+          is_published?: boolean | null
+          last_researched?: string | null
+          slug?: string
+          source_urls?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       lots: {
         Row: {
           buyers_premium_gbp: number | null
