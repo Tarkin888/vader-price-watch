@@ -1,0 +1,1 @@
+ALTER TABLE public.collection ADD COLUMN estimation_tier text DEFAULT NULL;

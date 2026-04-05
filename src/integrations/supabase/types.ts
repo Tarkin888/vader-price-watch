@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           current_estimated_value: number | null
           description: string
+          estimation_tier: string | null
           front_image_url: string | null
           grading: string
           id: string
@@ -38,6 +39,7 @@ export type Database = {
           created_at?: string
           current_estimated_value?: number | null
           description?: string
+          estimation_tier?: string | null
           front_image_url?: string | null
           grading?: string
           id?: string
@@ -55,6 +57,7 @@ export type Database = {
           created_at?: string
           current_estimated_value?: number | null
           description?: string
+          estimation_tier?: string | null
           front_image_url?: string | null
           grading?: string
           id?: string

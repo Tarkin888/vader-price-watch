@@ -9,20 +9,62 @@ interface Props {
   onUpdated: () => void;
 }
 
-/**
- * Map collection category → array of variant_code values to query from the lots table.
- * This is a best-effort mapping; users can always manually override.
- */
-const CARDBACK_TO_ERA: Record<string, string> = {
-  "SW-12": "SW", "SW-12A": "SW", "SW-12A-DT": "SW", "SW-12B": "SW", "SW-12B-DT": "SW", "SW-12C": "SW", "SW-12-DT": "SW",
-  "SW-20": "SW", "SW-21": "SW",
-  "ESB-31": "ESB", "ESB-32": "ESB", "ESB-41": "ESB", "ESB-45": "ESB", "ESB-47": "ESB", "ESB-48": "ESB",
-  "ROTJ-48": "ROTJ", "ROTJ-65": "ROTJ", "ROTJ-65A": "ROTJ", "ROTJ-65B": "ROTJ", "ROTJ-65D": "ROTJ",
-  "ROTJ-65-VP": "ROTJ", "ROTJ-70": "ROTJ", "ROTJ-77": "ROTJ", "ROTJ-79": "ROTJ", "ROTJ-79A": "ROTJ", "ROTJ-79B": "ROTJ",
-  "POTF-92": "POTF",
-  "CAN": "SW", "PAL": "ROTJ", "PAL-TL": "ROTJ", "MEX": "SW",
-  "PBP": "ROTJ", "TAK": "SW", "TT": "ROTJ", "HAR": "ROTJ",
+const GRADE_PREMIUM: Record<string, number> = {
+  "RAW-NM": 1.0, "RAW-EX": 0.6, "RAW-VG": 0.35,
+  "AFA-40": 0.5, "AFA-50": 0.7, "AFA-60": 0.85, "AFA-70": 1.0, "AFA-75": 1.3, "AFA-80": 1.65, "AFA-85": 2.15, "AFA-90+": 3.25,
+  "UKG-70": 0.85, "UKG-75": 1.15, "UKG-80": 1.65, "UKG-85": 2.15, "UKG-90": 2.75,
+  "CAS-70": 1.0, "CAS-75": 1.15, "CAS-80": 1.65, "CAS-85": 2.15,
+  "GRADED-UNKNOWN": 1.0, "UNKNOWN": 1.0,
 };
+
+function median(arr: number[]): number {
+  if (arr.length === 0) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+export async function calculateEstimatedValue(
+  category: string,
+  grading: string
+): Promise<{ value: number | null; tier: "Exact" | "Est." | null }> {
+  if (category === "UNKNOWN") return { value: null, tier: null };
+
+  // Tier 1: Exact match (cardback + grade)
+  const { data: exactData, error: e1 } = await supabase
+    .from("lots")
+    .select("total_paid_gbp")
+    .eq("variant_code", category as any)
+    .eq("grade_tier_code", grading as any);
+  if (e1) throw e1;
+
+  const exactPrices = (exactData ?? [])
+    .map((r: any) => Number(r.total_paid_gbp))
+    .filter((v: number) => v > 0);
+
+  if (exactPrices.length >= 2) {
+    return { value: Math.round(median(exactPrices)), tier: "Exact" };
+  }
+
+  // Tier 2: Grade-adjusted estimate (all grades for that cardback)
+  const { data: allData, error: e2 } = await supabase
+    .from("lots")
+    .select("total_paid_gbp")
+    .eq("variant_code", category as any);
+  if (e2) throw e2;
+
+  const allPrices = (allData ?? [])
+    .map((r: any) => Number(r.total_paid_gbp))
+    .filter((v: number) => v > 0);
+
+  if (allPrices.length === 0) {
+    return { value: null, tier: null }; // Tier 3: no data
+  }
+
+  const baseMedian = median(allPrices);
+  const factor = GRADE_PREMIUM[grading] ?? 1.0;
+  return { value: Math.round(baseMedian * factor), tier: "Est." };
+}
 
 const EstimatedValueCell = ({ item, onUpdated }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,11 +88,11 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
     return () => document.removeEventListener("mousedown", handler);
   }, [menuOpen]);
 
-  const saveValue = async (value: number | null) => {
+  const saveValue = async (value: number | null, tier: string | null) => {
     try {
       const { error } = await supabase
         .from("collection")
-        .update({ current_estimated_value: value } as any)
+        .update({ current_estimated_value: value, estimation_tier: tier } as any)
         .eq("id", item.id);
       if (error) throw error;
       onUpdated();
@@ -65,7 +107,7 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
       toast.error("Enter a valid number");
       return;
     }
-    await saveValue(val);
+    await saveValue(val, null);
     setEditing(false);
     setMenuOpen(false);
     toast.success(`Value set to £${val.toLocaleString("en-GB")}`);
@@ -74,89 +116,18 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
   const handleAutoCalc = async () => {
     setCalculating(true);
     try {
-      const cardback = item.category;
-      const fallbackEra = CARDBACK_TO_ERA[cardback] || "";
-
-      if (cardback === "UNKNOWN" && !fallbackEra) {
-        toast.error("No price tracker mapping for cardback: " + cardback);
+      const result = await calculateEstimatedValue(item.category, item.grading);
+      if (result.value == null) {
+        toast.error("No sales data found for this cardback");
         setCalculating(false);
         return;
       }
-
-      // Progressively widen the window: 1 year, 2 years, 3 years, then all-time
-      const windows = [1, 2, 3, 0]; // 0 = no cutoff
-      let data: any[] | null = null;
-      let usedYears = 1;
-      let usedFallback = false;
-
-      // Try variant_code matching first
-      for (const years of windows) {
-        if (cardback === "UNKNOWN") break;
-        let query = supabase
-          .from("lots")
-          .select("total_paid_gbp, sale_date")
-          .eq("variant_code", cardback as any);
-
-        if (years > 0) {
-          const cutoff = new Date();
-          cutoff.setFullYear(cutoff.getFullYear() - years);
-          query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
-        }
-
-        const { data: result, error: qErr } = await query;
-        if (qErr) throw qErr;
-
-        if (result && result.length > 0) {
-          data = result;
-          usedYears = years;
-          break;
-        }
-      }
-
-      // Fallback: query by era if no variant matches found
-      if ((!data || data.length === 0) && fallbackEra) {
-        usedFallback = true;
-        for (const years of windows) {
-          let query = supabase
-            .from("lots")
-            .select("total_paid_gbp, sale_date")
-            .eq("era", fallbackEra as any);
-
-          if (years > 0) {
-            const cutoff = new Date();
-            cutoff.setFullYear(cutoff.getFullYear() - years);
-            query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
-          }
-
-          const { data: result, error: qErr } = await query;
-          if (qErr) throw qErr;
-
-          if (result && result.length > 0) {
-            data = result;
-            usedYears = years;
-            break;
-          }
-        }
-      }
-
-      if (!data || data.length === 0) {
-        toast.error("No sales found in the price tracker for this category");
-        setCalculating(false);
-        return;
-      }
-
-      const avg = Math.round(data.reduce((s: number, r: any) => s + Number(r.total_paid_gbp), 0) / data.length);
-      await saveValue(avg);
+      await saveValue(result.value, result.tier);
       setMenuOpen(false);
-
-      const fallbackNote = usedFallback ? " (matched by era)" : "";
-      if (usedYears === 0) {
-        toast.warning(`No sales within 3 years. Used all-time avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
-      } else if (usedYears > 1) {
-        toast.warning(`No sales within 1 year. Used ${usedYears}-year avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`, { duration: 5000 });
-      } else {
-        toast.success(`1-year avg from ${data.length} sales${fallbackNote}: £${avg.toLocaleString("en-GB")}`);
-      }
+      const label = result.tier === "Exact"
+        ? `Exact median from matched sales: £${result.value.toLocaleString("en-GB")}`
+        : `Grade-adjusted estimate: £${result.value.toLocaleString("en-GB")}`;
+      toast.success(label);
     } catch (e: any) {
       toast.error("Calculation failed: " + e.message);
     } finally {
@@ -168,11 +139,18 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
     ? `£${Number(item.current_estimated_value).toLocaleString("en-GB")}`
     : null;
 
+  const tierLabel = (item as any).estimation_tier as string | null;
+
   return (
     <div className="relative" ref={menuRef}>
       <div className="flex items-center justify-end gap-1.5">
         <span className={displayValue ? "" : "text-muted-foreground"}>
           {displayValue ?? "—"}
+          {displayValue && tierLabel && (
+            <span className="ml-1 text-muted-foreground" style={{ fontSize: "10px", opacity: 0.6 }}>
+              {tierLabel}
+            </span>
+          )}
         </span>
         <button
           onClick={() => { setMenuOpen(!menuOpen); setEditing(false); }}
@@ -200,7 +178,7 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
                 className="flex items-center gap-2 px-3 py-2 text-xs tracking-wider text-foreground hover:bg-secondary transition-colors text-left disabled:opacity-50"
               >
                 <Calculator className="w-3 h-3 text-primary" />
-                {calculating ? "CALCULATING..." : "1-YEAR AVG (PRICE TRACKER)"}
+                {calculating ? "CALCULATING..." : "AUTO-CALCULATE"}
               </button>
             </div>
           ) : (
