@@ -16,9 +16,9 @@ const TIMELINE_NODES = [
 
 const MASTER_TABLE = [
   { code: "SW-12A", era: "SW", cardback: "12-Back A", year: "1977–78", features: "Action Display Stand offer; DT saber instructions; earliest release", rarity: "★★★★★", notes: "15–25% premium over SW-12C" },
-  { code: "SW-12A-DT", era: "SW", cardback: "12-Back A Double-Telescoping", year: "1977–78", features: "Inner saber wick visible; ~3 carded examples known worldwide", rarity: "★★★★★ (EXTREME)", notes: "£30k–£60k+ range" },
+  { code: "SW-12A-DT", era: "SW", cardback: "12-Back A Double-Telescoping", year: "1977–78", features: "Double-telescoping saber; extreme rarity", rarity: "★★★★★ (EXTREME)", notes: "See DT Variant Spotlight for details" },
   { code: "SW-12B", era: "SW", cardback: "12-Back B", year: "1978", features: "POP cut-out for second Display Stand; minor text variation", rarity: "★★★★☆", notes: "5–10% premium over SW-12C" },
-  { code: "SW-12B-DT", era: "SW", cardback: "12-Back B Double-Telescoping", year: "1978", features: "DT saber on 12B card; one documented example", rarity: "★★★★★ (EXTREME)", notes: "Comparable to SW-12A-DT" },
+  { code: "SW-12B-DT", era: "SW", cardback: "12-Back B Double-Telescoping", year: "1978", features: "DT saber on 12B card; single documented carded example", rarity: "★★★★★ (EXTREME)", notes: "See DT Variant Spotlight for details" },
   { code: "SW-12C", era: "SW", cardback: "12-Back C", year: "1978", features: "Shortened saber instruction text vs 12B; most common 12-back", rarity: "★★★☆☆", notes: "Baseline value for 12-back Vader" },
   { code: "SW-20", era: "SW", cardback: "20-Back", year: "1978–79", features: "Boba Fett mail-away offer on some variants; 20-figure grid", rarity: "★★★☆☆", notes: "Two sub-variants A and B; Boba Fett offer adds premium" },
   { code: "SW-21", era: "SW", cardback: "21-Back", year: "1979", features: "Adds Luke X-Wing Pilot to grid; multiple sub-variants A–G", rarity: "★★★☆☆", notes: "Sub-variants differ by offer and factory COO stamps" },
@@ -32,12 +32,12 @@ const MASTER_TABLE = [
   { code: "ROTJ-65A", era: "ROTJ", cardback: "65-Back A", year: "1983", features: "Standard ROTJ front photo (lightsaber raised)", rarity: "★★★☆☆", notes: "Most common ROTJ Vader card; multiple sub-variants A–D" },
   { code: "ROTJ-65B", era: "ROTJ", cardback: "65-Back B", year: "1983", features: "Minor offer and back text differences vs 65A", rarity: "★★★☆☆", notes: "Check back text and offer details to distinguish" },
   { code: "ROTJ-65C", era: "ROTJ", cardback: "65-Back C", year: "1983–84", features: "Further back text variation", rarity: "★★★★☆", notes: "Less common than 65A" },
-  { code: "ROTJ-65D", era: "ROTJ", cardback: "65-Back D — Made in Mexico", year: "1984", features: "Lili Ledy; different card finish; Made in Mexico", rarity: "★★★★★", notes: "Rare; POP 2 at AFA per Heritage; distinct collector premium" },
-  { code: "ROTJ-65-VP", era: "ROTJ", cardback: "65-Back Vader Pointing", year: "1983–84", features: "Alternate front photo: Vader pointing finger, arm extended", rarity: "★★★★☆", notes: "Confirmed on 65-back; rarer than standard pose" },
-  { code: "ROTJ-77", era: "ROTJ", cardback: "77-Back", year: "1984", features: "Expanded figure grid; Canadian 77-backs documented", rarity: "★★★☆☆", notes: "Vader Pointing variant also documented on 77-back" },
+  { code: "ROTJ-65D", era: "ROTJ", cardback: "65-Back D — Made in Mexico", year: "1984", features: "Lili Ledy; Made in Mexico", rarity: "★★★★★", notes: "See Mexico / Lili Ledy Spotlight for details" },
+  { code: "ROTJ-65-VP", era: "ROTJ", cardback: "65-Back Vader Pointing", year: "1983–84", features: "Alternate front photo: Vader pointing", rarity: "★★★★☆", notes: "See Vader Pointing Spotlight for details" },
+  { code: "ROTJ-77", era: "ROTJ", cardback: "77-Back", year: "1984", features: "Expanded figure grid; Canadian 77-backs documented", rarity: "★★★☆☆", notes: "Multiple sub-variants documented" },
   { code: "ROTJ-79A", era: "ROTJ", cardback: "79-Back A", year: "1984", features: "Near-complete ROTJ roster; standard Vader pose", rarity: "★★★☆☆", notes: "AFA 80 examples documented at Brian's Toys and Heritage" },
   { code: "ROTJ-79B", era: "ROTJ", cardback: "79-Back B", year: "1984", features: "Minor variation from 79A; check back text", rarity: "★★★★☆", notes: "Less common than 79A" },
-  { code: "POTF-92", era: "POTF", cardback: "92-Back", year: "1985", features: "Coin included in bubble; 92-figure grid; final vintage line", rarity: "★★★★☆", notes: "Vader coin is one of the most collected POTF items" },
+  { code: "POTF-92", era: "POTF", cardback: "92-Back", year: "1985", features: "Coin included; final vintage line", rarity: "★★★★☆", notes: "See POTF Coin Spotlight for details" },
   { code: "ROTJ-70", era: "ROTJ", cardback: "70-Back (Tri-Logo / Palitoy)", year: "1984–85", features: "70-figure grid on reverse; Palitoy or Tri-Logo branding; international market (primarily UK/Europe)", rarity: "★★★★☆", notes: "Not a U.S. Kenner cardback. Most examples are PAL-TL variant; some are PAL. Strong at Vectis, Hake's, and Heritage." },
 ];
 
@@ -90,16 +90,16 @@ const GRADE_TABLE = [
 ];
 
 const VALUE_RANKING = [
-  { era: "SW", highest: "SW-12A-DT / SW-12B-DT", reason: "Double-telescoping saber; only 3–4 known carded examples" },
-  { era: "SW", highest: "SW-12A", reason: "Earliest standard release; Action Display Stand offer" },
-  { era: "SW", highest: "SW-12B", reason: "POP cut-out; slightly more common than 12A" },
-  { era: "SW", highest: "SW-20 / SW-21", reason: "Less collected than 12-backs; still strong demand" },
-  { era: "ESB", highest: "ESB-32 / ESB-45", reason: "Shorter production runs; scarcer in high grade" },
-  { era: "ESB", highest: "ESB-41 / ESB-47", reason: "Core ESB collector cards; strong Heritage/Hake's volume" },
-  { era: "ROTJ", highest: "ROTJ-65D Mexico", reason: "Extremely low POP; Made in Mexico factory variant" },
-  { era: "ROTJ", highest: "ROTJ-65-VP", reason: "Vader Pointing alternate photo; rarer than standard ROTJ-65A" },
-  { era: "ROTJ", highest: "ROTJ-79 / ROTJ-77", reason: "Standard late-run ROTJ; good market volume" },
-  { era: "POTF", highest: "POTF-92", reason: "Coin included; last vintage run; strong demand for complete examples" },
+  { era: "SW", highest: "SW-12A-DT / SW-12B-DT", reason: "Rarest production Kenner variant; museum-tier collectible" },
+  { era: "SW", highest: "SW-12A", reason: "Highest value SW standard card" },
+  { era: "SW", highest: "SW-12B", reason: "Second-tier SW 12-back; slight premium over 12C" },
+  { era: "SW", highest: "SW-20 / SW-21", reason: "Strong demand but lower than 12-backs" },
+  { era: "ESB", highest: "ESB-32 / ESB-45", reason: "Low production run drives scarcity premium" },
+  { era: "ESB", highest: "ESB-41 / ESB-47", reason: "Most liquid ESB cards at auction" },
+  { era: "ROTJ", highest: "ROTJ-65D Mexico", reason: "Lowest graded population of any ROTJ Vader" },
+  { era: "ROTJ", highest: "ROTJ-65-VP", reason: "Photo variant premium over standard ROTJ pose" },
+  { era: "ROTJ", highest: "ROTJ-79 / ROTJ-77", reason: "Affordable late-run ROTJ; good entry point" },
+  { era: "POTF", highest: "POTF-92", reason: "End-of-line scarcity; coin adds collector appeal" },
 ];
 
 const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value", "Research Library"] as const;
