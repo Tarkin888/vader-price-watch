@@ -27,6 +27,13 @@ const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyTogg
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <Link
+          to="/admin"
+          className="text-[10px] font-bold tracking-widest px-2 py-1 transition-colors"
+          style={{ color: "hsl(43, 50%, 54%)", opacity: 0.6 }}
+        >
+          ADMIN
+        </Link>
         {onCurrencyToggle && (
           <button
             onClick={onCurrencyToggle}
