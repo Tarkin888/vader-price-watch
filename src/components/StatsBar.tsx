@@ -32,6 +32,7 @@ function calcStats(items: Lot[], isUSD: boolean) {
     pricedCount: pricedItems.length,
     avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
     max: prices.length > 0 ? Math.max(...prices) : 0,
+    min: prices.length > 0 ? Math.min(...prices) : 0,
   };
 }
 

@@ -31,6 +31,7 @@ function calcQuickStats(lots: Lot[], isUSD: boolean) {
     count: lots.length,
     avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
     max: prices.length > 0 ? Math.max(...prices) : 0,
+    min: prices.length > 0 ? Math.min(...prices) : 0,
   };
 }
 
@@ -188,14 +189,12 @@ const Index = () => {
         >
           My Collection
         </button>
-        <ReferencePanel />
       </div>
       {/* Mobile hamburger */}
       <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
         <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="text-muted-foreground hover:text-primary transition-colors">
           {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-        <ReferencePanel />
       </div>
       {mobileNavOpen && (
         <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
@@ -305,7 +304,7 @@ const Index = () => {
       </Sheet>
 
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
-        IMPERIAL PRICE TERMINAL v4.0 · Galactic Empire · Classified
+        IMPERIAL PRICE TERMINAL v4.1 · Galactic Empire · Classified
       </footer>
     </div>
   );
