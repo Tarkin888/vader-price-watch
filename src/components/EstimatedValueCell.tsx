@@ -74,11 +74,11 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
   const handleAutoCalc = async () => {
     setCalculating(true);
     try {
-      const variants = CATEGORY_TO_VARIANTS[item.category] || [];
-      const fallbackEra = CATEGORY_TO_ERA[item.category] || "";
+      const cardback = item.category;
+      const fallbackEra = CARDBACK_TO_ERA[cardback] || "";
 
-      if (variants.length === 0 && !fallbackEra) {
-        toast.error("No price tracker mapping for category: " + item.category);
+      if (cardback === "UNKNOWN" && !fallbackEra) {
+        toast.error("No price tracker mapping for cardback: " + cardback);
         setCalculating(false);
         return;
       }
@@ -91,11 +91,11 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
 
       // Try variant_code matching first
       for (const years of windows) {
-        if (variants.length === 0) break;
+        if (cardback === "UNKNOWN") break;
         let query = supabase
           .from("lots")
           .select("total_paid_gbp, sale_date")
-          .in("variant_code", variants as any);
+          .eq("variant_code", cardback as any);
 
         if (years > 0) {
           const cutoff = new Date();

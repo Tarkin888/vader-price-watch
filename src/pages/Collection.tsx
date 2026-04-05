@@ -140,16 +140,16 @@ const Collection = () => {
     let failed = 0;
     try {
       for (const item of items) {
-        const variants = CATEGORY_TO_VARIANTS[item.category] || [];
-        const fallbackEra = CATEGORY_TO_ERA[item.category] || "";
-        if (variants.length === 0 && !fallbackEra) { failed++; continue; }
+        const cardback = item.category;
+        const fallbackEra = CARDBACK_TO_ERA[cardback] || "";
+        if (cardback === "UNKNOWN" && !fallbackEra) { failed++; continue; }
 
         const windows = [1, 2, 3, 0];
         let data: any[] | null = null;
 
         for (const years of windows) {
-          if (variants.length === 0) break;
-          let query = supabase.from("lots").select("total_paid_gbp").in("variant_code", variants as any);
+          if (cardback === "UNKNOWN") break;
+          let query = supabase.from("lots").select("total_paid_gbp").eq("variant_code", cardback as any);
           if (years > 0) {
             const cutoff = new Date();
             cutoff.setFullYear(cutoff.getFullYear() - years);
