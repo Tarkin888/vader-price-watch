@@ -16,7 +16,7 @@ const TIMELINE_NODES = [
 
 const MASTER_TABLE = [
   { code: "SW-12A", era: "SW", cardback: "12-Back A", year: "1977–78", features: "Action Display Stand offer; DT saber instructions; earliest release", rarity: "★★★★★", notes: "15–25% premium over SW-12C" },
-  { code: "SW-12A-DT", era: "SW", cardback: "12-Back A Double-Telescoping", year: "1977–78", features: "Inner saber wick visible; ~3 carded examples known worldwide", rarity: "★★★★★ (EXTREME)", notes: "£30k–£60k+ range" },
+  { code: "SW-12A-DT", era: "SW", cardback: "12-Back A Double-Telescoping", year: "1977–78", features: "Double-telescoping saber; extreme rarity", rarity: "★★★★★ (EXTREME)", notes: "See DT Variant Spotlight for details" },
   { code: "SW-12B", era: "SW", cardback: "12-Back B", year: "1978", features: "POP cut-out for second Display Stand; minor text variation", rarity: "★★★★☆", notes: "5–10% premium over SW-12C" },
   { code: "SW-12B-DT", era: "SW", cardback: "12-Back B Double-Telescoping", year: "1978", features: "DT saber on 12B card; one documented example", rarity: "★★★★★ (EXTREME)", notes: "Comparable to SW-12A-DT" },
   { code: "SW-12C", era: "SW", cardback: "12-Back C", year: "1978", features: "Shortened saber instruction text vs 12B; most common 12-back", rarity: "★★★☆☆", notes: "Baseline value for 12-back Vader" },
