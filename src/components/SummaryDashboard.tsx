@@ -54,10 +54,12 @@ const SummaryDashboard = ({ lots, allLots, onLotClick, onViewResults }: Props) =
     })).filter((g) => g.lots.length > 0),
   [sourceLots]);
 
+  const SOURCE_DISPLAY: Record<string, string> = { Heritage: "Heritage", Hakes: "Hake's", Vectis: "Vectis", LCG: "LCG", CandT: "C&T" };
+
   const bySource = useMemo(() => {
     const map: Record<string, number> = {};
     lots.forEach((l) => { map[l.source] = (map[l.source] || 0) + 1; });
-    return Object.entries(map).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+    return Object.entries(map).map(([name, count]) => ({ name: SOURCE_DISPLAY[name] || name, count })).sort((a, b) => b.count - a.count);
   }, [lots]);
 
   const byVariant = useMemo(() => {
