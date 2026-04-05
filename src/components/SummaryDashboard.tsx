@@ -178,7 +178,7 @@ const SummaryDashboard = ({ lots, allLots, onLotClick, onViewResults }: Props) =
             <BarChart data={avgByGrade} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 50%, 54%, 0.1)" />
               <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `£${v.toLocaleString()}`} />
-              <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={60} />
+              <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={100} />
               <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [fmt(v), "Avg"]} />
               <Bar dataKey="avg" fill="hsl(140, 45%, 50%)" />
             </BarChart>
