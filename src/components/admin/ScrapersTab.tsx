@@ -66,6 +66,7 @@ const AdminScrapersTab = () => {
   }, []);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { const id = setInterval(fetchAll, 300000); return () => clearInterval(id); }, [fetchAll]);
 
   const handleSave = async () => {
     setSaving(true);
