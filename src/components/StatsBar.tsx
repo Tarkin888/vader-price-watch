@@ -87,6 +87,10 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
             <span className="text-primary font-bold">{fmt(stats.avg)}</span>
           </span>
           <span className="text-xs tracking-wider">
+            <span className="text-muted-foreground">LOW:</span>{" "}
+            <span className="text-primary font-bold">{fmt(stats.min)}</span>
+          </span>
+          <span className="text-xs tracking-wider">
             <span className="text-muted-foreground">HIGH:</span>{" "}
             <span className="text-primary font-bold">{fmt(stats.max)}</span>
           </span>
@@ -132,6 +136,10 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
       <span>
         <span className="text-muted-foreground">AVG: </span>
         <span className="text-primary font-bold">{fmt(totalStats.avg)}</span>
+      </span>
+      <span>
+        <span className="text-muted-foreground">LOW: </span>
+        <span className="text-primary font-bold">{fmt(totalStats.min)}</span>
       </span>
       <span>
         <span className="text-muted-foreground">HIGH: </span>

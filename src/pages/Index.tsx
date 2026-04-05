@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import ScatterChartPanel from "@/components/ScatterChartPanel";
 import PriceTrendChart from "@/components/PriceTrendChart";
-import ReferencePanel from "@/components/ReferencePanel";
+
 import LotsTable from "@/components/LotsTable";
 import ToolsDropdown from "@/components/ToolsDropdown";
 import SessionLog from "@/components/SessionLog";
@@ -211,6 +211,7 @@ const Index = () => {
           <span className="text-[11px] text-muted-foreground tracking-wider md:mr-3">
             {quickStats.count} records
             <span className="ml-2">Avg <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
+            <span className="ml-2">Low <span className="text-primary font-bold">{fmtPrice(quickStats.min, isUSD)}</span></span>
             <span className="ml-2">High <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
           </span>
           <div className="flex items-center gap-1 overflow-x-auto">
