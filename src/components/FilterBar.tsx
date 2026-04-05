@@ -22,7 +22,7 @@ const SOURCE_LABELS: Record<string, string> = {
 const CARDBACK_GROUPS: { label: string; codes: string[] }[] = [
   { label: "SW", codes: ["SW-12", "SW-12A", "SW-12A-DT", "SW-12B", "SW-12B-DT", "SW-12C", "SW-20", "SW-21"] },
   { label: "ESB", codes: ["ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48"] },
-  { label: "ROTJ", codes: ["ROTJ-48", "ROTJ-65", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79"] },
+  { label: "ROTJ", codes: ["ROTJ-48", "ROTJ-65", "ROTJ-65A", "ROTJ-65B", "ROTJ-65D", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79", "ROTJ-79A", "ROTJ-79B"] },
   { label: "POTF", codes: ["POTF-92"] },
   { label: "International", codes: ["CAN", "PAL", "MEX"] },
 ];

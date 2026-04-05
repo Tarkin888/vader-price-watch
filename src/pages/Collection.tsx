@@ -130,7 +130,7 @@ const Collection = () => {
     "20 BACK": ["SW-20"],
     "21 BACK": ["SW-21"],
     "ESB": ["ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48"],
-    "ROTJ": ["ROTJ-48", "ROTJ-65", "ROTJ-65-VP", "ROTJ-77", "ROTJ-79"],
+    "ROTJ": ["ROTJ-48", "ROTJ-65", "ROTJ-65A", "ROTJ-65B", "ROTJ-65D", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79", "ROTJ-79A", "ROTJ-79B"],
     "SECRET OFFER": ["SW-20", "SW-21"],
     "FETT STICKER": ["SW-20", "SW-21"],
     "TRILOGO": ["ROTJ-65", "ROTJ-77"],
