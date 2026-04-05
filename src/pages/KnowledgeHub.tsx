@@ -168,7 +168,7 @@ const KnowledgeHub = () => {
       )}
 
       {/* sub-nav */}
-      <div className="flex items-center gap-1 border-b border-border px-6 py-2 overflow-x-auto">
+      <div className="sticky top-0 z-20 bg-background flex items-center gap-1 border-b border-border px-6 py-2 overflow-x-auto">
         {SECTIONS.map((s) => (
           <button
             key={s}
@@ -183,12 +183,12 @@ const KnowledgeHub = () => {
       </div>
 
       {/* content */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-12">
+      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-3 space-y-6">
 
         {/* ──── SECTION 1: TIMELINE ──── */}
         <div ref={(el) => { sectionRefs.current["Timeline"] = el; }}>
           <SectionHeader title="Cardback Timeline" />
-          <div className="relative flex items-center justify-between mt-6 mb-4 px-4">
+          <div className="relative flex items-center justify-between mt-3 mb-2 px-4">
             {/* gold line */}
             <div className="absolute top-1/2 left-0 right-0 h-px bg-primary/60" />
             {TIMELINE_NODES.map((node) => (
@@ -210,7 +210,7 @@ const KnowledgeHub = () => {
         <div ref={(el) => { sectionRefs.current["Cardback Table"] = el; }}>
           <SectionHeader title="Cardback Master Table" />
           {/* era filter pills */}
-          <div className="flex gap-2 mt-4 mb-3">
+          <div className="flex gap-2 mt-2 mb-2">
             {ERA_FILTERS.map((e) => (
               <button
                 key={e}
@@ -258,7 +258,7 @@ const KnowledgeHub = () => {
         {/* ──── SECTION 3: VARIANT SPOTLIGHTS ──── */}
         <div ref={(el) => { sectionRefs.current["Variant Spotlights"] = el; }}>
           <SectionHeader title="Variant Spotlight Cards" />
-          <div className="grid md:grid-cols-2 gap-4 mt-4">
+          <div className="grid md:grid-cols-2 gap-4 mt-2">
             {SPOTLIGHT_CARDS.map((card) => (
               <div
                 key={card.title}
@@ -274,7 +274,7 @@ const KnowledgeHub = () => {
         {/* ──── SECTION 4: INTERNATIONAL ──── */}
         <div ref={(el) => { sectionRefs.current["International"] = el; }}>
           <SectionHeader title="International Variants" />
-          <div className="overflow-x-auto mt-4">
+          <div className="overflow-x-auto mt-2">
             <table className="w-full text-sm">
               <thead>
                 <tr>
@@ -306,7 +306,7 @@ const KnowledgeHub = () => {
         {/* ──── SECTION 5: AUCTION SOURCES ──── */}
         <div ref={(el) => { sectionRefs.current["Auction Sources"] = el; }}>
           <SectionHeader title="Auction Source Reference" />
-          <div className="overflow-x-auto mt-4">
+          <div className="overflow-x-auto mt-2">
             <table className="w-full text-sm">
               <thead>
                 <tr>
@@ -339,7 +339,7 @@ const KnowledgeHub = () => {
         {/* ──── SECTION 6: GRADES & VALUE ──── */}
         <div ref={(el) => { sectionRefs.current["Grades & Value"] = el; }}>
           <SectionHeader title="Grade Tier & Value Framework" />
-          <div className="grid lg:grid-cols-2 gap-6 mt-4">
+          <div className="grid lg:grid-cols-2 gap-4 mt-2">
             {/* left – grade reference */}
             <div>
               <h4 className="text-[10px] text-primary tracking-wider font-medium mb-2">Grade Tier Reference</h4>
@@ -407,7 +407,7 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── FOOTER NOTE ──── */}
-        <p className="text-[10px] text-primary/70 italic tracking-wider leading-relaxed pt-4 border-t border-border">
+        <p className="text-[10px] text-primary/70 italic tracking-wider leading-relaxed pt-2 border-t border-border">
           Reference data compiled from Heritage Auctions, Hake's Auctions, C&T Auctions, Dallas Vintage Toys, 4th Moon Toys, Brian's Toys, the SWCA archive, and the Kenner Star Wars Collectors' Handbook. Rarity ratings are collector consensus estimates. Always verify against current auction records in the Price Tracker tab.
         </p>
       </div>
