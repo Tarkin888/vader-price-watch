@@ -163,10 +163,38 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
       if (editLot) {
         const { error } = await supabase.from("lots").update(data).eq("id", editLot.id);
         if (error) throw error;
+
+        // Fire-and-forget audit log entries for each changed field
+        const auditEntries: { lot_id: string; lot_ref: string; action: string; field_changed: string; old_value: string; new_value: string }[] = [];
+        const fieldsToCheck: (keyof typeof data)[] = [
+          "capture_date", "sale_date", "source", "era", "cardback_code", "variant_code",
+          "grade_tier_code", "hammer_price_gbp", "buyers_premium_gbp", "total_paid_gbp",
+          "usd_to_gbp_rate", "condition_notes", "lot_ref", "lot_url", "grade_subgrades",
+        ];
+        for (const field of fieldsToCheck) {
+          const oldVal = String((editLot as any)[field] ?? "");
+          const newVal = String(data[field] ?? "");
+          if (oldVal !== newVal) {
+            auditEntries.push({
+              lot_id: editLot.id,
+              lot_ref: data.lot_ref || editLot.lot_ref,
+              action: "EDIT",
+              field_changed: field,
+              old_value: oldVal,
+              new_value: newVal,
+            });
+          }
+        }
+        if (auditEntries.length > 0) {
+          supabase.from("audit_log").insert(auditEntries).then(() => {});
+        }
+
         toast.success("Lot updated successfully");
       } else {
         const { error } = await supabase.from("lots").insert(data);
         if (error) throw error;
+        // Audit log for insert
+        supabase.from("audit_log").insert({ lot_ref: data.lot_ref, action: "INSERT" }).then(() => {});
         toast.success("Lot added successfully");
       }
 

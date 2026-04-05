@@ -5,6 +5,10 @@ import { Link } from "react-router-dom";
 import AdminOverviewTab from "@/components/admin/OverviewTab";
 import AdminScrapersTab from "@/components/admin/ScrapersTab";
 import AdminDataTab from "@/components/admin/DataTab";
+import AdminKnowledgeTab from "@/components/admin/KnowledgeTab";
+import AdminBugReportsTab from "@/components/admin/BugReportsTab";
+import AdminConfigTab from "@/components/admin/ConfigTab";
+import AdminAuditLogTab from "@/components/admin/AuditLogTab";
 
 const TABS = [
   { key: "overview", label: "OVERVIEW" },
@@ -151,11 +155,10 @@ const Admin = () => {
         {activeTab === "overview" && <AdminOverviewTab />}
         {activeTab === "scrapers" && <AdminScrapersTab />}
         {activeTab === "data" && <AdminDataTab />}
-        {["knowledge-hub", "bug-reports", "config", "audit-log"].includes(activeTab) && (
-          <p className="italic text-center py-16" style={{ color: "rgba(224,216,192,0.5)" }}>
-            This tab will be available after the next update.
-          </p>
-        )}
+        {activeTab === "knowledge-hub" && <AdminKnowledgeTab />}
+        {activeTab === "bug-reports" && <AdminBugReportsTab />}
+        {activeTab === "config" && <AdminConfigTab />}
+        {activeTab === "audit-log" && <AdminAuditLogTab />}
       </div>
 
       {/* Footer */}
