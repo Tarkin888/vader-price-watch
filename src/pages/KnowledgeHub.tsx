@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import ThemeToggle from "@/components/ThemeToggle";
 import ResearchLibrary from "@/components/ResearchLibrary";
 import { Menu, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ───────── data ───────── */
 
