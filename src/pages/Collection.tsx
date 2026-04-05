@@ -122,22 +122,16 @@ const Collection = () => {
     return items.reduce((latest, i) => i.purchase_date > latest.purchase_date ? i : latest, items[0]);
   }, [items]);
 
-  const CATEGORY_TO_VARIANTS: Record<string, string[]> = {
-    "12 BACK": ["SW-12", "SW-12A", "SW-12B", "SW-12C", "SW-12A-DT", "SW-12B-DT", "12A", "12B", "12C", "12A-DT", "12B-DT"],
-    "20 BACK": ["SW-20"],
-    "21 BACK": ["SW-21"],
-    "ESB": ["ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48"],
-    "ROTJ": ["ROTJ-48", "ROTJ-65", "ROTJ-65A", "ROTJ-65B", "ROTJ-65D", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79", "ROTJ-79A", "ROTJ-79B"],
-    "SECRET OFFER": ["SW-20", "SW-21"],
-    "FETT STICKER": ["SW-20", "SW-21"],
-    "TRILOGO": ["ROTJ-65", "ROTJ-77"],
-    "OTHER": [],
-  };
-  const CATEGORY_TO_ERA: Record<string, string> = {
-    "12 BACK": "SW", "20 BACK": "SW", "21 BACK": "SW",
-    "ESB": "ESB", "ROTJ": "ROTJ",
-    "SECRET OFFER": "SW", "FETT STICKER": "SW",
-    "TRILOGO": "ROTJ", "OTHER": "",
+  /** Map cardback code → era for fallback matching */
+  const CARDBACK_TO_ERA: Record<string, string> = {
+    "SW-12": "SW", "SW-12A": "SW", "SW-12A-DT": "SW", "SW-12B": "SW", "SW-12B-DT": "SW", "SW-12C": "SW", "SW-12-DT": "SW",
+    "SW-20": "SW", "SW-21": "SW",
+    "ESB-31": "ESB", "ESB-32": "ESB", "ESB-41": "ESB", "ESB-45": "ESB", "ESB-47": "ESB", "ESB-48": "ESB",
+    "ROTJ-48": "ROTJ", "ROTJ-65": "ROTJ", "ROTJ-65A": "ROTJ", "ROTJ-65B": "ROTJ", "ROTJ-65D": "ROTJ",
+    "ROTJ-65-VP": "ROTJ", "ROTJ-70": "ROTJ", "ROTJ-77": "ROTJ", "ROTJ-79": "ROTJ", "ROTJ-79A": "ROTJ", "ROTJ-79B": "ROTJ",
+    "POTF-92": "POTF",
+    "CAN": "SW", "PAL": "ROTJ", "PAL-TL": "ROTJ", "MEX": "SW",
+    "PBP": "ROTJ", "TAK": "SW", "TT": "ROTJ", "HAR": "ROTJ",
   };
 
   const handleBulkAutoCalc = async () => {
@@ -414,7 +408,7 @@ const Collection = () => {
                           <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
-                          {item.category === "12 BACK" && (
+                          {item.category.startsWith("SW-12") && (
                             <button onClick={(e) => handleFindComps(item, e)} className="text-muted-foreground hover:text-primary transition-colors" title="Find Comps">
                               <ArrowRight className="w-3.5 h-3.5" />
                             </button>
