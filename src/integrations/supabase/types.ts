@@ -14,6 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_config: {
+        Row: {
+          key: string
+          label: string | null
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          key: string
+          label?: string | null
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          key?: string
+          label?: string | null
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          field_changed: string | null
+          id: string
+          lot_id: string | null
+          lot_ref: string | null
+          new_value: string | null
+          old_value: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          field_changed?: string | null
+          id?: string
+          lot_id?: string | null
+          lot_ref?: string | null
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          field_changed?: string | null
+          id?: string
+          lot_id?: string | null
+          lot_ref?: string | null
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Relationships: []
+      }
+      bug_reports: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string
+          id: string
+          lot_ref: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string | null
+          description: string
+          id?: string
+          lot_ref?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          lot_ref?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       collection: {
         Row: {
           back_image_url: string | null
@@ -84,6 +174,7 @@ export type Database = {
           last_researched: string | null
           slug: string
           source_urls: string[] | null
+          tags: string[] | null
           title: string
           updated_at: string | null
         }
@@ -99,6 +190,7 @@ export type Database = {
           last_researched?: string | null
           slug: string
           source_urls?: string[] | null
+          tags?: string[] | null
           title: string
           updated_at?: string | null
         }
@@ -114,6 +206,7 @@ export type Database = {
           last_researched?: string | null
           slug?: string
           source_urls?: string[] | null
+          tags?: string[] | null
           title?: string
           updated_at?: string | null
         }
@@ -194,6 +287,63 @@ export type Database = {
           usd_to_gbp_rate?: number
           variant_code?: Database["public"]["Enums"]["variant_code"]
           variant_grade_key?: string
+        }
+        Relationships: []
+      }
+      page_views: {
+        Row: {
+          id: string
+          page: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          page?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          page?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: []
+      }
+      scraper_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          error_message: string | null
+          id: string
+          records_captured: number | null
+          records_skipped: number | null
+          source: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          error_message?: string | null
+          id?: string
+          records_captured?: number | null
+          records_skipped?: number | null
+          source: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          error_message?: string | null
+          id?: string
+          records_captured?: number | null
+          records_skipped?: number | null
+          source?: string
+          started_at?: string | null
+          status?: string
         }
         Relationships: []
       }
