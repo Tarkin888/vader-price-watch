@@ -141,13 +141,13 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
             {errors.description && <p className="text-[10px] text-destructive">{errors.description}</p>}
           </div>
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Category</label>
+            <label className={labelClass}>Cardback</label>
             <select className={selectClass} value={category} onChange={(e) => setCategory(e.target.value)}>
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Grading</label>
+            <label className={labelClass}>Grade</label>
             <select className={selectClass} value={grading} onChange={(e) => setGrading(e.target.value)}>
               {GRADINGS.map((g) => <option key={g} value={g}>{g}</option>)}
             </select>

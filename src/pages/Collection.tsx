@@ -92,10 +92,7 @@ const Collection = () => {
   const handleFindComps = (item: CollectionItem, e: React.MouseEvent) => {
     e.stopPropagation();
     // Map collection category/grading to price tracker filter values
-    const variantMap: Record<string, string> = {
-      "12 BACK": "12A", // Default to 12A; user can adjust
-    };
-    const variant = variantMap[item.category] || null;
+    const variant = item.category !== "UNKNOWN" ? item.category : null;
     // Navigate to price tracker with pre-set filters
     const params = new URLSearchParams();
     if (variant) params.set("variant", variant);
@@ -125,22 +122,16 @@ const Collection = () => {
     return items.reduce((latest, i) => i.purchase_date > latest.purchase_date ? i : latest, items[0]);
   }, [items]);
 
-  const CATEGORY_TO_VARIANTS: Record<string, string[]> = {
-    "12 BACK": ["SW-12", "SW-12A", "SW-12B", "SW-12C", "SW-12A-DT", "SW-12B-DT", "12A", "12B", "12C", "12A-DT", "12B-DT"],
-    "20 BACK": ["SW-20"],
-    "21 BACK": ["SW-21"],
-    "ESB": ["ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48"],
-    "ROTJ": ["ROTJ-48", "ROTJ-65", "ROTJ-65A", "ROTJ-65B", "ROTJ-65D", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79", "ROTJ-79A", "ROTJ-79B"],
-    "SECRET OFFER": ["SW-20", "SW-21"],
-    "FETT STICKER": ["SW-20", "SW-21"],
-    "TRILOGO": ["ROTJ-65", "ROTJ-77"],
-    "OTHER": [],
-  };
-  const CATEGORY_TO_ERA: Record<string, string> = {
-    "12 BACK": "SW", "20 BACK": "SW", "21 BACK": "SW",
-    "ESB": "ESB", "ROTJ": "ROTJ",
-    "SECRET OFFER": "SW", "FETT STICKER": "SW",
-    "TRILOGO": "ROTJ", "OTHER": "",
+  /** Map cardback code → era for fallback matching */
+  const CARDBACK_TO_ERA: Record<string, string> = {
+    "SW-12": "SW", "SW-12A": "SW", "SW-12A-DT": "SW", "SW-12B": "SW", "SW-12B-DT": "SW", "SW-12C": "SW", "SW-12-DT": "SW",
+    "SW-20": "SW", "SW-21": "SW",
+    "ESB-31": "ESB", "ESB-32": "ESB", "ESB-41": "ESB", "ESB-45": "ESB", "ESB-47": "ESB", "ESB-48": "ESB",
+    "ROTJ-48": "ROTJ", "ROTJ-65": "ROTJ", "ROTJ-65A": "ROTJ", "ROTJ-65B": "ROTJ", "ROTJ-65D": "ROTJ",
+    "ROTJ-65-VP": "ROTJ", "ROTJ-70": "ROTJ", "ROTJ-77": "ROTJ", "ROTJ-79": "ROTJ", "ROTJ-79A": "ROTJ", "ROTJ-79B": "ROTJ",
+    "POTF-92": "POTF",
+    "CAN": "SW", "PAL": "ROTJ", "PAL-TL": "ROTJ", "MEX": "SW",
+    "PBP": "ROTJ", "TAK": "SW", "TT": "ROTJ", "HAR": "ROTJ",
   };
 
   const handleBulkAutoCalc = async () => {
@@ -149,16 +140,16 @@ const Collection = () => {
     let failed = 0;
     try {
       for (const item of items) {
-        const variants = CATEGORY_TO_VARIANTS[item.category] || [];
-        const fallbackEra = CATEGORY_TO_ERA[item.category] || "";
-        if (variants.length === 0 && !fallbackEra) { failed++; continue; }
+        const cardback = item.category;
+        const fallbackEra = CARDBACK_TO_ERA[cardback] || "";
+        if (cardback === "UNKNOWN" && !fallbackEra) { failed++; continue; }
 
         const windows = [1, 2, 3, 0];
         let data: any[] | null = null;
 
         for (const years of windows) {
-          if (variants.length === 0) break;
-          let query = supabase.from("lots").select("total_paid_gbp").in("variant_code", variants as any);
+          if (cardback === "UNKNOWN") break;
+          let query = supabase.from("lots").select("total_paid_gbp").eq("variant_code", cardback as any);
           if (years > 0) {
             const cutoff = new Date();
             cutoff.setFullYear(cutoff.getFullYear() - years);
@@ -285,14 +276,14 @@ const Collection = () => {
               </div>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Category</label>
+              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Cardback</label>
               <select className={selectClass} value={filters.category ?? ""} onChange={(e) => setFilters({ ...filters, category: e.target.value || null })}>
                 <option value="">ALL</option>
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grading</label>
+              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grade</label>
               <select className={selectClass} value={filters.grading ?? ""} onChange={(e) => setFilters({ ...filters, grading: e.target.value || null })}>
                 <option value="">ALL</option>
                 {GRADINGS.map((g) => <option key={g} value={g}>{g}</option>)}
@@ -417,7 +408,7 @@ const Collection = () => {
                           <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
-                          {item.category === "12 BACK" && (
+                          {item.category.startsWith("SW-12") && (
                             <button onClick={(e) => handleFindComps(item, e)} className="text-muted-foreground hover:text-primary transition-colors" title="Find Comps">
                               <ArrowRight className="w-3.5 h-3.5" />
                             </button>

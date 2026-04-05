@@ -16,15 +16,17 @@ const WHITE = "hsl(40, 30%, 82%)";
 const BG_CARD = "hsl(50, 14%, 6%)";
 
 const GRADE_COLORS: Record<string, string> = {
-  "AFA 80": GOLD,
-  "AFA 75": "hsl(35, 60%, 50%)",
-  "AFA 85": "hsl(43, 60%, 60%)",
-  "AFA 90+": "hsl(50, 70%, 65%)",
-  "CAS 85": "hsl(175, 40%, 45%)",
-  "CAS 80": "hsl(210, 30%, 50%)",
-  "UKG 80": "hsl(200, 35%, 45%)",
-  "UKG 85": "hsl(190, 40%, 50%)",
-  "Not Graded": "hsl(40, 10%, 40%)",
+  "AFA-80": GOLD,
+  "AFA-75": "hsl(35, 60%, 50%)",
+  "AFA-85": "hsl(43, 60%, 60%)",
+  "AFA-90+": "hsl(50, 70%, 65%)",
+  "CAS-85": "hsl(175, 40%, 45%)",
+  "CAS-80": "hsl(210, 30%, 50%)",
+  "UKG-80": "hsl(200, 35%, 45%)",
+  "UKG-85": "hsl(190, 40%, 50%)",
+  "RAW-NM": "hsl(40, 10%, 40%)",
+  "RAW-EX": "hsl(40, 10%, 35%)",
+  "RAW-VG": "hsl(40, 10%, 30%)",
 };
 
 const CATEGORY_COLORS = [
@@ -69,8 +71,8 @@ export default function CollectionAnalytics({ items }: Props) {
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   }, [items]);
 
-  const graded = useMemo(() => items.filter(i => i.grading !== "Not Graded"), [items]);
-  const ungraded = useMemo(() => items.filter(i => i.grading === "Not Graded"), [items]);
+  const graded = useMemo(() => items.filter(i => !i.grading.startsWith("RAW-")), [items]);
+  const ungraded = useMemo(() => items.filter(i => i.grading.startsWith("RAW-")), [items]);
   const gradedAvg = graded.length > 0 ? graded.reduce((s, i) => s + Number(i.purchase_price), 0) / graded.length : 0;
   const ungradedAvg = ungraded.length > 0 ? ungraded.reduce((s, i) => s + Number(i.purchase_price), 0) / ungraded.length : 0;
   const gradedPremium = ungradedAvg > 0 ? (gradedAvg / ungradedAvg).toFixed(1) : "N/A";
@@ -169,7 +171,7 @@ export default function CollectionAnalytics({ items }: Props) {
   }, [items]);
 
   // ── Section 5: 12-Back ──
-  const twelveBackItems = useMemo(() => items.filter(i => i.category === "12 BACK"), [items]);
+  const twelveBackItems = useMemo(() => items.filter(i => i.category.startsWith("SW-12")), [items]);
   const twelveBackTotal = twelveBackItems.reduce((s, i) => s + Number(i.purchase_price), 0);
   const twelveBackAvg = twelveBackItems.length > 0 ? twelveBackTotal / twelveBackItems.length : 0;
   const twelveBackPct = totalCost > 0 ? ((twelveBackTotal / totalCost) * 100).toFixed(1) : "0";
@@ -321,7 +323,7 @@ export default function CollectionAnalytics({ items }: Props) {
                 <ReferenceLine x={ungradedAvg} stroke={MUTED} strokeDasharray="5 5" label={{ value: `Ungraded avg`, fill: MUTED, fontSize: 9, fontFamily: "'Aptos', sans-serif" }} />
                 <Bar dataKey="spend" radius={[0, 2, 2, 0]}>
                   {spendByGrade.map((entry) => (
-                    <Cell key={entry.name} fill={entry.name === "Not Graded" ? "hsl(40, 10%, 30%)" : GOLD} />
+                    <Cell key={entry.name} fill={entry.name.startsWith("RAW-") ? "hsl(40, 10%, 30%)" : GOLD} />
                   ))}
                 </Bar>
               </BarChart>
