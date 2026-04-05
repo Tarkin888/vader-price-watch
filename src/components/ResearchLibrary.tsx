@@ -253,18 +253,18 @@ const ResearchLibrary = () => {
           {selectedArticle.last_researched && (
             <p className="text-[10px] text-muted-foreground tracking-wider">Last Researched: {selectedArticle.last_researched}</p>
           )}
-          <div className="prose-custom">
-            <ReactMarkdown>{selectedArticle.content_md}</ReactMarkdown>
-          </div>
-          {selectedArticle.image_urls.length > 0 && (
-            <div className="flex flex-wrap gap-3 pt-2">
+          {selectedArticle.image_urls && selectedArticle.image_urls.length > 0 && (
+            <div className="flex flex-wrap gap-3">
               {selectedArticle.image_urls.map((url, i) => (
-                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block border border-border rounded overflow-hidden hover:border-primary transition-colors">
-                  <img src={url} alt={`Image ${i + 1}`} className="h-24 w-auto object-cover" />
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block" style={{ border: '1px solid #C9A84C', borderRadius: 4, overflow: 'hidden' }}>
+                  <img src={url} alt={`Image ${i + 1}`} className="h-[80px] w-auto object-contain transition-opacity hover:opacity-80" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 </a>
               ))}
             </div>
           )}
+          <div className="prose-custom">
+            <ReactMarkdown>{selectedArticle.content_md}</ReactMarkdown>
+          </div>
           {selectedArticle.source_urls.length > 0 && (
             <div className="pt-4 border-t border-border space-y-1">
               <p className="text-[10px] text-primary tracking-wider font-medium">Sources</p>
@@ -368,6 +368,15 @@ const ResearchLibrary = () => {
                 } ${!a.is_published ? "opacity-70" : ""}`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
+                  {a.image_urls && a.image_urls.length > 0 && (
+                    <img
+                      src={a.image_urls[0]}
+                      alt=""
+                      className="w-[48px] h-[48px] object-contain rounded shrink-0"
+                      style={{ border: '1px solid #C9A84C' }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  )}
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {!isAdmin && <span className="text-xs text-foreground font-medium">{a.title}</span>}
