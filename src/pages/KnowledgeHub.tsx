@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import ThemeToggle from "@/components/ThemeToggle";
 import ResearchLibrary from "@/components/ResearchLibrary";
 import { Menu, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ───────── data ───────── */
 
@@ -121,6 +121,17 @@ const KnowledgeHub = () => {
   const [eraFilter, setEraFilter] = useState<string>("All");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [lastScrapeDate, setLastScrapeDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.from("lots").select("capture_date", { count: "exact", head: false })
+      .order("capture_date", { ascending: false }).limit(1)
+      .then(({ data, count }) => {
+        setTotalRecords(count ?? 0);
+        if (data && data.length > 0) setLastScrapeDate(data[0].capture_date);
+      });
+  }, []);
 
   const filteredMaster = eraFilter === "All" ? MASTER_TABLE : MASTER_TABLE.filter((r) => r.era === eraFilter);
 
@@ -134,25 +145,7 @@ const KnowledgeHub = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* header placeholder — reuse the same header */}
-      <header className="border-b border-border px-4 md:px-6 py-5">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-2">
-          <div>
-            <div className="flex items-baseline gap-3">
-              <h1 className="text-xl md:text-2xl font-bold text-primary tracking-wider">
-                IMPERIAL PRICE TERMINAL
-              </h1>
-              <span className="text-[10px] text-muted-foreground tracking-widest">v4.0 | March 2026</span>
-            </div>
-            <p className="mt-1 text-[11px] text-muted-foreground tracking-wider leading-relaxed hidden md:block">
-              SW 12/20/21 &nbsp;•&nbsp; ESB 31/32/41/45/47/48 &nbsp;•&nbsp; ROTJ 48/65/77/79 &nbsp;•&nbsp; POTF 92
-              <br />
-              C&T &nbsp;•&nbsp; Hake's &nbsp;•&nbsp; Heritage &nbsp;•&nbsp; LCG &nbsp;•&nbsp; Vectis
-            </p>
-          </div>
-          <ThemeToggle />
-        </div>
-      </header>
+      <Header totalRecords={totalRecords} lastScrapeDate={lastScrapeDate} />
 
       {/* Desktop nav */}
       <div className="hidden md:flex items-center gap-1 border-b border-border px-6 py-2">
