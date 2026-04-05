@@ -95,13 +95,13 @@ const AdminDataTab = () => {
       const [nullDateRes, suspRes, imgRes] = await Promise.all([
         supabase.from("lots").select("lot_ref, source, sale_date").is("sale_date", null).limit(20),
         supabase.from("lots").select("lot_ref, source, total_paid_gbp").or("total_paid_gbp.lt.5,total_paid_gbp.gt.50000").limit(20),
-        supabase.from("lots").select("lot_ref, source, condition_notes").eq("image_urls", "{}").limit(20),
+        supabase.from("lots").select("lot_ref, source, condition_notes").eq("image_urls", "{}" as any).limit(20),
       ]);
 
       const [nullDateCount, suspCount, imgCount] = await Promise.all([
         supabase.from("lots").select("id", { count: "exact", head: true }).is("sale_date", null),
         supabase.from("lots").select("id", { count: "exact", head: true }).or("total_paid_gbp.lt.5,total_paid_gbp.gt.50000"),
-        supabase.from("lots").select("id", { count: "exact", head: true }).eq("image_urls", "{}"),
+        supabase.from("lots").select("id", { count: "exact", head: true }).eq("image_urls", "{}" as any),
       ]);
 
       setNullDates({ count: nullDateCount.count ?? 0, rows: (nullDateRes.data ?? []).map((r: any) => ({ lot_ref: r.lot_ref, source: r.source, extra: r.sale_date ?? "NULL" })) });
@@ -278,9 +278,8 @@ const AdminDataTab = () => {
   // Bulk delete
   const handleBulkDelete = async () => {
     if (delConfirm !== "DELETE") { toast.error("Type DELETE to confirm"); return; }
-    const { data } = await supabase.from("lots").select("id", { count: "exact", head: true }).eq("source", delSource);
-    const count = data;
-    const { error } = await supabase.from("lots").delete().eq("source", delSource);
+    const { count } = await supabase.from("lots").select("id", { count: "exact", head: true }).eq("source", delSource as any);
+    const { error } = await supabase.from("lots").delete().eq("source", delSource as any);
     if (error) { toast.error("Delete failed: " + error.message); return; }
     await supabase.from("audit_log").insert({ action: "DELETE", old_value: `${delSource}: records deleted` });
     toast.success(`Deleted ${delSource} records`);

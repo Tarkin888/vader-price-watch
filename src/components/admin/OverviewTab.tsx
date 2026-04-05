@@ -68,7 +68,7 @@ const AdminOverviewTab = () => {
       // Quality pills
       const [unknownRes, missingImgRes, suspPriceRes] = await Promise.all([
         supabase.from("lots").select("id", { count: "exact", head: true }).eq("cardback_code", "UNKNOWN"),
-        supabase.from("lots").select("id", { count: "exact", head: true }).eq("image_urls", "{}"),
+        supabase.from("lots").select("id", { count: "exact", head: true }).eq("image_urls", "{}" as any),
         supabase.from("lots").select("id", { count: "exact", head: true }).or("total_paid_gbp.lt.5,total_paid_gbp.gt.50000"),
       ]);
 
