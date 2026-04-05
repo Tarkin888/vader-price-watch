@@ -111,6 +111,11 @@ const Index = () => {
 
   useEffect(() => { loadLots(); }, [loadLots]);
 
+  // Page view tracking — fire and forget
+  useEffect(() => {
+    supabase.from("page_views").insert({ page: "main" });
+  }, []);
+
   const filtered = useMemo(() => {
     return lots.filter((l) => {
       if (filters.source && l.source !== filters.source) return false;
