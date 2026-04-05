@@ -37,7 +37,7 @@ const MASTER_TABLE = [
   { code: "ROTJ-77", era: "ROTJ", cardback: "77-Back", year: "1984", features: "Expanded figure grid; Canadian 77-backs documented", rarity: "★★★☆☆", notes: "Multiple sub-variants documented" },
   { code: "ROTJ-79A", era: "ROTJ", cardback: "79-Back A", year: "1984", features: "Near-complete ROTJ roster; standard Vader pose", rarity: "★★★☆☆", notes: "AFA 80 examples documented at Brian's Toys and Heritage" },
   { code: "ROTJ-79B", era: "ROTJ", cardback: "79-Back B", year: "1984", features: "Minor variation from 79A; check back text", rarity: "★★★★☆", notes: "Less common than 79A" },
-  { code: "POTF-92", era: "POTF", cardback: "92-Back", year: "1985", features: "Coin included in bubble; 92-figure grid; final vintage line", rarity: "★★★★☆", notes: "Vader coin is one of the most collected POTF items" },
+  { code: "POTF-92", era: "POTF", cardback: "92-Back", year: "1985", features: "Coin included; final vintage line", rarity: "★★★★☆", notes: "See POTF Coin Spotlight for details" },
   { code: "ROTJ-70", era: "ROTJ", cardback: "70-Back (Tri-Logo / Palitoy)", year: "1984–85", features: "70-figure grid on reverse; Palitoy or Tri-Logo branding; international market (primarily UK/Europe)", rarity: "★★★★☆", notes: "Not a U.S. Kenner cardback. Most examples are PAL-TL variant; some are PAL. Strong at Vectis, Hake's, and Heritage." },
 ];
 
