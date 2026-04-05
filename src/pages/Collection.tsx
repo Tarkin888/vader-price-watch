@@ -8,7 +8,7 @@ import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu
 import { supabase } from "@/integrations/supabase/client";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
-import EstimatedValueCell from "@/components/EstimatedValueCell";
+import EstimatedValueCell, { calculateEstimatedValue } from "@/components/EstimatedValueCell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -122,60 +122,23 @@ const Collection = () => {
     return items.reduce((latest, i) => i.purchase_date > latest.purchase_date ? i : latest, items[0]);
   }, [items]);
 
-  /** Map cardback code → era for fallback matching */
-  const CARDBACK_TO_ERA: Record<string, string> = {
-    "SW-12": "SW", "SW-12A": "SW", "SW-12A-DT": "SW", "SW-12B": "SW", "SW-12B-DT": "SW", "SW-12C": "SW", "SW-12-DT": "SW",
-    "SW-20": "SW", "SW-21": "SW",
-    "ESB-31": "ESB", "ESB-32": "ESB", "ESB-41": "ESB", "ESB-45": "ESB", "ESB-47": "ESB", "ESB-48": "ESB",
-    "ROTJ-48": "ROTJ", "ROTJ-65": "ROTJ", "ROTJ-65A": "ROTJ", "ROTJ-65B": "ROTJ", "ROTJ-65D": "ROTJ",
-    "ROTJ-65-VP": "ROTJ", "ROTJ-70": "ROTJ", "ROTJ-77": "ROTJ", "ROTJ-79": "ROTJ", "ROTJ-79A": "ROTJ", "ROTJ-79B": "ROTJ",
-    "POTF-92": "POTF",
-    "CAN": "SW", "PAL": "ROTJ", "PAL-TL": "ROTJ", "MEX": "SW",
-    "PBP": "ROTJ", "TAK": "SW", "TT": "ROTJ", "HAR": "ROTJ",
-  };
-
   const handleBulkAutoCalc = async () => {
     setBulkCalcing(true);
     let updated = 0;
     let failed = 0;
     try {
       for (const item of items) {
-        const cardback = item.category;
-        const fallbackEra = CARDBACK_TO_ERA[cardback] || "";
-        if (cardback === "UNKNOWN" && !fallbackEra) { failed++; continue; }
-
-        const windows = [1, 2, 3, 0];
-        let data: any[] | null = null;
-
-        for (const years of windows) {
-          if (cardback === "UNKNOWN") break;
-          let query = supabase.from("lots").select("total_paid_gbp").eq("variant_code", cardback as any);
-          if (years > 0) {
-            const cutoff = new Date();
-            cutoff.setFullYear(cutoff.getFullYear() - years);
-            query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
-          }
-          const { data: result } = await query;
-          if (result && result.length > 0) { data = result; break; }
+        try {
+          const result = await calculateEstimatedValue(item.category, item.grading);
+          if (result.value == null) { failed++; continue; }
+          const { error } = await supabase
+            .from("collection")
+            .update({ current_estimated_value: result.value, estimation_tier: result.tier } as any)
+            .eq("id", item.id);
+          if (!error) updated++; else failed++;
+        } catch {
+          failed++;
         }
-
-        if ((!data || data.length === 0) && fallbackEra) {
-          for (const years of windows) {
-            let query = supabase.from("lots").select("total_paid_gbp").eq("era", fallbackEra as any);
-            if (years > 0) {
-              const cutoff = new Date();
-              cutoff.setFullYear(cutoff.getFullYear() - years);
-              query = query.gte("sale_date", cutoff.toISOString().slice(0, 10));
-            }
-            const { data: result } = await query;
-            if (result && result.length > 0) { data = result; break; }
-          }
-        }
-
-        if (!data || data.length === 0) { failed++; continue; }
-        const avg = Math.round(data.reduce((s: number, r: any) => s + Number(r.total_paid_gbp), 0) / data.length);
-        const { error } = await supabase.from("collection").update({ current_estimated_value: avg } as any).eq("id", item.id);
-        if (!error) updated++; else failed++;
       }
       toast.success(`Updated ${updated} item(s)${failed > 0 ? `, ${failed} could not be calculated` : ""}`);
       load();
@@ -307,7 +270,7 @@ const Collection = () => {
                 disabled={bulkCalcing || items.length === 0}
               >
                 <Calculator className="w-3 h-3 mr-1" />
-                {bulkCalcing ? "Calculating..." : "1-Yr Avg All"}
+                {bulkCalcing ? "Calculating..." : "Auto-Calc All"}
               </Button>
             )}
           </div>
