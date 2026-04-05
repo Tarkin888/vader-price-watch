@@ -114,6 +114,7 @@ const AdminDataTab = () => {
   }, []);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { const id = setInterval(fetchAll, 300000); return () => clearInterval(id); }, [fetchAll]);
 
   // Reclassifier
   const runReclassify = async () => {
