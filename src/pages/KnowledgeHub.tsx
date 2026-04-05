@@ -90,16 +90,16 @@ const GRADE_TABLE = [
 ];
 
 const VALUE_RANKING = [
-  { era: "SW", highest: "SW-12A-DT / SW-12B-DT", reason: "Double-telescoping saber; only 3–4 known carded examples" },
-  { era: "SW", highest: "SW-12A", reason: "Earliest standard release; Action Display Stand offer" },
-  { era: "SW", highest: "SW-12B", reason: "POP cut-out; slightly more common than 12A" },
-  { era: "SW", highest: "SW-20 / SW-21", reason: "Less collected than 12-backs; still strong demand" },
-  { era: "ESB", highest: "ESB-32 / ESB-45", reason: "Shorter production runs; scarcer in high grade" },
-  { era: "ESB", highest: "ESB-41 / ESB-47", reason: "Core ESB collector cards; strong Heritage/Hake's volume" },
-  { era: "ROTJ", highest: "ROTJ-65D Mexico", reason: "Extremely low POP; Made in Mexico factory variant" },
-  { era: "ROTJ", highest: "ROTJ-65-VP", reason: "Vader Pointing alternate photo; rarer than standard ROTJ-65A" },
-  { era: "ROTJ", highest: "ROTJ-79 / ROTJ-77", reason: "Standard late-run ROTJ; good market volume" },
-  { era: "POTF", highest: "POTF-92", reason: "Coin included; last vintage run; strong demand for complete examples" },
+  { era: "SW", highest: "SW-12A-DT / SW-12B-DT", reason: "Rarest production Kenner variant; museum-tier collectible" },
+  { era: "SW", highest: "SW-12A", reason: "Highest value SW standard card" },
+  { era: "SW", highest: "SW-12B", reason: "Second-tier SW 12-back; slight premium over 12C" },
+  { era: "SW", highest: "SW-20 / SW-21", reason: "Strong demand but lower than 12-backs" },
+  { era: "ESB", highest: "ESB-32 / ESB-45", reason: "Low production run drives scarcity premium" },
+  { era: "ESB", highest: "ESB-41 / ESB-47", reason: "Most liquid ESB cards at auction" },
+  { era: "ROTJ", highest: "ROTJ-65D Mexico", reason: "Lowest graded population of any ROTJ Vader" },
+  { era: "ROTJ", highest: "ROTJ-65-VP", reason: "Photo variant premium over standard ROTJ pose" },
+  { era: "ROTJ", highest: "ROTJ-79 / ROTJ-77", reason: "Affordable late-run ROTJ; good entry point" },
+  { era: "POTF", highest: "POTF-92", reason: "End-of-line scarcity; coin adds collector appeal" },
 ];
 
 const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value", "Research Library"] as const;
