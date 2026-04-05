@@ -16,6 +16,7 @@ export interface CollectionItem {
   back_image_url: string;
   created_at: string;
   updated_at: string;
+  estimation_tier: string | null;
 }
 
 export const CATEGORIES = [
