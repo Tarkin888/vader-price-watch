@@ -8,7 +8,13 @@ import { CalendarIcon, X, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SOURCES = Constants.public.Enums.lot_source;
-const GRADES = Constants.public.Enums.grade_tier_code;
+const GRADES: readonly string[] = [
+  "RAW-NM", "RAW-EX", "RAW-VG",
+  "AFA-40", "AFA-50", "AFA-60", "AFA-70", "AFA-75", "AFA-80", "AFA-85", "AFA-90+",
+  "UKG-70", "UKG-75", "UKG-80", "UKG-85", "UKG-90",
+  "CAS-70", "CAS-75", "CAS-80", "CAS-85",
+  "UNKNOWN", "GRADED-UNKNOWN",
+];
 const ERAS = ["SW", "ESB", "ROTJ", "POTF"] as const;
 
 const SOURCE_LABELS: Record<string, string> = {
