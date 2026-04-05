@@ -32,6 +32,7 @@ function calcStats(items: Lot[], isUSD: boolean) {
     pricedCount: pricedItems.length,
     avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
     max: prices.length > 0 ? Math.max(...prices) : 0,
+    min: prices.length > 0 ? Math.min(...prices) : 0,
   };
 }
 
@@ -86,6 +87,10 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
             <span className="text-primary font-bold">{fmt(stats.avg)}</span>
           </span>
           <span className="text-xs tracking-wider">
+            <span className="text-muted-foreground">LOW:</span>{" "}
+            <span className="text-primary font-bold">{fmt(stats.min)}</span>
+          </span>
+          <span className="text-xs tracking-wider">
             <span className="text-muted-foreground">HIGH:</span>{" "}
             <span className="text-primary font-bold">{fmt(stats.max)}</span>
           </span>
@@ -131,6 +136,10 @@ const StatsBar = ({ lots, filters, currency = "GBP" }: StatsBarProps) => {
       <span>
         <span className="text-muted-foreground">AVG: </span>
         <span className="text-primary font-bold">{fmt(totalStats.avg)}</span>
+      </span>
+      <span>
+        <span className="text-muted-foreground">LOW: </span>
+        <span className="text-primary font-bold">{fmt(totalStats.min)}</span>
       </span>
       <span>
         <span className="text-muted-foreground">HIGH: </span>

@@ -413,7 +413,7 @@ const KnowledgeHub = () => {
       </div>
 
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
-        IMPERIAL PRICE TERMINAL v4.0 · Galactic Empire · Classified
+        IMPERIAL PRICE TERMINAL v4.1 · Galactic Empire · Classified
       </footer>
     </div>
   );

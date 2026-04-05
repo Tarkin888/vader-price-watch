@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import FilterBar, { type Filters } from "@/components/FilterBar";
 import ScatterChartPanel from "@/components/ScatterChartPanel";
 import PriceTrendChart from "@/components/PriceTrendChart";
-import ReferencePanel from "@/components/ReferencePanel";
+
 import LotsTable from "@/components/LotsTable";
 import ToolsDropdown from "@/components/ToolsDropdown";
 import SessionLog from "@/components/SessionLog";
@@ -31,6 +31,7 @@ function calcQuickStats(lots: Lot[], isUSD: boolean) {
     count: lots.length,
     avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
     max: prices.length > 0 ? Math.max(...prices) : 0,
+    min: prices.length > 0 ? Math.min(...prices) : 0,
   };
 }
 
@@ -188,14 +189,12 @@ const Index = () => {
         >
           My Collection
         </button>
-        <ReferencePanel />
       </div>
       {/* Mobile hamburger */}
       <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
         <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="text-muted-foreground hover:text-primary transition-colors">
           {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-        <ReferencePanel />
       </div>
       {mobileNavOpen && (
         <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
@@ -212,6 +211,7 @@ const Index = () => {
           <span className="text-[11px] text-muted-foreground tracking-wider md:mr-3">
             {quickStats.count} records
             <span className="ml-2">Avg <span className="text-primary font-bold">{fmtPrice(quickStats.avg, isUSD)}</span></span>
+            <span className="ml-2">Low <span className="text-primary font-bold">{fmtPrice(quickStats.min, isUSD)}</span></span>
             <span className="ml-2">High <span className="text-primary font-bold">{fmtPrice(quickStats.max, isUSD)}</span></span>
           </span>
           <div className="flex items-center gap-1 overflow-x-auto">
@@ -305,7 +305,7 @@ const Index = () => {
       </Sheet>
 
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
-        IMPERIAL PRICE TERMINAL v4.0 · Galactic Empire · Classified
+        IMPERIAL PRICE TERMINAL v4.1 · Galactic Empire · Classified
       </footer>
     </div>
   );

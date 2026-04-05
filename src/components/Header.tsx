@@ -19,7 +19,7 @@ const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyTogg
         </Link>
         <div className="flex items-baseline gap-2">
           <span className="text-[10px] text-muted-foreground tracking-widest">
-            v4.0
+            v4.1
           </span>
           <span className="text-[10px] text-muted-foreground tracking-wider">
             {totalRecords} Records • Last scrape: {lastScrapeDate ?? "N/A"}
