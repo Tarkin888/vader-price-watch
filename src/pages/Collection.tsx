@@ -92,10 +92,7 @@ const Collection = () => {
   const handleFindComps = (item: CollectionItem, e: React.MouseEvent) => {
     e.stopPropagation();
     // Map collection category/grading to price tracker filter values
-    const variantMap: Record<string, string> = {
-      "12 BACK": "12A", // Default to 12A; user can adjust
-    };
-    const variant = variantMap[item.category] || null;
+    const variant = item.category !== "UNKNOWN" ? item.category : null;
     // Navigate to price tracker with pre-set filters
     const params = new URLSearchParams();
     if (variant) params.set("variant", variant);
@@ -285,14 +282,14 @@ const Collection = () => {
               </div>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Category</label>
+              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Cardback</label>
               <select className={selectClass} value={filters.category ?? ""} onChange={(e) => setFilters({ ...filters, category: e.target.value || null })}>
                 <option value="">ALL</option>
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grading</label>
+              <label className="text-[10px] text-muted-foreground tracking-widest uppercase">Grade</label>
               <select className={selectClass} value={filters.grading ?? ""} onChange={(e) => setFilters({ ...filters, grading: e.target.value || null })}>
                 <option value="">ALL</option>
                 {GRADINGS.map((g) => <option key={g} value={g}>{g}</option>)}

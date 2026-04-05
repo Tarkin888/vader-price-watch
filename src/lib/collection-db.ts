@@ -19,13 +19,21 @@ export interface CollectionItem {
 }
 
 export const CATEGORIES = [
-  "12 BACK", "20 BACK", "21 BACK", "ESB", "ROTJ",
-  "SECRET OFFER", "FETT STICKER", "TRILOGO", "OTHER",
+  "SW-12", "SW-12A", "SW-12A-DT", "SW-12B", "SW-12B-DT", "SW-12C", "SW-12-DT",
+  "SW-20", "SW-21",
+  "ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48",
+  "ROTJ-48", "ROTJ-65", "ROTJ-65A", "ROTJ-65B", "ROTJ-65D", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79", "ROTJ-79A", "ROTJ-79B",
+  "POTF-92",
+  "CAN", "PAL", "PAL-TL", "MEX", "PBP", "TAK", "TT", "HAR",
+  "UNKNOWN",
 ] as const;
 
 export const GRADINGS = [
-  "Not Graded", "AFA 75", "AFA 80", "AFA 85", "AFA 90+",
-  "UKG 80", "UKG 85", "CAS 80", "CAS 85",
+  "RAW-NM", "RAW-EX", "RAW-VG",
+  "AFA-40", "AFA-50", "AFA-60", "AFA-70", "AFA-75", "AFA-80", "AFA-85", "AFA-90+",
+  "UKG-70", "UKG-75", "UKG-80", "UKG-85", "UKG-90",
+  "CAS-70", "CAS-75", "CAS-80", "CAS-85",
+  "GRADED-UNKNOWN", "UNKNOWN",
 ] as const;
 
 export const PURCHASE_SOURCES = [
