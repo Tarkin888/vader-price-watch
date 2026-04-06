@@ -10,7 +10,15 @@ const corsHeaders = {
 const SYSTEM_PROMPT = `You are the Imperial Price Terminal Assistant — an expert on vintage Kenner Star Wars Darth Vader mint-on-card (MOC) action figures and the auction price data tracked by this app.
 
 You help users with three core tasks:
-1. PRICE QUERIES — Answer questions about auction data by generating structured queries. When a user asks about prices, sales, or market data, respond with a [PRICE_QUERY] block containing: { "type": "price_query", "filters": { "era": "", "cardback_code": "", "source": "", "grade_tier_code": "", "variant_code": "", "date_from": "", "date_to": "" }, "aggregation": "list|average|highest|lowest|count", "limit": 10 }. Only populate filters the user mentions. After receiving results, summarise them conversationally in GBP.
+1. PRICE QUERIES — Answer questions about auction data by generating structured queries. When a user asks about prices, sales, or market data, respond with your conversational text FIRST, then on a new line output a [PRICE_QUERY] block with a closing [/PRICE_QUERY] tag. Example format:
+
+Here's what I found for ESB-41 sales:
+
+[PRICE_QUERY]
+{ "type": "price_query", "filters": { "cardback_code": "ESB-41" }, "aggregation": "highest", "limit": 1 }
+[/PRICE_QUERY]
+
+Available filter fields: era, cardback_code, source, grade_tier_code, variant_code, date_from, date_to. Only populate filters the user mentions. IMPORTANT: You MUST include both the opening [PRICE_QUERY] and closing [/PRICE_QUERY] tags.
 
 2. BUG REPORTS — If a user describes a problem with the app, gather details (what happened, what they expected, which page/feature), then output a [BUG_REPORT] block: { "type": "bug_report", "category": "SCRAPER|UI|CLASSIFIER|DATA|PRICING|GENERAL", "title": "", "description": "", "priority": "LOW|MEDIUM|HIGH|CRITICAL" }.
 
@@ -58,9 +66,13 @@ function enhanceMessage(message: string): string {
 }
 
 function parseActionBlocks(content: string) {
-  const priceMatch = content.match(/\[PRICE_QUERY\]([\s\S]*?)\[\/PRICE_QUERY\]/);
-  const bugMatch = content.match(/\[BUG_REPORT\]([\s\S]*?)\[\/BUG_REPORT\]/);
-  const feedbackMatch = content.match(/\[FEEDBACK\]([\s\S]*?)\[\/FEEDBACK\]/);
+  // Try with closing tag first, then fall back to unclosed block (to end of string)
+  const priceMatch = content.match(/\[PRICE_QUERY\]([\s\S]*?)\[\/PRICE_QUERY\]/) ||
+    content.match(/\[PRICE_QUERY\]([\s\S]*$)/);
+  const bugMatch = content.match(/\[BUG_REPORT\]([\s\S]*?)\[\/BUG_REPORT\]/) ||
+    content.match(/\[BUG_REPORT\]([\s\S]*$)/);
+  const feedbackMatch = content.match(/\[FEEDBACK\]([\s\S]*?)\[\/FEEDBACK\]/) ||
+    content.match(/\[FEEDBACK\]([\s\S]*$)/);
 
   return {
     priceQuery: priceMatch ? JSON.parse(priceMatch[1].trim()) : null,
@@ -71,9 +83,9 @@ function parseActionBlocks(content: string) {
 
 function stripActionBlocks(content: string): string {
   return content
-    .replace(/\[PRICE_QUERY\][\s\S]*?\[\/PRICE_QUERY\]/g, "")
-    .replace(/\[BUG_REPORT\][\s\S]*?\[\/BUG_REPORT\]/g, "")
-    .replace(/\[FEEDBACK\][\s\S]*?\[\/FEEDBACK\]/g, "")
+    .replace(/\[PRICE_QUERY\][\s\S]*?(\[\/PRICE_QUERY\]|$)/g, "")
+    .replace(/\[BUG_REPORT\][\s\S]*?(\[\/BUG_REPORT\]|$)/g, "")
+    .replace(/\[FEEDBACK\][\s\S]*?(\[\/FEEDBACK\]|$)/g, "")
     .trim();
 }
 
