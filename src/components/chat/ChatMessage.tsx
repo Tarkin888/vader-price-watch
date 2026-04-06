@@ -41,14 +41,14 @@ export default function ChatMessage({ msg }: Props) {
       >
         {displayContent}
 
-        {isBugConfirm && (
+        {isBugConfirm && msg.metadata?.bugReportId && (
           <div className="mt-2 px-2 py-1 rounded-full text-[11px] inline-block"
             style={{ background: "rgba(91,165,91,0.2)", color: "#5BA55B" }}>
             ✓ Bug report submitted
           </div>
         )}
 
-        {isFeedbackConfirm && (
+        {isFeedbackConfirm && msg.metadata?.feedbackId && (
           <div className="mt-2 px-2 py-1 rounded-full text-[11px] inline-block"
             style={{ background: "rgba(91,165,91,0.2)", color: "#5BA55B" }}>
             ✓ Feedback recorded
