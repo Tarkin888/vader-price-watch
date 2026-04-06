@@ -148,8 +148,8 @@ const AdminDataTab = () => {
         }
 
         if (Object.keys(updates).length > 0) {
-          await supabase.from("lots").update(updates).eq("id", lot.id);
-          if (auditEntries.length > 0) await supabase.from("audit_log").insert(auditEntries);
+          await adminWrite({ table: "lots", operation: "update", data: updates, match: { column: "id", value: lot.id } });
+          if (auditEntries.length > 0) await adminWrite({ table: "audit_log", operation: "insert", data: auditEntries });
           changed++;
         }
       }
@@ -205,9 +205,9 @@ const AdminDataTab = () => {
         condition_notes: qa.condition_notes,
         image_urls: qa.image_urls ? qa.image_urls.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
       };
-      const { error } = await supabase.from("lots").insert(row);
-      if (error) throw error;
-      await supabase.from("audit_log").insert({ lot_ref: qa.lot_ref.trim(), action: "INSERT" });
+      const res = await adminWrite({ table: "lots", operation: "insert", data: row });
+      if (!res.success) throw new Error(res.error);
+      await adminWrite({ table: "audit_log", operation: "insert", data: { lot_ref: qa.lot_ref.trim(), action: "INSERT" } });
       toast.success(`Lot ${qa.lot_ref} added`);
       setQa({ source: "Heritage", lot_ref: "", lot_url: "", sale_date: "", era: "", cardback_code: "", variant_code: "", grade_tier_code: "", hammer_price_gbp: "", buyers_premium_gbp: "", total_paid_gbp: "", condition_notes: "", image_urls: "" });
       fetchAll();
@@ -264,9 +264,9 @@ const AdminDataTab = () => {
     setImporting(true);
     try {
       const toInsert = importPreview.map((r) => ({ ...r, capture_date: r.capture_date || new Date().toISOString().slice(0, 10) }));
-      const { error } = await supabase.from("lots").insert(toInsert);
-      if (error) throw error;
-      await supabase.from("audit_log").insert(toInsert.map((r: any) => ({ lot_ref: r.lot_ref, action: "IMPORT" })));
+      const res = await adminWrite({ table: "lots", operation: "insert", data: toInsert });
+      if (!res.success) throw new Error(res.error);
+      await adminWrite({ table: "audit_log", operation: "insert", data: toInsert.map((r: any) => ({ lot_ref: r.lot_ref, action: "IMPORT" })) });
       toast.success(`Imported ${toInsert.length} records`);
       setImportPreview(null);
       fetchAll();
@@ -281,9 +281,9 @@ const AdminDataTab = () => {
   const handleBulkDelete = async () => {
     if (delConfirm !== "DELETE") { toast.error("Type DELETE to confirm"); return; }
     const { count } = await supabase.from("lots").select("id", { count: "exact", head: true }).eq("source", delSource as any);
-    const { error } = await supabase.from("lots").delete().eq("source", delSource as any);
-    if (error) { toast.error("Delete failed: " + error.message); return; }
-    await supabase.from("audit_log").insert({ action: "DELETE", old_value: `${delSource}: records deleted` });
+    const res = await adminWrite({ table: "lots", operation: "delete", match: { column: "source", value: delSource } });
+    if (!res.success) { toast.error("Delete failed: " + res.error); return; }
+    await adminWrite({ table: "audit_log", operation: "insert", data: { action: "DELETE", old_value: `${delSource}: records deleted` } });
     toast.success(`Deleted ${delSource} records`);
     setDelOpen(false); setDelConfirm("");
     fetchAll();
