@@ -335,7 +335,10 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
     if (!deleteLot) return;
     const { error } = await supabase.from("lots").delete().eq("id", deleteLot.id);
     if (error) toast.error("Delete failed: " + error.message);
-    else { toast.success("Lot deleted"); onChanged(); }
+    else {
+      supabase.from("audit_log").insert({ action: "DELETE", lot_ref: deleteLot.lot_ref }).then(() => {});
+      toast.success("Lot deleted"); onChanged();
+    }
     setDeleteLot(null);
   };
 
