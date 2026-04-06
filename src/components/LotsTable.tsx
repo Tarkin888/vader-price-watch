@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import type { Lot } from "@/lib/db";
 import type { Currency } from "@/components/FilterBar";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown, ChevronDown, ChevronUp, Columns3, X } from "lucide-react";
 import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";

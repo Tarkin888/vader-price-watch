@@ -77,9 +77,9 @@ const ImportCSV = ({ onImported }: Props) => {
       return;
     }
 
-    const { error } = await supabase.from("lots").insert(toInsert);
-    if (error) {
-      toast.error("Import failed: " + error.message);
+    const res = await adminWrite({ table: "lots", operation: "insert", data: toInsert });
+    if (!res.success) {
+      toast.error("Import failed: " + res.error);
     } else {
       toast.success(`Imported ${toInsert.length} rows (${rows.length - toInsert.length} duplicates skipped)`);
       onImported();

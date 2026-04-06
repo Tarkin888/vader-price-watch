@@ -161,8 +161,8 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
       };
 
       if (editLot) {
-        const { error } = await supabase.from("lots").update(data).eq("id", editLot.id);
-        if (error) throw error;
+        const res = await adminWrite({ table: "lots", operation: "update", data, match: { column: "id", value: editLot.id } });
+        if (!res.success) throw new Error(res.error);
 
         // Fire-and-forget audit log entries for each changed field
         const auditEntries: { lot_id: string; lot_ref: string; action: string; field_changed: string; old_value: string; new_value: string }[] = [];
@@ -186,15 +186,15 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
           }
         }
         if (auditEntries.length > 0) {
-          supabase.from("audit_log").insert(auditEntries).then(() => {});
+          adminWrite({ table: "audit_log", operation: "insert", data: auditEntries });
         }
 
         toast.success("Lot updated successfully");
       } else {
-        const { error } = await supabase.from("lots").insert(data);
-        if (error) throw error;
+        const res = await adminWrite({ table: "lots", operation: "insert", data });
+        if (!res.success) throw new Error(res.error);
         // Audit log for insert
-        supabase.from("audit_log").insert({ lot_ref: data.lot_ref, action: "INSERT" }).then(() => {});
+        adminWrite({ table: "audit_log", operation: "insert", data: { lot_ref: data.lot_ref, action: "INSERT" } });
         toast.success("Lot added successfully");
       }
 
