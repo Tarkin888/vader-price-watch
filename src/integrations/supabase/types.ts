@@ -237,6 +237,7 @@ export type Database = {
           purchase_price: number
           purchase_source: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           back_image_url?: string | null
@@ -255,6 +256,7 @@ export type Database = {
           purchase_price?: number
           purchase_source?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           back_image_url?: string | null
@@ -273,6 +275,7 @@ export type Database = {
           purchase_price?: number
           purchase_source?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
