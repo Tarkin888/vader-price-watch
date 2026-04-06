@@ -12,6 +12,7 @@ import type { Lot } from "@/lib/db";
 import type { LotInsert } from "@/lib/db";
 import { classifyLot, deriveFromVariantCode } from "@/lib/classify-lot";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 
 interface Props {
