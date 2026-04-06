@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { ConfigProvider } from "@/hooks/use-config";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import KnowledgeHub from "./pages/KnowledgeHub";
@@ -13,7 +15,15 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useEffect(() => {
+    supabase.from("page_views").insert({
+      page: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <ConfigProvider>
@@ -34,6 +44,7 @@ const App = () => (
       </ConfigProvider>
     </ThemeProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
