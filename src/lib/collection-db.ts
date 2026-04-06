@@ -1,10 +1,17 @@
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 
+async function getCurrentUserId(): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) throw new Error("Not authenticated");
+  return session.user.id;
+}
+
 export interface CollectionItem {
   id: string;
   item_id: string;
   description: string;
+  user_id: string;
   category: string;
   grading: string;
   purchase_price: number;
@@ -69,11 +76,15 @@ export async function upsertCollectionItem(
   item: Partial<CollectionItem> & { item_id: string; description: string; category: string; grading: string; purchase_price: number; purchase_date: string; purchase_source: string },
   existingId?: string
 ) {
+  const userId = await getCurrentUserId();
   if (existingId) {
-    const res = await adminWrite({ table: "collection", operation: "update", data: item as Record<string, unknown>, match: { column: "id", value: existingId } });
+    // Don't send user_id in update payload
+    const { user_id, ...updateData } = item as any;
+    const res = await adminWrite({ table: "collection", operation: "update", data: updateData as Record<string, unknown>, match: { column: "id", value: existingId } });
     if (!res.success) throw new Error(res.error);
   } else {
-    const res = await adminWrite({ table: "collection", operation: "insert", data: item as Record<string, unknown> });
+    const itemWithUser = { ...item, user_id: userId };
+    const res = await adminWrite({ table: "collection", operation: "insert", data: itemWithUser as Record<string, unknown> });
     if (!res.success) throw new Error(res.error);
   }
 }

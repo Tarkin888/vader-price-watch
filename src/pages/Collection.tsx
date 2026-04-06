@@ -6,6 +6,7 @@ import CollectionAnalytics from "@/components/CollectionAnalytics";
 import CollectionPhotoGallery from "@/components/CollectionPhotoGallery";
 import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { adminWrite } from "@/lib/admin-write";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
@@ -26,6 +27,7 @@ interface CollectionFilters {
 
 const Collection = () => {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [items, setItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<CollectionFilters>({ category: null, grading: null, search: "" });
@@ -195,7 +197,7 @@ const Collection = () => {
         <span className="text-muted-foreground/30 mx-2">|</span>
         <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Inventory</button>
         <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Analytics</button>
-        <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>
+        {isAdmin && <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>}
       </div>
       {/* Mobile hamburger */}
       <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
@@ -205,7 +207,7 @@ const Collection = () => {
         <div className="flex items-center gap-1">
           <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "inventory" ? "text-primary" : "text-muted-foreground"}`}>Inventory</button>
           <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "analytics" ? "text-primary" : "text-muted-foreground"}`}>Analytics</button>
-          <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "gallery" ? "text-primary" : "text-muted-foreground"}`}>Gallery</button>
+          {isAdmin && <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "gallery" ? "text-primary" : "text-muted-foreground"}`}>Gallery</button>}
         </div>
       </div>
       {mobileNavOpen && (
@@ -218,7 +220,7 @@ const Collection = () => {
 
       {subTab === "analytics" ? (
         <CollectionAnalytics items={items} />
-      ) : subTab === "gallery" ? (
+      ) : subTab === "gallery" && isAdmin ? (
         <CollectionPhotoGallery />
       ) : (
         <>
