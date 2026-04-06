@@ -128,7 +128,7 @@ const AdminOverviewTab = () => {
       </button>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}>
         {statCards.map((c) => (
           <div key={c.label} className="rounded p-3" style={{ border: "1px solid rgba(201,168,76,0.3)", background: "#0D0D0B" }}>
             <div className="flex items-center gap-2 mb-1">

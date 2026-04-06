@@ -312,8 +312,14 @@ const AdminKnowledgeTab = () => {
           </div>
         </div>
 
+        {/* Mobile editor tabs */}
+        <div className="md:hidden flex gap-0 mb-2" style={{ borderBottom: "1px solid rgba(201,168,76,0.2)" }}>
+          <button onClick={() => setMobilePreview(false)} className="flex-1 py-2 text-[11px] font-bold tracking-wider" style={{ color: !mobilePreview ? "#C9A84C" : "rgba(224,216,192,0.6)", borderBottom: !mobilePreview ? "2px solid #C9A84C" : "2px solid transparent", minHeight: 44 }}>EDIT</button>
+          <button onClick={() => setMobilePreview(true)} className="flex-1 py-2 text-[11px] font-bold tracking-wider" style={{ color: mobilePreview ? "#C9A84C" : "rgba(224,216,192,0.6)", borderBottom: mobilePreview ? "2px solid #C9A84C" : "2px solid transparent", minHeight: 44 }}>PREVIEW</button>
+        </div>
+
         {/* Markdown toolbar */}
-        <div className="flex items-center gap-1 overflow-x-auto py-1" style={{ borderBottom: "1px solid rgba(201,168,76,0.2)" }}>
+        <div className="flex items-center gap-1 overflow-x-auto py-1 -webkit-overflow-scrolling-touch" style={{ borderBottom: "1px solid rgba(201,168,76,0.2)", WebkitOverflowScrolling: "touch" as any }}>
           {[
             { icon: Bold, type: "bold" as const, tip: "Bold" },
             { icon: Heading2, type: "h2" as const, tip: "H2" },
@@ -322,15 +328,10 @@ const AdminKnowledgeTab = () => {
             { icon: Table, type: "table" as const, tip: "Table" },
             { icon: List, type: "list" as const, tip: "List" },
           ].map((btn) => (
-            <button key={btn.type} onClick={() => insertMarkdown(btn.type)} title={btn.tip} className="p-2 rounded" style={{ color: "#C9A84C", minHeight: 44, minWidth: 44 }}>
+            <button key={btn.type} onClick={() => insertMarkdown(btn.type)} title={btn.tip} className="flex-shrink-0 p-2 rounded" style={{ color: "#C9A84C", minHeight: 44, minWidth: 44 }}>
               <btn.icon className="w-4 h-4" />
             </button>
           ))}
-          {/* Mobile toggle */}
-          <div className="md:hidden ml-auto flex gap-1">
-            <button onClick={() => setMobilePreview(false)} className="px-2 py-1 text-[10px] font-bold rounded" style={{ background: !mobilePreview ? "rgba(201,168,76,0.3)" : "transparent", color: "#C9A84C", minHeight: 44 }}>EDIT</button>
-            <button onClick={() => setMobilePreview(true)} className="px-2 py-1 text-[10px] font-bold rounded" style={{ background: mobilePreview ? "rgba(201,168,76,0.3)" : "transparent", color: "#C9A84C", minHeight: 44 }}>PREVIEW</button>
-          </div>
         </div>
 
         {/* Editor + Preview */}

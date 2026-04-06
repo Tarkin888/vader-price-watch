@@ -131,14 +131,21 @@ const Admin = () => {
 
       {/* Tab bar */}
       <div
-        className="flex items-center gap-0 border-b overflow-x-auto"
+        className="admin-tab-bar items-center gap-0 border-b"
         style={{ borderColor: "rgba(201,168,76,0.2)" }}
+        ref={(el) => {
+          if (el) {
+            const active = el.querySelector('[data-active="true"]') as HTMLElement | null;
+            if (active) active.scrollIntoView({ inline: "center", block: "nearest" });
+          }
+        }}
       >
         {TABS.map((t) => (
           <button
             key={t.key}
+            data-active={activeTab === t.key}
             onClick={() => switchTab(t.key)}
-            className="flex-shrink-0 px-4 py-3 text-[11px] font-bold tracking-wider transition-colors"
+            className="flex-shrink-0 px-4 py-3 text-[11px] font-bold tracking-wider transition-colors whitespace-nowrap"
             style={{
               color: activeTab === t.key ? "#C9A84C" : "rgba(224,216,192,0.6)",
               borderBottom: activeTab === t.key ? "2px solid #C9A84C" : "2px solid transparent",
