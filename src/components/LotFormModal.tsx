@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Constants } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import type { Lot, LotInsert } from "@/lib/db";
 import { deriveFromVariantCode } from "@/lib/classify-lot";
 import { toast } from "sonner";

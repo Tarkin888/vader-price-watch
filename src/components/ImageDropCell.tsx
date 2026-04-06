@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 
 interface Props {

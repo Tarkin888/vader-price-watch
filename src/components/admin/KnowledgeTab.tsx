@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw, ArrowLeft, Trash2, Bold, Heading2, Link as LinkIcon, Image, Table, List } from "lucide-react";
 import ReactMarkdown from "react-markdown";

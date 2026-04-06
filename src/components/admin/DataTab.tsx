@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
 import { classifyLot, deriveFromVariantCode } from "@/lib/classify-lot";
