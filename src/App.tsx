@@ -9,6 +9,9 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatProvider } from "@/components/chat/ChatProvider";
 import ChatWidget from "@/components/chat/ChatWidget";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import SignOn from "./pages/SignOn";
+import PendingApproval from "./pages/PendingApproval";
 import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import KnowledgeHub from "./pages/KnowledgeHub";
@@ -17,7 +20,17 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const LoadingScreen = () => (
+  <div className="flex min-h-screen items-center justify-center" style={{ background: "#080806" }}>
+    <span className="text-sm tracking-wider animate-pulse" style={{ color: "#C9A84C" }}>
+      Loading Imperial Database...
+    </span>
+  </div>
+);
+
+const AppRoutes = () => {
+  const { isLoading, isAuthenticated, isApproved, profile } = useAuth();
+
   useEffect(() => {
     supabase.from("page_views").insert({
       page: window.location.pathname,
@@ -25,29 +38,43 @@ const App = () => {
     });
   }, []);
 
+  if (isLoading) return <LoadingScreen />;
+  if (!isAuthenticated) return <SignOn />;
+  if (!isApproved) return <PendingApproval />;
+
   return (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <ConfigProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <ChatProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/knowledge" element={<KnowledgeHub />} />
-                <Route path="/collection" element={<Collection />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-            <ChatWidget />
-          </ChatProvider>
-        </TooltipProvider>
-      </ConfigProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/knowledge" element={<KnowledgeHub />} />
+        <Route path="/collection" element={<Collection />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <ChatWidget />
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <ConfigProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <AuthProvider>
+              <ChatProvider>
+                <BrowserRouter>
+                  <AppRoutes />
+                </BrowserRouter>
+              </ChatProvider>
+            </AuthProvider>
+          </TooltipProvider>
+        </ConfigProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import AdminOverviewTab from "@/components/admin/OverviewTab";
@@ -9,6 +10,7 @@ import AdminKnowledgeTab from "@/components/admin/KnowledgeTab";
 import AdminBugReportsTab from "@/components/admin/BugReportsTab";
 import AdminConfigTab from "@/components/admin/ConfigTab";
 import AdminAuditLogTab from "@/components/admin/AuditLogTab";
+import AdminUsersTab from "@/components/admin/UsersTab";
 
 const TABS = [
   { key: "overview", label: "OVERVIEW" },
@@ -18,11 +20,13 @@ const TABS = [
   { key: "bug-reports", label: "BUG REPORTS" },
   { key: "config", label: "CONFIG" },
   { key: "audit-log", label: "AUDIT LOG" },
+  { key: "users", label: "USERS" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
 
 const Admin = () => {
+  const { isAdmin, isLoading: authLoading } = useAuth();
   const [authed, setAuthed] = useState(() => sessionStorage.getItem("admin_auth") === "true");
   const [pin, setPin] = useState("");
   const [checking, setChecking] = useState(false);
@@ -80,6 +84,25 @@ const Admin = () => {
       setChecking(false);
     }
   }, [pin, checking]);
+
+  if (authLoading) {
+    return <div className="min-h-screen" style={{ background: "#080806" }} />;
+  }
+
+  // Non-admin users see access restricted
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#080806" }}>
+        <div className="text-center">
+          <p className="text-lg font-bold tracking-widest mb-4" style={{ color: "#C9A84C" }}>ACCESS RESTRICTED</p>
+          <p className="text-sm mb-6" style={{ color: "#e0d8c0", opacity: 0.6 }}>Admin access is required to view this page.</p>
+          <Link to="/" className="text-xs tracking-widest px-4 py-3 rounded" style={{ border: "1px solid #C9A84C", color: "#C9A84C", minHeight: 44, display: "inline-block" }}>
+            BACK TO DASHBOARD
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!urlChecked) {
     return <div className="min-h-screen" style={{ background: "#080806" }} />;
@@ -187,6 +210,7 @@ const Admin = () => {
         {activeTab === "bug-reports" && <AdminBugReportsTab />}
         {activeTab === "config" && <AdminConfigTab />}
         {activeTab === "audit-log" && <AdminAuditLogTab />}
+        {activeTab === "users" && <AdminUsersTab />}
       </div>
 
       {/* Footer */}
