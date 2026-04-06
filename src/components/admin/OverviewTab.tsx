@@ -159,6 +159,7 @@ const AdminOverviewTab = () => {
           <a
             key={p.label}
             href={p.filter ? `/?${p.filter}` : "#"}
+            onClick={(e) => { if (p.filter) { e.preventDefault(); window.location.href = `/?${p.filter}`; } }}
             className="rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wider"
             style={{ background: p.bg, color: p.text, minHeight: 44, display: "inline-flex", alignItems: "center" }}
           >
