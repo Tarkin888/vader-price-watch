@@ -104,6 +104,121 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          message_type: string
+          metadata: Json
+          role: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          message_type?: string
+          metadata?: Json
+          role: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          message_type?: string
+          metadata?: Json
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          session_type: string
+          status: string
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          session_type?: string
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          session_type?: string
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chatbot_feedback: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string
+          feedback_type: string
+          id: string
+          metadata: Json
+          priority: string
+          session_id: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description: string
+          feedback_type: string
+          id?: string
+          metadata?: Json
+          priority?: string
+          session_id?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string
+          feedback_type?: string
+          id?: string
+          metadata?: Json
+          priority?: string
+          session_id?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chatbot_feedback_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collection: {
         Row: {
           back_image_url: string | null
