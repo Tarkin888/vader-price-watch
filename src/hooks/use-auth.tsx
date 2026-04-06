@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (sess?.user) {
           // Use setTimeout to avoid deadlock with Supabase auth
           setTimeout(async () => {
-            await fetchProfile(sess.user.id);
+            await fetchProfile(sess.user.id, sess.user.email);
             if (event === "SIGNED_IN") {
               await updateLastSignIn(sess.user.id);
               // Fire-and-forget audit log
@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (sess?.user) {
         setSession(sess);
         setUser(sess.user);
-        fetchProfile(sess.user.id).then(() => setIsLoading(false));
+        fetchProfile(sess.user.id, sess.user.email).then(() => setIsLoading(false));
       } else {
         setIsLoading(false);
       }
