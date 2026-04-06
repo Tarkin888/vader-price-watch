@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 
 export interface CollectionItem {
   id: string;
