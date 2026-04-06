@@ -26,6 +26,23 @@ const Admin = () => {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem("admin_auth") === "true");
   const [pin, setPin] = useState("");
   const [checking, setChecking] = useState(false);
+  const [urlChecked, setUrlChecked] = useState(() => sessionStorage.getItem("admin_auth") === "true");
+
+  // Auto-auth from URL ?pin= parameter
+  useEffect(() => {
+    if (authed) { setUrlChecked(true); return; }
+    const params = new URLSearchParams(window.location.search);
+    const urlPin = params.get("pin");
+    if (!urlPin) { setUrlChecked(true); return; }
+    supabase.from("admin_config").select("value").eq("key", "admin_pin").single().then(({ data }) => {
+      if (data && urlPin === data.value) {
+        sessionStorage.setItem("admin_auth", "true");
+        setAuthed(true);
+      }
+      history.replaceState(null, "", "/admin" + window.location.hash);
+      setUrlChecked(true);
+    });
+  }, []);
 
   const getHash = (): TabKey => {
     const h = window.location.hash.replace("#", "") as TabKey;
