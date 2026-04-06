@@ -17,7 +17,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify caller is authenticated admin
+    // Verify caller is authenticated
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Not authenticated" }), {
@@ -35,24 +35,29 @@ serve(async (req) => {
       });
     }
 
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select("role, status")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "admin" || profile.status !== "approved") {
-      return new Response(JSON.stringify({ error: "Admin access required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const { email, displayName, status, rejectionReason } = await req.json();
 
+    // For "registered" status, any authenticated user can trigger their own notification
+    // For "approved"/"rejected", require admin
+    if (status !== "registered") {
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("role, status")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile || profile.role !== "admin" || profile.status !== "approved") {
+        return new Response(JSON.stringify({ error: "Admin access required" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // Log to audit_log
+    const action = status === "registered" ? "USER_REGISTRATION_NOTIFICATION" : "USER_STATUS_NOTIFICATION";
     await supabase.from("audit_log").insert({
-      action: "USER_STATUS_NOTIFICATION",
+      action,
       lot_ref: email,
       old_value: user.email,
       new_value: `${status}${rejectionReason ? `: ${rejectionReason}` : ""}`,
