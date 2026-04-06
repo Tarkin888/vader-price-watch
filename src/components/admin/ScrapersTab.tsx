@@ -2,9 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
 
 const SOURCES = ["Heritage", "Hakes", "LCG", "Vectis", "CandT"];
 const STATUS_OPTIONS = ["SUCCESS", "PARTIAL", "FAILED"];
@@ -178,7 +175,7 @@ const AdminScrapersTab = () => {
         {recentRuns.length === 0 ? (
           <p className="italic text-center py-4" style={{ color: "rgba(224,216,192,0.5)" }}>No scraper runs recorded yet.</p>
         ) : (
-          <div className="overflow-x-auto rounded" style={{ border: "1px solid rgba(201,168,76,0.2)" }}>
+          <div className="table-scroll-wrapper rounded" style={{ border: "1px solid rgba(201,168,76,0.2)" }}>
             <table className="w-full text-[11px]" style={{ minWidth: 600 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid rgba(201,168,76,0.2)" }}>
@@ -212,55 +209,62 @@ const AdminScrapersTab = () => {
       </div>
 
       {/* Log modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent style={{ background: "#0D0D0B", border: "1px solid rgba(201,168,76,0.3)", color: "#e0d8c0" }} className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-sm tracking-wider" style={{ color: "#C9A84C" }}>LOG SCRAPER RUN</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>SOURCE</label>
-              <select value={fSource} onChange={(e) => setFSource(e.target.value)} style={inputStyle}>
-                {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
+      {modalOpen && (
+        <>
+          <div className="admin-modal-overlay" onClick={() => setModalOpen(false)} />
+          <div className="admin-modal">
+            <div className="md:hidden flex justify-center mb-2">
+              <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(201,168,76,0.4)" }} />
             </div>
-            <div>
-              <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>STATUS</label>
-              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} style={inputStyle}>
-                {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm tracking-wider font-bold" style={{ color: "#C9A84C" }}>LOG SCRAPER RUN</span>
+              <button onClick={() => setModalOpen(false)} className="text-lg" style={{ color: "#e0d8c0", minHeight: 44, minWidth: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
               <div>
-                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>CAPTURED</label>
-                <input type="number" inputMode="numeric" value={fCaptured} onChange={(e) => setFCaptured(e.target.value)} style={inputStyle} />
+                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>SOURCE</label>
+                <select value={fSource} onChange={(e) => setFSource(e.target.value)} style={inputStyle}>
+                  {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
               </div>
               <div>
-                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>SKIPPED</label>
-                <input type="number" inputMode="numeric" value={fSkipped} onChange={(e) => setFSkipped(e.target.value)} style={inputStyle} />
+                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>STATUS</label>
+                <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} style={inputStyle}>
+                  {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
               </div>
-            </div>
-            <div>
-              <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>DURATION (s)</label>
-              <input type="number" inputMode="decimal" value={fDuration} onChange={(e) => setFDuration(e.target.value)} style={inputStyle} />
-            </div>
-            {fStatus !== "SUCCESS" && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>CAPTURED</label>
+                  <input type="number" inputMode="numeric" value={fCaptured} onChange={(e) => setFCaptured(e.target.value)} style={inputStyle} />
+                </div>
+                <div>
+                  <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>SKIPPED</label>
+                  <input type="number" inputMode="numeric" value={fSkipped} onChange={(e) => setFSkipped(e.target.value)} style={inputStyle} />
+                </div>
+              </div>
               <div>
-                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>ERROR MESSAGE</label>
-                <textarea value={fError} onChange={(e) => setFError(e.target.value)} rows={3} style={{ ...inputStyle, minHeight: 80 }} />
+                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>DURATION (s)</label>
+                <input type="number" inputMode="decimal" value={fDuration} onChange={(e) => setFDuration(e.target.value)} style={inputStyle} />
               </div>
-            )}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="w-full py-3 rounded text-[11px] font-bold tracking-wider"
-              style={{ background: "#C9A84C", color: "#080806", minHeight: 44, opacity: saving ? 0.5 : 1 }}
-            >
-              {saving ? "SAVING…" : "SAVE"}
-            </button>
+              {fStatus !== "SUCCESS" && (
+                <div>
+                  <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>ERROR MESSAGE</label>
+                  <textarea value={fError} onChange={(e) => setFError(e.target.value)} rows={3} style={{ ...inputStyle, minHeight: 80 }} />
+                </div>
+              )}
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="w-full py-3 rounded text-[11px] font-bold tracking-wider"
+                style={{ background: "#C9A84C", color: "#080806", minHeight: 44, opacity: saving ? 0.5 : 1 }}
+              >
+                {saving ? "SAVING…" : "SAVE"}
+              </button>
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </>
+      )}
     </div>
   );
 };

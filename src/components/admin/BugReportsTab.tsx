@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 
 const BUG_CATEGORIES = ["SCRAPER", "CLASSIFICATION", "UI", "DATA", "OTHER"] as const;
 const CAT_COLORS: Record<string, string> = {
@@ -190,33 +190,40 @@ const AdminBugReportsTab = () => {
       )}
 
       {/* Add bug modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent style={{ background: "#0D0D0B", border: "1px solid rgba(201,168,76,0.3)", color: "#e0d8c0" }} className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-sm tracking-wider" style={{ color: "#C9A84C" }}>ADD BUG REPORT</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>CATEGORY *</label>
-              <select value={fCat} onChange={(e) => setFCat(e.target.value)} style={inputStyle}>
-                {BUG_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+      {modalOpen && (
+        <>
+          <div className="admin-modal-overlay" onClick={() => setModalOpen(false)} />
+          <div className="admin-modal">
+            <div className="md:hidden flex justify-center mb-2">
+              <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(201,168,76,0.4)" }} />
             </div>
-            <div>
-              <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>DESCRIPTION * (min 10 chars)</label>
-              <textarea value={fDesc} onChange={(e) => setFDesc(e.target.value)} rows={4} style={{ ...inputStyle, minHeight: 100 }} />
-              {fError && <span className="text-[10px]" style={{ color: "#F44336" }}>{fError}</span>}
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm tracking-wider font-bold" style={{ color: "#C9A84C" }}>ADD BUG REPORT</span>
+              <button onClick={() => setModalOpen(false)} className="text-lg" style={{ color: "#e0d8c0", minHeight: 44, minWidth: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
             </div>
-            <div>
-              <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>LOT REF (optional)</label>
-              <input value={fLotRef} onChange={(e) => setFLotRef(e.target.value)} style={inputStyle} />
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>CATEGORY *</label>
+                <select value={fCat} onChange={(e) => setFCat(e.target.value)} style={inputStyle}>
+                  {BUG_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>DESCRIPTION * (min 10 chars)</label>
+                <textarea value={fDesc} onChange={(e) => setFDesc(e.target.value)} rows={4} style={{ ...inputStyle, minHeight: 100 }} />
+                {fError && <span className="text-[10px]" style={{ color: "#F44336" }}>{fError}</span>}
+              </div>
+              <div>
+                <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>LOT REF (optional)</label>
+                <input value={fLotRef} onChange={(e) => setFLotRef(e.target.value)} style={inputStyle} />
+              </div>
+              <button onClick={handleSubmit} disabled={saving} className="w-full py-3 rounded text-[11px] font-bold tracking-wider" style={{ background: "#C9A84C", color: "#080806", minHeight: 44, opacity: saving ? 0.5 : 1 }}>
+                {saving ? "SUBMITTING…" : "SUBMIT"}
+              </button>
             </div>
-            <button onClick={handleSubmit} disabled={saving} className="w-full py-3 rounded text-[11px] font-bold tracking-wider" style={{ background: "#C9A84C", color: "#080806", minHeight: 44, opacity: saving ? 0.5 : 1 }}>
-              {saving ? "SUBMITTING…" : "SUBMIT"}
-            </button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </>
+      )}
     </div>
   );
 };

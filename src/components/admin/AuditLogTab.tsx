@@ -101,7 +101,7 @@ const AdminAuditLogTab = () => {
           No audit log entries yet. Entries are created automatically when lots are edited, imported, deleted, or reclassified.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded" style={{ border: "1px solid rgba(201,168,76,0.2)" }}>
+        <div className="table-scroll-wrapper rounded" style={{ border: "1px solid rgba(201,168,76,0.2)" }}>
           <table className="w-full text-[11px]" style={{ minWidth: 700 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(201,168,76,0.2)" }}>
