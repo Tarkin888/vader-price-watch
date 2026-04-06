@@ -19,7 +19,7 @@ export default function ChatHeader() {
           className="text-sm font-bold"
           style={{ color: "#C9A84C", fontFamily: "Aptos, 'Courier New', monospace" }}
         >
-          IPT Assistant
+          Kenny
         </span>
       </div>
       <div className="flex items-center gap-1">

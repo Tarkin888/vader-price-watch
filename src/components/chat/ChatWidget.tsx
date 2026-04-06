@@ -31,7 +31,7 @@ export default function ChatWidget() {
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Chat with IPT Assistant"
+          aria-label="Chat with Kenny"
           className="fixed z-[9999] flex flex-col sm:bottom-[92px] sm:right-6 sm:w-[380px] sm:h-[520px] sm:max-h-[80vh] sm:rounded-xl
                      bottom-0 right-0 w-screen h-screen rounded-none"
           style={{
@@ -49,7 +49,7 @@ export default function ChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Open chat assistant"
+        aria-label="Open Kenny chat assistant"
         className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all"
         style={{
           background: "#C9A84C",
