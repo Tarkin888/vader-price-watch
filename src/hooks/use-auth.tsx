@@ -36,14 +36,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string, email?: string) => {
     const { data } = await supabase
       .from("user_profiles")
       .select("*")
       .eq("id", userId)
       .single();
-    setProfile(data as UserProfile | null);
-    return data as UserProfile | null;
+    let prof = data as UserProfile | null;
+
+    // Belt-and-braces: if owner account is stuck as pending, self-repair
+    if (email?.toLowerCase() === "zrezvi@gmail.com" && prof && prof.status !== "approved") {
+      await supabase.rpc("repair_owner_account");
+      const { data: refreshed } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (refreshed) prof = refreshed as UserProfile;
+    }
+
+    setProfile(prof);
+    return prof;
   }, []);
 
   const updateLastSignIn = useCallback(async (userId: string) => {
@@ -69,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (sess?.user) {
           // Use setTimeout to avoid deadlock with Supabase auth
           setTimeout(async () => {
-            await fetchProfile(sess.user.id);
+            await fetchProfile(sess.user.id, sess.user.email);
             if (event === "SIGNED_IN") {
               await updateLastSignIn(sess.user.id);
               // Fire-and-forget audit log
@@ -92,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (sess?.user) {
         setSession(sess);
         setUser(sess.user);
-        fetchProfile(sess.user.id).then(() => setIsLoading(false));
+        fetchProfile(sess.user.id, sess.user.email).then(() => setIsLoading(false));
       } else {
         setIsLoading(false);
       }

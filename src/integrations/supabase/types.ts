@@ -518,6 +518,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      repair_owner_account: { Args: never; Returns: undefined }
       verify_admin_pin: { Args: { pin_input: string }; Returns: boolean }
     }
     Enums: {
