@@ -83,9 +83,12 @@ const CollectionPhotoGallery = () => {
 
   const handleDelete = async (e: React.MouseEvent, photo: GalleryPhoto) => {
     e.stopPropagation();
-    const { error } = await supabase.storage.from(BUCKET).remove([photo.name]);
-    if (error) {
-      toast.error("Failed to delete photo: " + error.message);
+    const pin = sessionStorage.getItem("admin_pin") ?? "";
+    const { data, error: fnError } = await supabase.functions.invoke("gallery-delete", {
+      body: { pin, fileName: photo.name },
+    });
+    if (fnError || !data?.success) {
+      toast.error("Failed to delete photo: " + (fnError?.message || data?.error || "Unknown error"));
     } else {
       toast.success("Photo deleted");
       setPhotos((prev) => prev.filter((p) => p.name !== photo.name));

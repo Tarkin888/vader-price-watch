@@ -34,9 +34,10 @@ const Admin = () => {
     const params = new URLSearchParams(window.location.search);
     const urlPin = params.get("pin");
     if (!urlPin) { setUrlChecked(true); return; }
-    supabase.from("admin_config").select("value").eq("key", "admin_pin").single().then(({ data }) => {
-      if (data && urlPin === data.value) {
+    supabase.functions.invoke("admin-verify-pin", { body: { pin: urlPin } }).then(({ data }) => {
+      if (data?.valid) {
         sessionStorage.setItem("admin_auth", "true");
+        sessionStorage.setItem("admin_pin", urlPin);
         setAuthed(true);
       }
       history.replaceState(null, "", "/admin" + window.location.hash);
@@ -65,13 +66,12 @@ const Admin = () => {
     if (checking) return;
     setChecking(true);
     try {
-      const { data } = await supabase
-        .from("admin_config")
-        .select("value")
-        .eq("key", "admin_pin")
-        .single();
-      if (data && pin === data.value) {
+      const { data } = await supabase.functions.invoke("admin-verify-pin", {
+        body: { pin },
+      });
+      if (data?.valid) {
         sessionStorage.setItem("admin_auth", "true");
+        sessionStorage.setItem("admin_pin", pin);
         setAuthed(true);
       } else {
         toast.error("ACCESS DENIED — Invalid PIN");

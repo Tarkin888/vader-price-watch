@@ -470,7 +470,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      verify_admin_pin: { Args: { pin_input: string }; Returns: boolean }
     }
     Enums: {
       grade_tier_code:
