@@ -46,19 +46,23 @@ const AdminConfigTab = () => {
   const handleSave = async (key: string) => {
     const val = editValues[key];
     if (val === undefined) return;
-    const { error } = await supabase.from("admin_config").update({ value: val, updated_at: new Date().toISOString() }).eq("key", key);
-    if (error) { toast.error("Save failed: " + error.message); return; }
+    const pin = sessionStorage.getItem("admin_pin") ?? "";
+    const { data, error: fnError } = await supabase.functions.invoke("admin-config-update", {
+      body: { pin, key, value: val },
+    });
+    if (fnError || !data?.success) {
+      toast.error("Save failed: " + (fnError?.message || data?.error || "Unknown error"));
+      return;
+    }
 
-    // Update ConfigContext by triggering re-render (force refetch)
-    // The simplest approach: mutate the window to signal config update
     setSavedKeys((s) => new Set(s).add(key));
     setTimeout(() => setSavedKeys((s) => { const n = new Set(s); n.delete(key); return n; }), 2000);
 
     if (key === "admin_pin") {
-      sessionStorage.setItem("admin_auth", "true");
+      sessionStorage.setItem("admin_pin", val);
     }
 
-    // Force config context refresh by dispatching a custom event
+    // Force config context refresh
     window.dispatchEvent(new CustomEvent("config-updated"));
   };
 
