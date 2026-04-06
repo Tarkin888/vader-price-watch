@@ -177,11 +177,11 @@ const AdminKnowledgeTab = () => {
       content_md: form.content_md,
     };
     if (id) {
-      const { error } = await supabase.from("knowledge_articles").update(row).eq("id", id);
-      if (error) throw error;
+      const res = await adminWrite({ table: "knowledge_articles", operation: "update", data: row, match: { column: "id", value: id } });
+      if (!res.success) throw new Error(res.error);
     } else {
-      const { error } = await supabase.from("knowledge_articles").insert(row);
-      if (error) throw error;
+      const res = await adminWrite({ table: "knowledge_articles", operation: "insert", data: row });
+      if (!res.success) throw new Error(res.error);
     }
   };
 
@@ -198,8 +198,8 @@ const AdminKnowledgeTab = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("knowledge_articles").delete().eq("id", id);
-    if (error) { toast.error("Delete failed"); return; }
+    const res = await adminWrite({ table: "knowledge_articles", operation: "delete", match: { column: "id", value: id } });
+    if (!res.success) { toast.error("Delete failed"); return; }
     toast.success("Article deleted");
     setDeleteConfirm(null);
     fetchArticles();
@@ -209,7 +209,7 @@ const AdminKnowledgeTab = () => {
     const next = !form.is_published;
     setField("is_published", next);
     if (editingId) {
-      await supabase.from("knowledge_articles").update({ is_published: next }).eq("id", editingId);
+      await adminWrite({ table: "knowledge_articles", operation: "update", data: { is_published: next }, match: { column: "id", value: editingId } });
       toast.success(next ? "Published" : "Unpublished");
       fetchArticles();
     }
