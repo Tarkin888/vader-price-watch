@@ -90,11 +90,11 @@ function stripActionBlocks(content: string): string {
 }
 
 function applyFilters(q: any, filters: any) {
-  if (filters.era) q = q.ilike("era", filters.era);
+  if (filters.era) q = q.eq("era", filters.era);
   if (filters.cardback_code) q = q.ilike("cardback_code", filters.cardback_code);
-  if (filters.source) q = q.ilike("source", filters.source);
-  if (filters.grade_tier_code) q = q.ilike("grade_tier_code", filters.grade_tier_code);
-  if (filters.variant_code) q = q.ilike("variant_code", filters.variant_code);
+  if (filters.source) q = q.eq("source", filters.source);
+  if (filters.grade_tier_code) q = q.eq("grade_tier_code", filters.grade_tier_code);
+  if (filters.variant_code) q = q.eq("variant_code", filters.variant_code);
   if (filters.date_from) q = q.gte("sale_date", filters.date_from);
   if (filters.date_to) q = q.lte("sale_date", filters.date_to);
   q = q.not("total_paid_gbp", "is", null).gt("total_paid_gbp", 0);
