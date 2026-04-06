@@ -81,6 +81,10 @@ const Admin = () => {
     }
   }, [pin, checking]);
 
+  if (!urlChecked) {
+    return <div className="min-h-screen" style={{ background: "#080806" }} />;
+  }
+
   if (!authed) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#080806" }}>
