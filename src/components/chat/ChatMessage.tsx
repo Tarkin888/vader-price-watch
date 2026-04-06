@@ -17,6 +17,13 @@ export default function ChatMessage({ msg }: Props) {
   const isBugConfirm = msg.message_type === "BUG_REPORT";
   const isFeedbackConfirm = msg.message_type === "FEEDBACK";
 
+  // Strip any leaked [PRICE_QUERY] blocks from display text
+  const displayContent = msg.content
+    .replace(/\[PRICE_QUERY\][\s\S]*?(\[\/PRICE_QUERY\]|$)/g, "")
+    .replace(/\[BUG_REPORT\][\s\S]*?(\[\/BUG_REPORT\]|$)/g, "")
+    .replace(/\[FEEDBACK\][\s\S]*?(\[\/FEEDBACK\]|$)/g, "")
+    .trim();
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2`}>
       <div
@@ -32,7 +39,7 @@ export default function ChatMessage({ msg }: Props) {
           maxWidth: isUser ? "80%" : "85%",
         }}
       >
-        {msg.content}
+        {displayContent}
 
         {isBugConfirm && (
           <div className="mt-2 px-2 py-1 rounded-full text-[11px] inline-block"
