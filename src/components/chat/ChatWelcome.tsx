@@ -12,7 +12,7 @@ export default function ChatWelcome() {
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 text-center gap-4">
       <h3 className="text-base font-bold" style={{ color: "#C9A84C" }}>
-        Welcome to the IPT Assistant
+        Hi, I'm Kenny — your Imperial Price Terminal assistant
       </h3>
       <p className="text-xs" style={{ color: "#e0d8c0" }}>
         I can help you with:

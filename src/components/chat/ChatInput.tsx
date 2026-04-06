@@ -34,7 +34,7 @@ export default function ChatInput() {
             e.target.style.height = Math.min(e.target.scrollHeight, 100) + "px";
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Ask about prices, report a bug..."
+          placeholder="Ask Kenny about prices, report a bug..."
           rows={1}
           className="flex-1 resize-none text-[13px] px-3 py-2 rounded-lg outline-none"
           style={{
