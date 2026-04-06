@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
+import UserMenu from "./UserMenu";
+import { useAuth } from "@/hooks/use-auth";
 
 interface HeaderProps {
   totalRecords: number;
@@ -9,6 +11,8 @@ interface HeaderProps {
 }
 
 const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyToggle }: HeaderProps) => {
+  const { isAdmin } = useAuth();
+
   return (
     <header className="border-b border-border px-4 md:px-6 flex flex-col md:flex-row md:items-center justify-between py-2 md:py-0 md:h-[60px] gap-1 md:gap-0">
       <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-3">
@@ -27,13 +31,15 @@ const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyTogg
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Link
-          to="/admin"
-          className="text-[10px] font-bold tracking-widest px-2 py-1 transition-colors"
-          style={{ color: "hsl(43, 50%, 54%)", opacity: 0.6 }}
-        >
-          ADMIN
-        </Link>
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="text-[10px] font-bold tracking-widest px-2 py-1 transition-colors"
+            style={{ color: "hsl(43, 50%, 54%)", opacity: 0.6 }}
+          >
+            ADMIN
+          </Link>
+        )}
         {onCurrencyToggle && (
           <button
             onClick={onCurrencyToggle}
@@ -47,10 +53,10 @@ const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyTogg
           </button>
         )}
         <ThemeToggle />
+        <UserMenu />
       </div>
     </header>
   );
 };
-
 
 export default Header;
