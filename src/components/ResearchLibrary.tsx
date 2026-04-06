@@ -210,8 +210,8 @@ const ResearchLibrary = () => {
           confidence: obj.confidence || "MEDIUM",
           is_published: false,
           last_researched: obj.last_researched || null,
-        } as any);
-        if (error) errors.push(`${obj.slug}: ${error.message}`);
+        }});
+        if (!res.success) errors.push(`${obj.slug}: ${res.error}`);
         else imported++;
       }
       toast.success(`Imported ${imported} articles`);

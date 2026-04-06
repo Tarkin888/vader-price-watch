@@ -27,11 +27,8 @@ const ImageDropCell = ({ imageUrl, itemId, field, onUpdated }: Props) => {
       const reader = new FileReader();
       reader.onload = async () => {
         const dataUrl = reader.result as string;
-        const { error } = await supabase
-          .from("collection")
-          .update({ [field]: dataUrl } as any)
-          .eq("id", itemId);
-        if (error) throw error;
+        const res = await adminWrite({ table: "collection", operation: "update", data: { [field]: dataUrl }, match: { column: "id", value: itemId } });
+        if (!res.success) throw new Error(res.error);
         toast.success("Image saved");
         onUpdated();
       };
@@ -51,11 +48,8 @@ const ImageDropCell = ({ imageUrl, itemId, field, onUpdated }: Props) => {
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const { error } = await supabase
-        .from("collection")
-        .update({ [field]: "" } as any)
-        .eq("id", itemId);
-      if (error) throw error;
+      const res = await adminWrite({ table: "collection", operation: "update", data: { [field]: "" }, match: { column: "id", value: itemId } });
+      if (!res.success) throw new Error(res.error);
       toast.success("Image removed");
       onUpdated();
     } catch (err: any) {
