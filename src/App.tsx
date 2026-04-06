@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { ConfigProvider } from "@/hooks/use-config";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ChatProvider } from "@/components/chat/ChatProvider";
+import ChatWidget from "@/components/chat/ChatWidget";
 import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import KnowledgeHub from "./pages/KnowledgeHub";
@@ -30,16 +32,18 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/knowledge" element={<KnowledgeHub />} />
-              <Route path="/collection" element={<Collection />} />
-              <Route path="/admin" element={<Admin />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <ChatProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/knowledge" element={<KnowledgeHub />} />
+                <Route path="/collection" element={<Collection />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+            <ChatWidget />
+          </ChatProvider>
         </TooltipProvider>
       </ConfigProvider>
     </ThemeProvider>
