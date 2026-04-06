@@ -11,6 +11,7 @@ export interface CollectionItem {
   id: string;
   item_id: string;
   description: string;
+  user_id: string;
   category: string;
   grading: string;
   purchase_price: number;
