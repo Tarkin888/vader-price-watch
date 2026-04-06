@@ -70,7 +70,7 @@ const SignOn = () => {
 
     setLoading(true);
     try {
-      const { error: err } = await supabase.auth.signUp({
+      const { data: signUpData, error: err } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: displayName } },
@@ -80,6 +80,16 @@ const SignOn = () => {
         else setError(err.message);
       } else {
         setRegistered(true);
+        // Send registration confirmation email (non-blocking)
+        if (signUpData?.user) {
+          try {
+            await supabase.functions.invoke("notify-user-status", {
+              body: { email, displayName, status: "registered" },
+            });
+          } catch (notifyErr) {
+            console.warn("Registration notification failed:", notifyErr);
+          }
+        }
       }
     } catch (e: any) {
       setError(e.message || "Connection error — please try again");
