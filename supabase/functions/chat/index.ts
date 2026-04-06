@@ -20,7 +20,19 @@ Here's what I found for ESB-41 sales:
 
 Available filter fields: era, cardback_code, source, grade_tier_code, variant_code, date_from, date_to. Only populate filters the user mentions. IMPORTANT: You MUST include both the opening [PRICE_QUERY] and closing [/PRICE_QUERY] tags.
 
-2. BUG REPORTS — If a user describes a problem with the app, gather details (what happened, what they expected, which page/feature), then output a [BUG_REPORT] block: { "type": "bug_report", "category": "SCRAPER|UI|CLASSIFIER|DATA|PRICING|GENERAL", "title": "", "description": "", "priority": "LOW|MEDIUM|HIGH|CRITICAL" }.
+2. BUG REPORTS — If a user describes a problem with the app, DO NOT immediately generate a [BUG_REPORT] block. Instead, follow this two-step process:
+
+   Step 1 (first response): Acknowledge the issue and ask clarifying questions to gather enough detail for a useful report. Ask about:
+   - When did this happen (date/time or "just now")?
+   - Which page or feature were they using?
+   - What did they expect to happen vs what actually happened?
+   - Are there specific lot references, cardback codes, or sources involved?
+   Do NOT include a [BUG_REPORT] block in this response.
+
+   Step 2 (after the user replies with details): Now generate the [BUG_REPORT] block with the full context gathered from both messages:
+   { "type": "bug_report", "category": "SCRAPER|UI|CLASSIFIER|DATA|PRICING|GENERAL", "title": "<concise summary>", "description": "<full detail incorporating the user's answers>", "priority": "LOW|MEDIUM|HIGH|CRITICAL" }
+
+   Only generate the [BUG_REPORT] block once you have enough detail. If the user's first message already contains all the necessary information (specific lots, dates, expected vs actual behaviour), you may generate the block in your first response — but this should be rare.
 
 3. APP FEEDBACK — If a user offers feedback, a feature request, or a data correction, gather details and output a [FEEDBACK] block: { "type": "feedback", "feedback_type": "FEATURE_REQUEST|APP_FEEDBACK|DATA_ISSUE|OTHER", "category": "SCRAPER|UI|CLASSIFIER|DATA|PRICING|GENERAL", "title": "", "description": "" }.
 
@@ -371,7 +383,7 @@ serve(async (req) => {
     // 7. Handle bug report
     if (actions.bugReport) {
       try {
-        await supabase.from("chatbot_feedback").insert({
+        const { data: bugRow } = await supabase.from("chatbot_feedback").insert({
           session_id: currentSessionId,
           feedback_type: "BUG",
           category: actions.bugReport.category || "GENERAL",
@@ -379,12 +391,13 @@ serve(async (req) => {
           description: actions.bugReport.description,
           priority: actions.bugReport.priority || "MEDIUM",
           status: "OPEN",
-        });
+        }).select("id").single();
         await supabase
           .from("chat_sessions")
           .update({ session_type: "BUG_REPORT" })
           .eq("id", currentSessionId);
         messageType = "BUG_REPORT";
+        messageMetadata.bugReportId = bugRow?.id || null;
       } catch (e) {
         console.error("Bug report insert error:", e);
       }
@@ -393,7 +406,7 @@ serve(async (req) => {
     // 8. Handle feedback
     if (actions.feedback) {
       try {
-        await supabase.from("chatbot_feedback").insert({
+        const { data: fbRow } = await supabase.from("chatbot_feedback").insert({
           session_id: currentSessionId,
           feedback_type: actions.feedback.feedback_type || "OTHER",
           category: actions.feedback.category || "GENERAL",
@@ -401,12 +414,13 @@ serve(async (req) => {
           description: actions.feedback.description,
           status: "OPEN",
           priority: "MEDIUM",
-        });
+        }).select("id").single();
         await supabase
           .from("chat_sessions")
           .update({ session_type: "FEEDBACK" })
           .eq("id", currentSessionId);
         messageType = "FEEDBACK";
+        messageMetadata.feedbackId = fbRow?.id || null;
       } catch (e) {
         console.error("Feedback insert error:", e);
       }
