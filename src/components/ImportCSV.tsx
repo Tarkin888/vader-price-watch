@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import type { LotInsert } from "@/lib/db";
 import { classifyLot, deriveFromVariantCode } from "@/lib/classify-lot";
 import { Upload } from "lucide-react";
@@ -77,9 +78,9 @@ const ImportCSV = ({ onImported }: Props) => {
       return;
     }
 
-    const { error } = await supabase.from("lots").insert(toInsert);
-    if (error) {
-      toast.error("Import failed: " + error.message);
+    const res = await adminWrite({ table: "lots", operation: "insert", data: toInsert });
+    if (!res.success) {
+      toast.error("Import failed: " + res.error);
     } else {
       toast.success(`Imported ${toInsert.length} rows (${rows.length - toInsert.length} duplicates skipped)`);
       onImported();

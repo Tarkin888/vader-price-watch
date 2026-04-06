@@ -12,6 +12,7 @@ import type { Lot } from "@/lib/db";
 import type { LotInsert } from "@/lib/db";
 import { classifyLot, deriveFromVariantCode } from "@/lib/classify-lot";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 
 interface Props {
@@ -96,8 +97,8 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
     const existingKeys = new Set((existing ?? []).map((e) => `${e.lot_ref}|||${e.source}`));
     const toInsert = rows.filter((r) => !existingKeys.has(`${r.lot_ref}|||${r.source}`));
     if (toInsert.length === 0) { toast.info("All rows already exist"); return; }
-    const { error } = await supabase.from("lots").insert(toInsert);
-    if (error) { toast.error("Import failed: " + error.message); return; }
+    const res = await adminWrite({ table: "lots", operation: "insert", data: toInsert });
+    if (!res.success) { toast.error("Import failed: " + res.error); return; }
     toast.success(`Imported ${toInsert.length} row(s)`);
     onImported();
   };

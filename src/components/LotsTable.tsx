@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import type { Lot } from "@/lib/db";
 import type { Currency } from "@/components/FilterBar";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { Copy, ExternalLink, Pencil, Trash2, ArrowUp, ArrowDown, ChevronDown, ChevronUp, Columns3, X } from "lucide-react";
 import { toast } from "sonner";
 import LotFormModal from "@/components/LotFormModal";
@@ -317,8 +318,8 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
   const handleBulkDelete = async () => {
     setBulkDeleting(true);
     const ids = Array.from(selectedIds);
-    const { error } = await supabase.from("lots").delete().in("id", ids);
-    if (error) toast.error("Bulk delete failed: " + error.message);
+    const res = await adminWrite({ table: "lots", operation: "delete", matchColumn: "id", matchValues: ids });
+    if (!res.success) toast.error("Bulk delete failed: " + res.error);
     else { toast.success(`Deleted ${ids.length} lot(s)`); setSelectedIds(new Set()); onChanged(); }
     setBulkDeleting(false);
     setShowBulkConfirm(false);
@@ -333,10 +334,10 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
 
   const handleDelete = async () => {
     if (!deleteLot) return;
-    const { error } = await supabase.from("lots").delete().eq("id", deleteLot.id);
-    if (error) toast.error("Delete failed: " + error.message);
+    const res = await adminWrite({ table: "lots", operation: "delete", match: { column: "id", value: deleteLot.id } });
+    if (!res.success) toast.error("Delete failed: " + res.error);
     else {
-      supabase.from("audit_log").insert({ action: "DELETE", lot_ref: deleteLot.lot_ref }).then(() => {});
+      adminWrite({ table: "audit_log", operation: "insert", data: { action: "DELETE", lot_ref: deleteLot.lot_ref } });
       toast.success("Lot deleted"); onChanged();
     }
     setDeleteLot(null);

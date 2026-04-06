@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
 
@@ -69,10 +70,10 @@ const AdminBugReportsTab = () => {
     setFError("");
     setSaving(true);
     try {
-      const { error } = await supabase.from("bug_reports").insert({
+      const res = await adminWrite({ table: "bug_reports", operation: "insert", data: {
         category: fCat, description: fDesc.trim(), lot_ref: fLotRef.trim() || null,
-      });
-      if (error) throw error;
+      }});
+      if (!res.success) throw new Error(res.error);
       toast.success("Bug report submitted");
       setModalOpen(false);
       setFDesc(""); setFLotRef("");
@@ -90,8 +91,8 @@ const AdminBugReportsTab = () => {
       update.resolved_at = new Date().toISOString();
       update.resolution_notes = notes || null;
     }
-    const { error } = await supabase.from("bug_reports").update(update).eq("id", id);
-    if (error) { toast.error("Update failed"); return; }
+    const res = await adminWrite({ table: "bug_reports", operation: "update", data: update, match: { column: "id", value: id } });
+    if (!res.success) { toast.error("Update failed"); return; }
     toast.success(`Status updated to ${status}`);
     setResolvingId(null);
     setResolutionNotes("");

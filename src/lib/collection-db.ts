@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 
 export interface CollectionItem {
   id: string;
@@ -69,20 +70,15 @@ export async function upsertCollectionItem(
   existingId?: string
 ) {
   if (existingId) {
-    const { error } = await supabase
-      .from("collection")
-      .update(item as any)
-      .eq("id", existingId);
-    if (error) throw error;
+    const res = await adminWrite({ table: "collection", operation: "update", data: item as Record<string, unknown>, match: { column: "id", value: existingId } });
+    if (!res.success) throw new Error(res.error);
   } else {
-    const { error } = await supabase
-      .from("collection")
-      .insert(item as any);
-    if (error) throw error;
+    const res = await adminWrite({ table: "collection", operation: "insert", data: item as Record<string, unknown> });
+    if (!res.success) throw new Error(res.error);
   }
 }
 
 export async function deleteCollectionItem(id: string) {
-  const { error } = await supabase.from("collection").delete().eq("id", id);
-  if (error) throw error;
+  const res = await adminWrite({ table: "collection", operation: "delete", match: { column: "id", value: id } });
+  if (!res.success) throw new Error(res.error);
 }

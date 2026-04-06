@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
 
@@ -68,7 +69,7 @@ const AdminScrapersTab = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { error } = await supabase.from("scraper_logs").insert({
+      const res = await adminWrite({ table: "scraper_logs", operation: "insert", data: {
         source: fSource,
         status: fStatus,
         records_captured: parseInt(fCaptured) || 0,
@@ -76,8 +77,8 @@ const AdminScrapersTab = () => {
         duration_seconds: parseFloat(fDuration) || null,
         error_message: fStatus !== "SUCCESS" ? fError || null : null,
         completed_at: new Date().toISOString(),
-      });
-      if (error) throw error;
+      }});
+      if (!res.success) throw new Error(res.error);
       toast.success("Scraper run logged");
       setModalOpen(false);
       setFCaptured(""); setFSkipped(""); setFDuration(""); setFError("");
