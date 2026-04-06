@@ -128,7 +128,7 @@ const AdminOverviewTab = () => {
       </button>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {statCards.map((c) => (
           <div key={c.label} className="rounded p-3" style={{ border: "1px solid rgba(201,168,76,0.3)", background: "#0D0D0B" }}>
             <div className="flex items-center gap-2 mb-1">
@@ -141,7 +141,7 @@ const AdminOverviewTab = () => {
       </div>
 
       {/* Source bar chart */}
-      <div className="rounded p-4" style={{ border: "1px solid rgba(201,168,76,0.3)", background: "#0D0D0B" }}>
+      <div className="rounded p-4 overflow-hidden" style={{ border: "1px solid rgba(201,168,76,0.3)", background: "#0D0D0B" }}>
         <h3 className="text-xs tracking-wider mb-3" style={{ color: "rgba(224,216,192,0.6)" }}>SOURCE DISTRIBUTION</h3>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={sourceData}>
@@ -169,7 +169,7 @@ const AdminOverviewTab = () => {
       </div>
 
       {/* 7-day visitor chart */}
-      <div className="rounded p-4" style={{ border: "1px solid rgba(201,168,76,0.3)", background: "#0D0D0B" }}>
+      <div className="rounded p-4 overflow-hidden" style={{ border: "1px solid rgba(201,168,76,0.3)", background: "#0D0D0B" }}>
         <h3 className="text-xs tracking-wider mb-3" style={{ color: "rgba(224,216,192,0.6)" }}>7-DAY VISITORS</h3>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={visitorData}>

@@ -85,14 +85,14 @@ const AdminAuditLogTab = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2">
-        <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)} style={{ ...inputStyle, width: "auto" }}>
+      <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2">
+        <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)} style={{ ...inputStyle, width: "100%" }} className="md:!w-auto">
           <option value="All">All Actions</option>
           {["INSERT", "EDIT", "DELETE", "RECLASSIFY", "IMPORT"].map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
-        <input value={lotRefSearch} onChange={(e) => setLotRefSearch(e.target.value)} placeholder="Search lot ref…" style={{ ...inputStyle, width: 180 }} />
-        <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} style={{ ...inputStyle, width: "auto" }} />
-        <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} style={{ ...inputStyle, width: "auto" }} />
+        <input value={lotRefSearch} onChange={(e) => setLotRefSearch(e.target.value)} placeholder="Search lot ref…" style={{ ...inputStyle }} className="md:!w-[180px]" />
+        <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} style={{ ...inputStyle }} className="md:!w-auto" />
+        <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} style={{ ...inputStyle }} className="md:!w-auto" />
       </div>
 
       {/* Table */}
