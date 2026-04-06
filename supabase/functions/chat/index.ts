@@ -89,6 +89,18 @@ function stripActionBlocks(content: string): string {
     .trim();
 }
 
+function applyFilters(q: any, filters: any) {
+  if (filters.era) q = q.eq("era", filters.era);
+  if (filters.cardback_code) q = q.ilike("cardback_code", filters.cardback_code);
+  if (filters.source) q = q.eq("source", filters.source);
+  if (filters.grade_tier_code) q = q.eq("grade_tier_code", filters.grade_tier_code);
+  if (filters.variant_code) q = q.eq("variant_code", filters.variant_code);
+  if (filters.date_from) q = q.gte("sale_date", filters.date_from);
+  if (filters.date_to) q = q.lte("sale_date", filters.date_to);
+  q = q.not("total_paid_gbp", "is", null).gt("total_paid_gbp", 0);
+  return q;
+}
+
 async function executePriceQuery(
   supabase: ReturnType<typeof createClient>,
   query: any
@@ -97,70 +109,68 @@ async function executePriceQuery(
   const aggregation = query.aggregation || "list";
   const limit = Math.min(query.limit || 10, 25);
 
-  const selectCols =
-    "sale_date, source, era, cardback_code, variant_code, grade_tier_code, total_paid_gbp, hammer_price_gbp, lot_ref, lot_url, image_urls, condition_notes";
-
-  let q = supabase.from("lots").select(selectCols, { count: "exact" });
-
-  // Apply filters
-  if (filters.era) q = q.ilike("era", filters.era);
-  if (filters.cardback_code) q = q.ilike("cardback_code", filters.cardback_code);
-  if (filters.source) q = q.ilike("source", filters.source);
-  if (filters.grade_tier_code) q = q.ilike("grade_tier_code", filters.grade_tier_code);
-  if (filters.variant_code) q = q.ilike("variant_code", filters.variant_code);
-  if (filters.date_from) q = q.gte("sale_date", filters.date_from);
-  if (filters.date_to) q = q.lte("sale_date", filters.date_to);
-
-  // Exclude null/zero prices
-  q = q.not("total_paid_gbp", "is", null).gt("total_paid_gbp", 0);
-
-  // Order
-  q = q.order("sale_date", { ascending: false });
-
-  if (aggregation === "list") {
-    q = q.limit(limit);
-  } else if (aggregation === "highest") {
-    q = q.order("total_paid_gbp", { ascending: false }).limit(1);
-  } else if (aggregation === "lowest") {
-    q = q.order("total_paid_gbp", { ascending: true }).limit(1);
-  }
-
-  const { data, error, count } = await q;
-  if (error) throw error;
-
-  if (aggregation === "average") {
-    const totalMatches = count || 0;
-    // Need all values for average - re-query just the column
-    let avgQ = supabase.from("lots").select("total_paid_gbp");
-    if (filters.era) avgQ = avgQ.ilike("era", filters.era);
-    if (filters.cardback_code) avgQ = avgQ.ilike("cardback_code", filters.cardback_code);
-    if (filters.source) avgQ = avgQ.ilike("source", filters.source);
-    if (filters.grade_tier_code) avgQ = avgQ.ilike("grade_tier_code", filters.grade_tier_code);
-    if (filters.variant_code) avgQ = avgQ.ilike("variant_code", filters.variant_code);
-    if (filters.date_from) avgQ = avgQ.gte("sale_date", filters.date_from);
-    if (filters.date_to) avgQ = avgQ.lte("sale_date", filters.date_to);
-    avgQ = avgQ.not("total_paid_gbp", "is", null).gt("total_paid_gbp", 0);
-
-    const { data: avgData, error: avgError } = await avgQ;
-    if (avgError) throw avgError;
-
-    const values = (avgData || []).map((r: any) => Number(r.total_paid_gbp));
-    const avg = values.length > 0 ? values.reduce((a: number, b: number) => a + b, 0) / values.length : 0;
-
-    return {
-      results: { average: Math.round(avg * 100) / 100, count: values.length },
-      resultCount: values.length,
-      totalMatches,
-    };
-  }
-
+  // COUNT — head-only query
   if (aggregation === "count") {
+    let q = supabase.from("lots").select("*", { count: "exact", head: true });
+    q = applyFilters(q, filters);
+    const { count, error } = await q;
+    if (error) throw error;
     return {
       results: { count: count || 0 },
       resultCount: count || 0,
       totalMatches: count || 0,
     };
   }
+
+  // AVERAGE — fetch all matching total_paid_gbp values
+  if (aggregation === "average") {
+    // First get total count
+    let countQ = supabase.from("lots").select("*", { count: "exact", head: true });
+    countQ = applyFilters(countQ, filters);
+    const { count: totalCount, error: countErr } = await countQ;
+    if (countErr) throw countErr;
+
+    // Fetch values in pages to avoid 1000-row limit
+    const allValues: number[] = [];
+    const pageSize = 1000;
+    const total = totalCount || 0;
+    for (let offset = 0; offset < total; offset += pageSize) {
+      let q = supabase.from("lots").select("total_paid_gbp");
+      q = applyFilters(q, filters);
+      q = q.range(offset, offset + pageSize - 1);
+      const { data, error } = await q;
+      if (error) throw error;
+      for (const r of (data || [])) {
+        allValues.push(Number(r.total_paid_gbp));
+      }
+    }
+
+    const avg = allValues.length > 0 ? allValues.reduce((a, b) => a + b, 0) / allValues.length : 0;
+    return {
+      results: { average: Math.round(avg * 100) / 100, count: allValues.length },
+      resultCount: allValues.length,
+      totalMatches: total,
+    };
+  }
+
+  // LIST / HIGHEST / LOWEST — fetch rows
+  const selectCols =
+    "sale_date, source, era, cardback_code, variant_code, grade_tier_code, total_paid_gbp, hammer_price_gbp, lot_ref, lot_url, image_urls, condition_notes";
+
+  let q = supabase.from("lots").select(selectCols, { count: "exact" });
+  q = applyFilters(q, filters);
+  q = q.order("sale_date", { ascending: false });
+
+  if (aggregation === "highest") {
+    q = q.order("total_paid_gbp", { ascending: false }).limit(1);
+  } else if (aggregation === "lowest") {
+    q = q.order("total_paid_gbp", { ascending: true }).limit(1);
+  } else {
+    q = q.limit(limit);
+  }
+
+  const { data, error, count } = await q;
+  if (error) throw error;
 
   return {
     results: data || [],
