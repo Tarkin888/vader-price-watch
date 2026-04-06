@@ -115,3 +115,4 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     </ChatContext.Provider>
   );
 }
+
