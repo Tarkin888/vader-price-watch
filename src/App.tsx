@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { ConfigProvider } from "@/hooks/use-config";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ChatProvider } from "@/components/chat/ChatProvider";
+import ChatWidget from "@/components/chat/ChatWidget";
 import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import KnowledgeHub from "./pages/KnowledgeHub";
