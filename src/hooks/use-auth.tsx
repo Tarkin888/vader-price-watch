@@ -36,14 +36,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string, email?: string) => {
     const { data } = await supabase
       .from("user_profiles")
       .select("*")
       .eq("id", userId)
       .single();
-    setProfile(data as UserProfile | null);
-    return data as UserProfile | null;
+    let prof = data as UserProfile | null;
+
+    // Belt-and-braces: if owner account is stuck as pending, self-repair
+    if (email?.toLowerCase() === "zrezvi@gmail.com" && prof && prof.status !== "approved") {
+      await supabase.rpc("repair_owner_account");
+      const { data: refreshed } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (refreshed) prof = refreshed as UserProfile;
+    }
+
+    setProfile(prof);
+    return prof;
   }, []);
 
   const updateLastSignIn = useCallback(async (userId: string) => {
