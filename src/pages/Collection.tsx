@@ -6,6 +6,7 @@ import CollectionAnalytics from "@/components/CollectionAnalytics";
 import CollectionPhotoGallery from "@/components/CollectionPhotoGallery";
 import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
 import EstimatedValueCell, { calculateEstimatedValue } from "@/components/EstimatedValueCell";
@@ -131,11 +132,8 @@ const Collection = () => {
         try {
           const result = await calculateEstimatedValue(item.category, item.grading);
           if (result.value == null) { failed++; continue; }
-          const { error } = await supabase
-            .from("collection")
-            .update({ current_estimated_value: result.value, estimation_tier: result.tier } as any)
-            .eq("id", item.id);
-          if (!error) updated++; else failed++;
+          const res = await adminWrite({ table: "collection", operation: "update", data: { current_estimated_value: result.value, estimation_tier: result.tier }, match: { column: "id", value: item.id } });
+          if (res.success) updated++; else failed++;
         } catch {
           failed++;
         }

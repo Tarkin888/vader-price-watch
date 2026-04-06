@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 import { deriveFromVariantCode } from "@/lib/classify-lot";
 
@@ -28,7 +29,7 @@ export async function fixUnknownEraCardback(): Promise<void> {
     if (lot.era === "UNKNOWN" && derived.era !== "UNKNOWN") updates.era = derived.era;
     if (lot.cardback_code === "UNKNOWN" && derived.cardback_code !== "UNKNOWN") updates.cardback_code = derived.cardback_code;
     if (Object.keys(updates).length > 0) {
-      await supabase.from("lots").update(updates).eq("id", lot.id);
+      await adminWrite({ table: "lots", operation: "update", data: updates, match: { column: "id", value: lot.id } });
     }
   }
 }

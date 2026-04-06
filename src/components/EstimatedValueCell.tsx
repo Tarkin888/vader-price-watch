@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { Pencil, Calculator, Check, X } from "lucide-react";
 import type { CollectionItem } from "@/lib/collection-db";
@@ -90,11 +91,8 @@ const EstimatedValueCell = ({ item, onUpdated }: Props) => {
 
   const saveValue = async (value: number | null, tier: string | null) => {
     try {
-      const { error } = await supabase
-        .from("collection")
-        .update({ current_estimated_value: value, estimation_tier: tier } as any)
-        .eq("id", item.id);
-      if (error) throw error;
+      const res = await adminWrite({ table: "collection", operation: "update", data: { current_estimated_value: value, estimation_tier: tier }, match: { column: "id", value: item.id } });
+      if (!res.success) throw new Error(res.error);
       onUpdated();
     } catch (e: any) {
       toast.error("Failed to save: " + e.message);
