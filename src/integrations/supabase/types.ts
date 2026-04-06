@@ -518,6 +518,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      is_admin: { Args: { check_user_id: string }; Returns: boolean }
       repair_owner_account: { Args: never; Returns: undefined }
       verify_admin_pin: { Args: { pin_input: string }; Returns: boolean }
     }
