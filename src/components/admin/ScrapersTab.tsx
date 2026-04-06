@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { adminRead } from "@/lib/admin-read";
 import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
@@ -43,11 +43,7 @@ const AdminScrapersTab = () => {
   const fetchAll = useCallback(async () => {
     setSpinning(true);
     try {
-      const { data } = await supabase
-        .from("scraper_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(100);
+      const { data } = await adminRead({ table: "scraper_logs", order_by: "created_at", order_asc: false, limit: 100 });
 
       const logs = (data ?? []) as ScraperLog[];
       setRecentRuns(logs.slice(0, 30));

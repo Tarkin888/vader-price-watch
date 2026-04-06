@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { adminRead } from "@/lib/admin-read";
 import { RefreshCw } from "lucide-react";
 
 const ACTION_COLORS: Record<string, string> = {
@@ -30,7 +30,7 @@ const AdminAuditLogTab = () => {
   const fetchAll = useCallback(async () => {
     setSpinning(true);
     try {
-      const { data } = await supabase.from("audit_log").select("*").order("created_at", { ascending: false }).limit(200);
+      const { data } = await adminRead({ table: "audit_log", order_by: "created_at", order_asc: false, limit: 200 });
       setEntries((data ?? []) as AuditEntry[]);
     } finally {
       setLoading(false);
