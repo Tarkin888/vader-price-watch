@@ -162,12 +162,12 @@ const ResearchLibrary = () => {
     };
 
     if (editingId) {
-      const { error } = await supabase.from("knowledge_articles" as any).update(payload as any).eq("id", editingId);
-      if (error) { toast.error("Update failed: " + error.message); return; }
+      const res = await adminWrite({ table: "knowledge_articles", operation: "update", data: payload, match: { column: "id", value: editingId } });
+      if (!res.success) { toast.error("Update failed: " + res.error); return; }
       toast.success("Article updated");
     } else {
-      const { error } = await supabase.from("knowledge_articles" as any).insert({ ...payload, is_published: false } as any);
-      if (error) { toast.error("Insert failed: " + error.message); return; }
+      const res = await adminWrite({ table: "knowledge_articles", operation: "insert", data: { ...payload, is_published: false } });
+      if (!res.success) { toast.error("Insert failed: " + res.error); return; }
       toast.success("Article created as draft");
     }
     setShowForm(false);
@@ -177,14 +177,14 @@ const ResearchLibrary = () => {
   };
 
   const togglePublish = async (a: Article) => {
-    const { error } = await supabase.from("knowledge_articles" as any).update({ is_published: !a.is_published } as any).eq("id", a.id);
-    if (error) { toast.error("Toggle failed"); return; }
+    const res = await adminWrite({ table: "knowledge_articles", operation: "update", data: { is_published: !a.is_published }, match: { column: "id", value: a.id } });
+    if (!res.success) { toast.error("Toggle failed"); return; }
     fetchArticles();
   };
 
   const deleteArticle = async (id: string) => {
-    const { error } = await supabase.from("knowledge_articles" as any).delete().eq("id", id);
-    if (error) { toast.error("Delete failed"); return; }
+    const res = await adminWrite({ table: "knowledge_articles", operation: "delete", match: { column: "id", value: id } });
+    if (!res.success) { toast.error("Delete failed"); return; }
     setDeleteConfirm(null);
     fetchArticles();
   };
@@ -199,7 +199,7 @@ const ResearchLibrary = () => {
           errors.push(`Missing fields in: ${obj.slug || "unknown"}`);
           continue;
         }
-        const { error } = await supabase.from("knowledge_articles" as any).insert({
+        const res = await adminWrite({ table: "knowledge_articles", operation: "insert", data: {
           category: obj.category,
           slug: obj.slug,
           title: obj.title,
