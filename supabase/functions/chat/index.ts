@@ -348,7 +348,7 @@ serve(async (req) => {
         messageType = "ERROR";
       } else {
         try {
-          const queryResult = await executePriceQuery(supabase, actions.priceQuery);
+          const queryResult = await executePriceQuery(supabase as any, actions.priceQuery);
           messageType = "PRICE_RESULT";
           messageMetadata = {
             query: actions.priceQuery.filters || {},
