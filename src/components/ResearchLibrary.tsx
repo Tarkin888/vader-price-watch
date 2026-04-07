@@ -59,12 +59,12 @@ interface Article {
   slug: string;
   title: string;
   content_md: string;
-  image_urls: string[];
-  source_urls: string[];
+  image_urls: string[] | null;
+  source_urls: string[] | null;
   display_order: number;
   is_published: boolean;
   last_researched: string | null;
-  confidence: string;
+  confidence: string | null;
   created_at: string;
   updated_at: string;
 }
