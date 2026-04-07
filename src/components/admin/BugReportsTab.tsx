@@ -48,7 +48,7 @@ const AdminBugReportsTab = () => {
         .from("chatbot_feedback" as any)
         .select("id, title, feedback_type, category, description, priority, status, created_at")
         .order("created_at", { ascending: false });
-      setBugs((data ?? []) as BugReport[]);
+      setBugs((data ?? []) as unknown as BugReport[]);
     } finally {
       setLoading(false);
       setSpinning(false);
