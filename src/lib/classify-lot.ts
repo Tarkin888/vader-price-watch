@@ -61,7 +61,7 @@ export function classifyLot(title: string, conditionNotes?: string): ClassifiedF
   else if (/12[\s-]?(?:figure\s*)?a[\s-]?back|12-?back\s*a|\b12a\b/i.test(text)) cardbackCode = "SW-12A";
   else if (/12[\s-]?(?:figure\s*)?b[\s-]?back|12-?back\s*b|\b12b\b/i.test(text)) cardbackCode = "SW-12B";
   else if (/12[\s-]?(?:figure\s*)?c[\s-]?back|12-?back\s*c|\b12c\b/i.test(text)) cardbackCode = "SW-12C";
-  else if (/12[\s-]?back|12[\s-]?figure|\b12\s*card\b/i.test(text)) cardbackCode = "SW-12";
+  else if (/12[\s-]?back|12[\s-]?figure|\b12\s*card\b|12[\s-]card[\s-]?back/i.test(text)) cardbackCode = "SW-12";
 
   // --- VARIANT SUB-CODE ---
   // Detect regional/special variants independently of cardbackCode
