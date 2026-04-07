@@ -63,17 +63,24 @@ const Index = () => {
   const [showBenchmark, setShowBenchmark] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
-  const [filters, setFilters] = useState<Filters>(() => ({
-    source: searchParams.get("source") || null,
-    era: searchParams.get("era") || null,
-    cardbackCode: searchParams.get("cardback") || null,
-    variantCode: searchParams.get("variant") || null,
-    gradeTier: searchParams.get("grade") || null,
-    dateFrom: searchParams.get("dateFrom") ? new Date(searchParams.get("dateFrom")!) : null,
-    dateTo: searchParams.get("dateTo") ? new Date(searchParams.get("dateTo")!) : null,
-    search: searchParams.get("q") || "",
-    currency: (searchParams.get("currency") as "GBP" | "USD") || "GBP",
-  }));
+  const [filters, setFilters] = useState<Filters>(() => {
+    const parseDate = (s: string | null): Date | null => {
+      if (!s) return null;
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    };
+    return {
+      source: searchParams.get("source") || null,
+      era: searchParams.get("era") || null,
+      cardbackCode: searchParams.get("cardback") || null,
+      variantCode: searchParams.get("variant") || null,
+      gradeTier: searchParams.get("grade") || null,
+      dateFrom: parseDate(searchParams.get("dateFrom")),
+      dateTo: parseDate(searchParams.get("dateTo")),
+      search: searchParams.get("q") || "",
+      currency: (searchParams.get("currency") as "GBP" | "USD") || "GBP",
+    };
+  });
 
   const updateFilters = useCallback((f: Filters) => {
     setFilters(f);
@@ -85,8 +92,8 @@ const Index = () => {
         ["cardback", f.cardbackCode],
         ["variant", f.variantCode],
         ["grade", f.gradeTier],
-        ["dateFrom", f.dateFrom ? f.dateFrom.toISOString().slice(0, 10) : null],
-        ["dateTo", f.dateTo ? f.dateTo.toISOString().slice(0, 10) : null],
+        ["dateFrom", f.dateFrom && !isNaN(f.dateFrom.getTime()) ? f.dateFrom.toISOString().slice(0, 10) : null],
+        ["dateTo", f.dateTo && !isNaN(f.dateTo.getTime()) ? f.dateTo.toISOString().slice(0, 10) : null],
         ["q", f.search || null],
         ["currency", f.currency === "GBP" ? null : f.currency],
       ];
