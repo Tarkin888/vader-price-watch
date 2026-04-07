@@ -43,6 +43,9 @@ const AdminDataTab = () => {
   const [missingImages, setMissingImages] = useState<{ count: number; rows: BadRow[] }>({ count: 0, rows: [] });
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
 
+  // Needs Review (genuinely unclassifiable UNKNOWN records)
+  const [needsReview, setNeedsReview] = useState<{ count: number; rows: { lot_ref: string; source: string; era: string; variant_code: string; notes_preview: string }[] }>({ count: 0, rows: [] });
+
   // Dedup
   const [dupGroups, setDupGroups] = useState<{ lot_ref: string; source: string; count: number }[] | null>(null);
 
