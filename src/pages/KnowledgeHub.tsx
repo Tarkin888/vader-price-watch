@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ResearchLibrary from "@/components/ResearchLibrary";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -395,7 +396,7 @@ const KnowledgeHub = () => {
 
         {/* ──── SECTION 7: RESEARCH LIBRARY ──── */}
         <div ref={(el) => { sectionRefs.current["Research Library"] = el; }}>
-          {activeSection === "Research Library" && <ResearchLibrary />}
+          {activeSection === "Research Library" && <ErrorBoundary><ResearchLibrary /></ErrorBoundary>}
           {activeSection !== "Research Library" && (
             <>
               <SectionHeader title="Research Library" />
