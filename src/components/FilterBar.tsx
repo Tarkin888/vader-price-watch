@@ -150,6 +150,15 @@ const FilterBar = ({ filters, onChange }: FilterBarProps) => {
 };
 
 function DateFilter({ label, value, onChange }: { label: string; value: Date | null; onChange: (d: Date | null) => void }) {
+  // Guard against Invalid Date objects
+  const safeValue = value && !isNaN(value.getTime()) ? value : null;
+  let formatted = "ANY";
+  try {
+    if (safeValue) formatted = format(safeValue, "yyyy-MM-dd");
+  } catch {
+    formatted = "ANY";
+  }
+
   return (
     <div className="flex flex-col gap-1">
       <label className="text-[10px] text-muted-foreground tracking-widest uppercase">{label}</label>
@@ -160,18 +169,24 @@ function DateFilter({ label, value, onChange }: { label: string; value: Date | n
             size="sm"
             className={cn(
               "text-xs justify-start tracking-wider border-border bg-secondary",
-              !value && "text-muted-foreground"
+              !safeValue && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="w-3 h-3 mr-1" />
-            {value ? format(value, "yyyy-MM-dd") : "ANY"}
+            {formatted}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0 bg-card border-border" align="start">
           <Calendar
             mode="single"
-            selected={value ?? undefined}
-            onSelect={(d) => onChange(d ?? null)}
+            selected={safeValue ?? undefined}
+            onSelect={(d) => {
+              if (d && !isNaN(d.getTime())) {
+                onChange(d);
+              } else {
+                onChange(null);
+              }
+            }}
             className={cn("p-3 pointer-events-auto")}
           />
         </PopoverContent>
