@@ -228,10 +228,10 @@ const ResearchLibrary = () => {
       slug: a.slug,
       title: a.title,
       content_md: a.content_md,
-      image_urls: a.image_urls.join("\n"),
-      source_urls: a.source_urls.join("\n"),
+      image_urls: (a.image_urls ?? []).join("\n"),
+      source_urls: (a.source_urls ?? []).join("\n"),
       display_order: a.display_order,
-      confidence: a.confidence,
+      confidence: a.confidence ?? "MEDIUM",
     });
     setEditingId(a.id);
     setShowForm(true);
@@ -264,9 +264,9 @@ const ResearchLibrary = () => {
             </div>
           )}
           <div className="prose-custom">
-            <ReactMarkdown>{selectedArticle.content_md}</ReactMarkdown>
+            <ReactMarkdown>{selectedArticle.content_md || ""}</ReactMarkdown>
           </div>
-          {selectedArticle.source_urls.length > 0 && (
+          {selectedArticle.source_urls && selectedArticle.source_urls.length > 0 && (
             <div className="pt-4 border-t border-border space-y-1">
               <p className="text-[10px] text-primary tracking-wider font-medium">Sources</p>
               {selectedArticle.source_urls.map((url, i) => (
