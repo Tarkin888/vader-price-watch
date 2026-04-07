@@ -14,9 +14,11 @@ export async function getAllLots(): Promise<Lot[]> {
   if (error) throw error;
   return data ?? [];
 }
-
-/** Fix any lots with UNKNOWN era/cardback by deriving from variant_code */
+/** Fix any lots with UNKNOWN era/cardback by deriving from variant_code. Requires admin PIN. */
 export async function fixUnknownEraCardback(): Promise<void> {
+  const pin = sessionStorage.getItem("admin_pin");
+  if (!pin) return; // Skip silently when not in admin context
+
   const { data, error } = await supabase
     .from("lots")
     .select("id, variant_code, era, cardback_code")

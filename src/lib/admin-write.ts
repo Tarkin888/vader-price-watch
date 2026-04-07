@@ -15,6 +15,9 @@ type AdminWriteParams = {
  */
 export async function adminWrite(params: AdminWriteParams): Promise<{ success: boolean; error?: string }> {
   const pin = sessionStorage.getItem("admin_pin") ?? "";
+  if (!pin) {
+    return { success: false, error: "No admin PIN set — authenticate via Admin Dashboard first" };
+  }
   const { data, error } = await supabase.functions.invoke("admin-write", {
     body: { pin, ...params },
   });
