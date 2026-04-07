@@ -59,12 +59,12 @@ interface Article {
   slug: string;
   title: string;
   content_md: string;
-  image_urls: string[];
-  source_urls: string[];
+  image_urls: string[] | null;
+  source_urls: string[] | null;
   display_order: number;
   is_published: boolean;
   last_researched: string | null;
-  confidence: string;
+  confidence: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -228,10 +228,10 @@ const ResearchLibrary = () => {
       slug: a.slug,
       title: a.title,
       content_md: a.content_md,
-      image_urls: a.image_urls.join("\n"),
-      source_urls: a.source_urls.join("\n"),
+      image_urls: (a.image_urls ?? []).join("\n"),
+      source_urls: (a.source_urls ?? []).join("\n"),
       display_order: a.display_order,
-      confidence: a.confidence,
+      confidence: a.confidence ?? "MEDIUM",
     });
     setEditingId(a.id);
     setShowForm(true);
@@ -249,7 +249,7 @@ const ResearchLibrary = () => {
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-base font-medium text-primary tracking-wider">{selectedArticle.title}</h3>
             <CategoryBadge category={selectedArticle.category} />
-            <ConfidenceBadge confidence={selectedArticle.confidence} />
+             <ConfidenceBadge confidence={selectedArticle.confidence ?? "MEDIUM"} />
           </div>
           {selectedArticle.last_researched && (
             <p className="text-[10px] text-muted-foreground tracking-wider">Last Researched: {selectedArticle.last_researched}</p>
@@ -264,9 +264,9 @@ const ResearchLibrary = () => {
             </div>
           )}
           <div className="prose-custom">
-            <ReactMarkdown>{selectedArticle.content_md}</ReactMarkdown>
+            <ReactMarkdown>{selectedArticle.content_md || ""}</ReactMarkdown>
           </div>
-          {selectedArticle.source_urls.length > 0 && (
+          {selectedArticle.source_urls && selectedArticle.source_urls.length > 0 && (
             <div className="pt-4 border-t border-border space-y-1">
               <p className="text-[10px] text-primary tracking-wider font-medium">Sources</p>
               {selectedArticle.source_urls.map((url, i) => (
@@ -390,7 +390,7 @@ const ResearchLibrary = () => {
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <CategoryBadge category={a.category} />
-                      <ConfidenceBadge confidence={a.confidence} />
+                      <ConfidenceBadge confidence={a.confidence ?? "MEDIUM"} />
                       {a.last_researched && <span className="text-[9px] text-muted-foreground">{a.last_researched}</span>}
                     </div>
                   </div>
