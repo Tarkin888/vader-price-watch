@@ -194,21 +194,12 @@ const Collection = () => {
         <button onClick={() => navigate("/")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Price Tracker</button>
         <button onClick={() => navigate("/knowledge")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Knowledge Hub</button>
         <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">My Collection</button>
-        <span className="text-muted-foreground/30 mx-2">|</span>
-        <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Inventory</button>
-        <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Analytics</button>
-        {isAdmin && <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>}
       </div>
       {/* Mobile hamburger */}
-      <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
+      <div className="md:hidden flex items-center border-b border-border px-4 py-2">
         <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="text-muted-foreground hover:text-primary transition-colors">
           {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-        <div className="flex items-center gap-1">
-          <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "inventory" ? "text-primary" : "text-muted-foreground"}`}>Inventory</button>
-          <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "analytics" ? "text-primary" : "text-muted-foreground"}`}>Analytics</button>
-          {isAdmin && <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-2 py-1 ${subTab === "gallery" ? "text-primary" : "text-muted-foreground"}`}>Gallery</button>}
-        </div>
       </div>
       {mobileNavOpen && (
         <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
@@ -217,6 +208,13 @@ const Collection = () => {
           <button className="text-[11px] tracking-wider px-3 py-2 text-primary text-left">My Collection</button>
         </div>
       )}
+
+      {/* Sub-nav */}
+      <div className="flex items-center gap-1 border-b border-border px-6 py-2 bg-background overflow-x-auto">
+        <button onClick={() => setSubTab("inventory")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${subTab === "inventory" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Inventory</button>
+        <button onClick={() => setSubTab("analytics")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${subTab === "analytics" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Analytics</button>
+        {isAdmin && <button onClick={() => setSubTab("gallery")} className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${subTab === "gallery" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}>Photo Gallery</button>}
+      </div>
 
       {subTab === "analytics" ? (
         <CollectionAnalytics items={items} />
