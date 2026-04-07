@@ -126,8 +126,8 @@ const Index = () => {
       if (filters.cardbackCode && (l as any).cardback_code !== filters.cardbackCode) return false;
       if (filters.variantCode && l.variant_code !== filters.variantCode) return false;
       if (filters.gradeTier && l.grade_tier_code !== filters.gradeTier) return false;
-      if (filters.dateFrom && new Date(l.sale_date) < filters.dateFrom) return false;
-      if (filters.dateTo && new Date(l.sale_date) > filters.dateTo) return false;
+      if (filters.dateFrom && !isNaN(filters.dateFrom.getTime()) && new Date(l.sale_date) < filters.dateFrom) return false;
+      if (filters.dateTo && !isNaN(filters.dateTo.getTime()) && new Date(l.sale_date) > filters.dateTo) return false;
       if (filters.search) {
         const q = filters.search.toLowerCase();
         const searchable = [
