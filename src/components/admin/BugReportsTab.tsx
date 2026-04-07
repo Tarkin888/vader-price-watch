@@ -15,14 +15,13 @@ const STATUS_COLORS: Record<string, string> = {
 
 interface BugReport {
   id: string;
+  title: string | null;
+  feedback_type: string | null;
   category: string;
   description: string;
-  lot_ref: string | null;
+  priority: string | null;
   status: string;
-  resolution_notes: string | null;
-  resolved_at: string | null;
   created_at: string;
-  updated_at: string;
 }
 
 const AdminBugReportsTab = () => {
@@ -45,7 +44,10 @@ const AdminBugReportsTab = () => {
   const fetchAll = useCallback(async () => {
     setSpinning(true);
     try {
-      const { data } = await supabase.from("bug_reports").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase
+        .from("chatbot_feedback" as any)
+        .select("id, title, feedback_type, category, description, priority, status, created_at")
+        .order("created_at", { ascending: false });
       setBugs((data ?? []) as BugReport[]);
     } finally {
       setLoading(false);
@@ -151,20 +153,19 @@ const AdminBugReportsTab = () => {
                     <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${STATUS_COLORS[b.status] || "#666"}20`, color: STATUS_COLORS[b.status] || "#666" }}>
                       {b.status.replace("_", " ")}
                     </span>
-                    {b.lot_ref && <span className="text-[10px]" style={{ color: "rgba(224,216,192,0.5)" }}>Ref: {b.lot_ref}</span>}
+                    {b.feedback_type && <span className="text-[10px]" style={{ color: "rgba(224,216,192,0.6)" }}>{b.feedback_type}</span>}
+                    {b.priority && <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>{b.priority}</span>}
                     <span className="text-[10px]" style={{ color: "rgba(224,216,192,0.4)" }}>{new Date(b.created_at).toLocaleDateString()}</span>
                   </div>
+                  {b.title && <p className="text-[12px] font-bold mb-1" style={{ color: "#e0d8c0" }}>{b.title}</p>}
                   <p className="text-[12px]" style={{ color: "#e0d8c0" }}>
-                    {expanded === b.id ? b.description : b.description.slice(0, 120)}
-                    {b.description.length > 120 && (
+                    {expanded === b.id ? b.description : (b.description ?? "").slice(0, 120)}
+                    {(b.description?.length ?? 0) > 120 && (
                       <button onClick={() => setExpanded(expanded === b.id ? null : b.id)} className="ml-1 underline" style={{ color: "#C9A84C" }}>
                         {expanded === b.id ? "Less" : "More"}
                       </button>
                     )}
                   </p>
-                  {b.resolution_notes && (
-                    <p className="text-[11px] mt-1 italic" style={{ color: "rgba(224,216,192,0.5)" }}>Resolution: {b.resolution_notes}</p>
-                  )}
                 </div>
                 <div className="flex flex-col gap-1 flex-shrink-0">
                   {b.status === "OPEN" && (

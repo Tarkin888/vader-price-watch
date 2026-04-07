@@ -55,7 +55,7 @@ function NoImagePlaceholder() {
 }
 
 /* ── types ── */
-type SortKey = "sale_date" | "created_at" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp";
+type SortKey = "sale_date" | "created_at" | "variant_grade_key" | "total_paid_gbp" | "hammer_price_gbp" | "buyers_premium_gbp" | "pop";
 type SortDir = "asc" | "desc";
 
 // All toggleable column keys
@@ -81,7 +81,7 @@ const ERA_COLORS: Record<string, string> = {
 // Default hidden columns
 const DEFAULT_HIDDEN: ColId[] = ["created_at", "bp"];
 // Additional columns hidden below 1024px
-const NARROW_HIDDEN: ColId[] = ["hammer", "pop"];
+const NARROW_HIDDEN: ColId[] = ["hammer"];
 
 /* ── small components ── */
 function toUsd(gbp: number, rate: number): number {
@@ -106,7 +106,7 @@ function PopBadge({ variantCode }: { variantCode: string }) {
   if (entry.confidence === "LOW") {
     return <span className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400" title={`Population estimate only — ${entry.source}`}>POP ?</span>;
   }
-  return <span className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground" title="Population unknown — approximate">POP ~?</span>;
+  return <span className="inline-block text-[8px] tracking-widest font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground" title="POP ~? — approximate population count (exact number unknown)">POP ~?</span>;
 }
 
 function EraBadge({ era }: { era: string }) {
@@ -289,10 +289,17 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
   const sorted = useMemo(() => {
     const copy = [...lots];
     copy.sort((a, b) => {
-      let av: string | number = a[sortKey] as any;
-      let bv: string | number = b[sortKey] as any;
-      if (["total_paid_gbp", "hammer_price_gbp", "buyers_premium_gbp"].includes(sortKey)) {
-        av = Number(av); bv = Number(bv);
+      let av: string | number;
+      let bv: string | number;
+      if (sortKey === "pop") {
+        av = popCounts[a.variant_code]?.pop ?? -1;
+        bv = popCounts[b.variant_code]?.pop ?? -1;
+      } else {
+        av = a[sortKey] as any;
+        bv = b[sortKey] as any;
+        if (["total_paid_gbp", "hammer_price_gbp", "buyers_premium_gbp"].includes(sortKey)) {
+          av = Number(av); bv = Number(bv);
+        }
       }
       if (av < bv) return sortDir === "asc" ? -1 : 1;
       if (av > bv) return sortDir === "asc" ? 1 : -1;
@@ -511,7 +518,7 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
                   {colVisible("hammer") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("hammer_price_gbp")}>Hammer{isUSD ? " (USD)" : ""}<SortIcon col="hammer_price_gbp" /></th>}
                   {colVisible("bp") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors text-right" onClick={() => toggleSort("buyers_premium_gbp")}>BP{isUSD ? " (USD)" : ""}<SortIcon col="buyers_premium_gbp" /></th>}
                   {colVisible("cardback") && <th className="px-3 py-2">Cardback</th>}
-                  {colVisible("pop") && <th className="px-3 py-2">Pop</th>}
+                  {colVisible("pop") && <th className="px-3 py-2 cursor-pointer select-none hover:text-primary transition-colors" onClick={() => toggleSort("pop")}>Pop<SortIcon col="pop" /></th>}
                   {colVisible("source") && <th className="px-3 py-2">Source</th>}
                   {colVisible("lot_ref") && <th className="px-3 py-2">Lot Ref</th>}
                   {colVisible("notes") && <th className="px-3 py-2">Notes</th>}
