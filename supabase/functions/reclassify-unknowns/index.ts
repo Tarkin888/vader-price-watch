@@ -37,21 +37,55 @@ function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
   else if (/41[\s-]?a?\s*-?back|41a\b|\besb[\s-]?41\b/i.test(text)) cardbackCode = "ESB-41";
   else if (/32[\s-]?back/i.test(text)) cardbackCode = "ESB-32";
   else if (/31[\s-]?back|\besb[\s-]?31\b/i.test(text)) cardbackCode = "ESB-31";
-  else if (/21[\s-]?back/i.test(text)) cardbackCode = "SW-21";
-  else if (/20[\s-]?back/i.test(text)) cardbackCode = "SW-20";
+  else if (/21[\s-]?back|\b21\s*card\b/i.test(text)) cardbackCode = "SW-21";
+  else if (/20[\s-]?back|\b20\s*card\b/i.test(text)) cardbackCode = "SW-20";
   else if (/12[\s-]?(?:figure\s*)?a[\s-]?back|12-?back\s*a|\b12a\b/i.test(text)) cardbackCode = "SW-12A";
   else if (/12[\s-]?(?:figure\s*)?b[\s-]?back|12-?back\s*b|\b12b\b/i.test(text)) cardbackCode = "SW-12B";
   else if (/12[\s-]?(?:figure\s*)?c[\s-]?back|12-?back\s*c|\b12c\b/i.test(text)) cardbackCode = "SW-12C";
-  else if (/12[\s-]?back|12[\s-]?figure/i.test(text)) cardbackCode = "SW-12";
+  else if (/12[\s-]?back|12[\s-]?figure|\b12\s*card\b|12[\s-]card[\s-]?back/i.test(text)) cardbackCode = "SW-12";
 
   let variantCode = cardbackCode;
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
   if (isDT) variantCode = cardbackCode + "-DT";
-  if (/tri[\s-]?logo|trilogo/i.test(text)) variantCode = "PAL-TL";
-  else if (/\bcanadian\b|\bbilingual\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "CAN";
-  else if (/\bpalitoy\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "PAL";
-  else if (/\bmexico\b|\bmexican\b|\blili\s*ledy\b/i.test(text) && cardbackCode === "UNKNOWN") variantCode = "MEX";
-  else if (/vader\s*pointing|alternate\s*photo/i.test(text)) variantCode = "VP";
+
+  const isTriLogo = /tri[\s-]?logo|trilogo/i.test(text);
+  const isPalitoy = /\bpalitoy\b/i.test(text);
+  const isCanadian = /\bcanadian\b|\bbilingual\b/i.test(text);
+  const isMexico = /\bmexico\b|\bmexican\b|\blili\s*ledy\b/i.test(text);
+  const isTopToys = /\btop\s*toys\b/i.test(text);
+  const isPBP = /\bpbp\b/i.test(text);
+  const isVaderPointing = /vader\s*pointing|alternate\s*photo/i.test(text);
+  const isTakara = /\btakara\b/i.test(text);
+  const isHarbert = /\bharbert\b/i.test(text);
+  const isClipMask = /\bclip[\s-]?mask\b/i.test(text);
+
+  if (isTriLogo) {
+    variantCode = "PAL-TL";
+    if (cardbackCode === "UNKNOWN") cardbackCode = "ROTJ-70";
+    if (era === "UNKNOWN" || era === "SW") era = "ROTJ";
+  } else if (isPBP) {
+    variantCode = "PBP";
+  } else if (isCanadian) {
+    variantCode = "CAN";
+  } else if (isMexico) {
+    variantCode = "MEX";
+    if (cardbackCode === "UNKNOWN") cardbackCode = "ROTJ-65";
+    if (era === "UNKNOWN") era = "ROTJ";
+  } else if (isPalitoy) {
+    variantCode = "PAL";
+  } else if (isTopToys) {
+    variantCode = "TT";
+  } else if (isTakara) {
+    variantCode = "TAK";
+  } else if (isHarbert) {
+    variantCode = "HAR";
+  } else if (isClipMask) {
+    variantCode = "CLIP";
+  } else if (isVaderPointing) {
+    variantCode = "VP";
+    if (cardbackCode === "UNKNOWN") cardbackCode = "ROTJ-65";
+    if (era === "UNKNOWN") era = "ROTJ";
+  }
 
   let gradeTierCode = "UNKNOWN";
   if (/afa\s*(?:graded\s*)?u?9[0-9]|afa\s*9[0-9]|afa\s*(?:graded\s*)?u90/i.test(text)) gradeTierCode = "AFA-90+";
@@ -82,6 +116,19 @@ function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
   return { era, cardback_code: cardbackCode, variant_code: variantCode, grade_tier_code: gradeTierCode, variant_grade_key: variantGradeKey };
 }
 
+function deriveFromVariantCode(variantCode: string): { era: string; cardback_code: string } {
+  const vc = variantCode.toUpperCase();
+  if (vc.startsWith("POTF-")) return { era: "POTF", cardback_code: vc.replace(/-DT$/, "") };
+  if (vc.startsWith("ROTJ-")) return { era: "ROTJ", cardback_code: vc.replace(/-VP$/, "").replace(/-DT$/, "") };
+  if (vc.startsWith("ESB-")) return { era: "ESB", cardback_code: vc.replace(/-DT$/, "") };
+  if (vc.startsWith("SW-")) return { era: "SW", cardback_code: vc.replace(/-DT$/, "") };
+  if (/^12[ABC]/.test(vc)) return { era: "SW", cardback_code: `SW-${vc.replace(/-DT$/, "")}` };
+  if (vc === "PAL-TL") return { era: "ROTJ", cardback_code: "ROTJ-70" };
+  if (vc === "MEX") return { era: "ROTJ", cardback_code: "ROTJ-65" };
+  if (vc === "VP") return { era: "ROTJ", cardback_code: "ROTJ-65" };
+  return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -110,29 +157,35 @@ Deno.serve(async (req) => {
     const details: string[] = [];
 
     for (const lot of lots) {
-      // Search both lot_ref (title) and condition_notes
       const classified = classifyLot(lot.lot_ref || "", lot.condition_notes || "");
       const updates: Record<string, string> = {};
+
+      // Also try deriving from variant_code as fallback
+      let finalClassifiedEra = classified.era;
+      let finalClassifiedCardback = classified.cardback_code;
+      if (finalClassifiedEra === "UNKNOWN" || finalClassifiedCardback === "UNKNOWN") {
+        const derived = deriveFromVariantCode(lot.variant_code || classified.variant_code);
+        if (finalClassifiedEra === "UNKNOWN" && derived.era !== "UNKNOWN") finalClassifiedEra = derived.era;
+        if (finalClassifiedCardback === "UNKNOWN" && derived.cardback_code !== "UNKNOWN") finalClassifiedCardback = derived.cardback_code;
+      }
 
       if (lot.variant_code === "UNKNOWN" && classified.variant_code !== "UNKNOWN") {
         updates.variant_code = classified.variant_code;
       }
-      // Re-classify PAL → PAL-TL if tri-logo found in condition_notes
       if (lot.variant_code === "PAL" && classified.variant_code === "PAL-TL") {
         updates.variant_code = "PAL-TL";
       }
       if (lot.grade_tier_code === "UNKNOWN" && classified.grade_tier_code !== "UNKNOWN") {
         updates.grade_tier_code = classified.grade_tier_code;
       }
-      // Re-evaluate GRADED-UNKNOWN against full text
       if (lot.grade_tier_code === "GRADED-UNKNOWN" && classified.grade_tier_code !== "UNKNOWN" && classified.grade_tier_code !== "GRADED-UNKNOWN") {
         updates.grade_tier_code = classified.grade_tier_code;
       }
-      if (lot.era === "UNKNOWN" && classified.era !== "UNKNOWN") {
-        updates.era = classified.era;
+      if (lot.era === "UNKNOWN" && finalClassifiedEra !== "UNKNOWN") {
+        updates.era = finalClassifiedEra;
       }
-      if (lot.cardback_code === "UNKNOWN" && classified.cardback_code !== "UNKNOWN") {
-        updates.cardback_code = classified.cardback_code;
+      if (lot.cardback_code === "UNKNOWN" && finalClassifiedCardback !== "UNKNOWN") {
+        updates.cardback_code = finalClassifiedCardback;
       }
 
       if (Object.keys(updates).length > 0) {

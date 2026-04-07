@@ -43,6 +43,9 @@ const AdminDataTab = () => {
   const [missingImages, setMissingImages] = useState<{ count: number; rows: BadRow[] }>({ count: 0, rows: [] });
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null);
 
+  // Needs Review (genuinely unclassifiable UNKNOWN records)
+  const [needsReview, setNeedsReview] = useState<{ count: number; rows: { lot_ref: string; source: string; era: string; variant_code: string; notes_preview: string }[] }>({ count: 0, rows: [] });
+
   // Dedup
   const [dupGroups, setDupGroups] = useState<{ lot_ref: string; source: string; count: number }[] | null>(null);
 
@@ -108,6 +111,22 @@ const AdminDataTab = () => {
       setNullDates({ count: nullDateCount.count ?? 0, rows: (nullDateRes.data ?? []).map((r: any) => ({ lot_ref: r.lot_ref, source: r.source, extra: r.sale_date ?? "NULL" })) });
       setSuspPrices({ count: suspCount.count ?? 0, rows: (suspRes.data ?? []).map((r: any) => ({ lot_ref: r.lot_ref, source: r.source, extra: `£${r.total_paid_gbp}` })) });
       setMissingImages({ count: imgCount.count ?? 0, rows: (imgRes.data ?? []).map((r: any) => ({ lot_ref: r.lot_ref, source: r.source, extra: (r.condition_notes ?? "").slice(0, 60) })) });
+
+      // Fetch UNKNOWN cardback records for "Needs Review"
+      const [unknownRes, unknownCountRes] = await Promise.all([
+        supabase.from("lots").select("lot_ref, source, era, variant_code, condition_notes").eq("cardback_code", "UNKNOWN" as any).limit(50),
+        supabase.from("lots").select("id", { count: "exact", head: true }).eq("cardback_code", "UNKNOWN" as any),
+      ]);
+      setNeedsReview({
+        count: unknownCountRes.count ?? 0,
+        rows: (unknownRes.data ?? []).map((r: any) => ({
+          lot_ref: r.lot_ref,
+          source: r.source,
+          era: r.era,
+          variant_code: r.variant_code,
+          notes_preview: (r.condition_notes ?? "").slice(0, 100),
+        })),
+      });
     } finally {
       setLoading(false);
       setSpinning(false);
@@ -379,6 +398,48 @@ const AdminDataTab = () => {
             )}
           </div>
         ))}
+      </div>
+
+      {/* Needs Review — UNKNOWN cardback records */}
+      <div className="space-y-2">
+        <h3 className="text-xs tracking-wider font-bold" style={{ color: needsReview.count > 5 ? "#F44336" : "rgba(224,216,192,0.6)" }}>
+          NEEDS REVIEW — UNKNOWN CARDBACKS ({needsReview.count})
+        </h3>
+        <p className="text-[10px]" style={{ color: "rgba(224,216,192,0.5)" }}>
+          Records the classifier could not auto-resolve. Run the reclassifier first, then review remaining records manually.
+        </p>
+        <div className="rounded" style={{ border: "1px solid rgba(201,168,76,0.2)", background: "#0D0D0B" }}>
+          <button onClick={() => togglePanel("needsReview")} className="flex items-center justify-between w-full px-3 py-2 text-[11px]" style={{ color: "#e0d8c0", minHeight: 44 }}>
+            <span>UNKNOWN Cardback Records ({needsReview.count})</span>
+            {expandedPanel === "needsReview" ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </button>
+          {expandedPanel === "needsReview" && (
+            <div className="px-3 pb-3">
+              {needsReview.rows.length === 0 ? (
+                <p className="italic text-[11px]" style={{ color: "rgba(224,216,192,0.5)" }}>No UNKNOWN records — all classified! ✓</p>
+              ) : (
+                <>
+                  <div className="flex gap-2 py-1 text-[9px] tracking-wider font-bold" style={{ color: "#C9A84C", borderBottom: "1px solid rgba(201,168,76,0.3)" }}>
+                    <span className="w-24 flex-shrink-0">LOT REF</span>
+                    <span className="w-16 flex-shrink-0">SOURCE</span>
+                    <span className="w-14 flex-shrink-0">ERA</span>
+                    <span className="w-16 flex-shrink-0">VARIANT</span>
+                    <span className="flex-1">NOTES</span>
+                  </div>
+                  {needsReview.rows.map((r, i) => (
+                    <div key={i} className="flex gap-2 py-1 text-[11px]" style={{ color: "#e0d8c0", background: i % 2 === 0 ? "#0D0D0B" : "#111110" }}>
+                      <span className="w-24 flex-shrink-0 truncate">{r.lot_ref}</span>
+                      <span className="w-16 flex-shrink-0">{r.source}</span>
+                      <span className="w-14 flex-shrink-0">{r.era}</span>
+                      <span className="w-16 flex-shrink-0">{r.variant_code}</span>
+                      <span className="flex-1 truncate text-[10px]" style={{ color: "rgba(224,216,192,0.5)" }}>{r.notes_preview}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Quick Add Lot */}
