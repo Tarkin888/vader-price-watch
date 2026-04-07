@@ -249,7 +249,7 @@ const ResearchLibrary = () => {
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-base font-medium text-primary tracking-wider">{selectedArticle.title}</h3>
             <CategoryBadge category={selectedArticle.category} />
-            <ConfidenceBadge confidence={selectedArticle.confidence} />
+             <ConfidenceBadge confidence={selectedArticle.confidence ?? "MEDIUM"} />
           </div>
           {selectedArticle.last_researched && (
             <p className="text-[10px] text-muted-foreground tracking-wider">Last Researched: {selectedArticle.last_researched}</p>
@@ -390,7 +390,7 @@ const ResearchLibrary = () => {
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <CategoryBadge category={a.category} />
-                      <ConfidenceBadge confidence={a.confidence} />
+                      <ConfidenceBadge confidence={a.confidence ?? "MEDIUM"} />
                       {a.last_researched && <span className="text-[9px] text-muted-foreground">{a.last_researched}</span>}
                     </div>
                   </div>
