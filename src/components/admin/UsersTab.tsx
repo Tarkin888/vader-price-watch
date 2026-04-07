@@ -23,6 +23,8 @@ const UsersTab = () => {
   const [filter, setFilter] = useState<string>("all");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [deletingUser, setDeletingUser] = useState<UserProfile | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const loadUsers = useCallback(async () => {
     const { data, error } = await supabase
@@ -81,6 +83,19 @@ const UsersTab = () => {
     loadUsers();
   };
 
+  const handleDelete = async () => {
+    if (!deletingUser) return;
+    setDeleteLoading(true);
+    const { error } = await supabase.functions.invoke("delete-user", {
+      body: { userId: deletingUser.id, userEmail: deletingUser.email },
+    });
+    setDeleteLoading(false);
+    if (error) { toast.error(`Failed to delete user: ${error.message}`); return; }
+    toast.success(`User deleted — ${deletingUser.display_name || deletingUser.email}`);
+    setDeletingUser(null);
+    loadUsers();
+  };
+
   const handleRevoke = async (u: UserProfile) => {
     const { error } = await supabase
       .from("user_profiles")
@@ -117,6 +132,21 @@ const UsersTab = () => {
 
   return (
     <div>
+      {deletingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.75)" }}>
+          <div className="rounded p-6 w-full max-w-sm mx-4" style={{ background: "#111110", border: "1px solid rgba(201,168,76,0.3)" }}>
+            <h3 className="text-sm font-bold tracking-widest mb-2" style={{ color: "#C9A84C" }}>DELETE USER</h3>
+            <p className="text-[12px] mb-4" style={{ color: "#e0d8c0", opacity: 0.8 }}>
+              Are you sure you want to delete <span className="font-bold" style={{ color: "#C9A84C" }}>{deletingUser.email}</span>?<br/>
+              <span className="text-[11px]" style={{ opacity: 0.6 }}>This action cannot be undone.</span>
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setDeletingUser(null)} disabled={deleteLoading} className="px-4 py-2 rounded text-[10px] font-bold tracking-wider" style={{ background: "#333", color: "#e0d8c0", minHeight: 38 }}>CANCEL</button>
+              <button onClick={handleDelete} disabled={deleteLoading} className="px-4 py-2 rounded text-[10px] font-bold tracking-wider" style={{ background: "#7A1F1F", color: "#fff", minHeight: 38 }}>{deleteLoading ? "DELETING…" : "CONFIRM DELETE"}</button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Stats */}
       <div className="flex flex-wrap gap-3 mb-6">
         {[
@@ -310,6 +340,9 @@ const UsersTab = () => {
                         APPROVE
                       </button>
                     ) : null}
+                    {u.role !== "admin" && (
+                      <button onClick={() => setDeletingUser(u)} title="Delete user permanently" className="px-2 py-1 rounded text-[9px] font-bold ml-1" style={{ background: "#7A1F1F", color: "#fff", minHeight: 30 }}>🗑</button>
+                    )}
                   </td>
                 </tr>
               ))}
