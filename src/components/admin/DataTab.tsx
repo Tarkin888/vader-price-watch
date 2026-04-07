@@ -111,6 +111,22 @@ const AdminDataTab = () => {
       setNullDates({ count: nullDateCount.count ?? 0, rows: (nullDateRes.data ?? []).map((r: any) => ({ lot_ref: r.lot_ref, source: r.source, extra: r.sale_date ?? "NULL" })) });
       setSuspPrices({ count: suspCount.count ?? 0, rows: (suspRes.data ?? []).map((r: any) => ({ lot_ref: r.lot_ref, source: r.source, extra: `£${r.total_paid_gbp}` })) });
       setMissingImages({ count: imgCount.count ?? 0, rows: (imgRes.data ?? []).map((r: any) => ({ lot_ref: r.lot_ref, source: r.source, extra: (r.condition_notes ?? "").slice(0, 60) })) });
+
+      // Fetch UNKNOWN cardback records for "Needs Review"
+      const [unknownRes, unknownCountRes] = await Promise.all([
+        supabase.from("lots").select("lot_ref, source, era, variant_code, condition_notes").eq("cardback_code", "UNKNOWN" as any).limit(50),
+        supabase.from("lots").select("id", { count: "exact", head: true }).eq("cardback_code", "UNKNOWN" as any),
+      ]);
+      setNeedsReview({
+        count: unknownCountRes.count ?? 0,
+        rows: (unknownRes.data ?? []).map((r: any) => ({
+          lot_ref: r.lot_ref,
+          source: r.source,
+          era: r.era,
+          variant_code: r.variant_code,
+          notes_preview: (r.condition_notes ?? "").slice(0, 100),
+        })),
+      });
     } finally {
       setLoading(false);
       setSpinning(false);
