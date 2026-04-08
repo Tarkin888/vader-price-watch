@@ -27,6 +27,7 @@ interface Props {
 }
 
 const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots, onShowBenchmark, onShowPriceTrend }: Props) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [screenshotOpen, setScreenshotOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -107,7 +108,7 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-1.5 text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors border border-border rounded">
             <Wrench className="w-3.5 h-3.5" />
@@ -124,7 +125,7 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
             {reclassifying ? "Re-classifying..." : "Re-classify Unknowns"}
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setScreenshotOpen(true)}
+            onClick={() => { setDropdownOpen(false); setScreenshotOpen(true); }}
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
             <Camera className="w-3.5 h-3.5" />
