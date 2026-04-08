@@ -99,7 +99,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
         .from("lots")
         .select("id")
         .eq("lot_ref", record.lot_ref as string)
-        .eq("source", record.source as string)
+        .eq("source", record.source as any)
         .limit(1);
       if (existing && existing.length > 0) {
         if (!confirm("A record with this lot ref + source already exists. Save anyway?")) {
