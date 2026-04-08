@@ -28,6 +28,7 @@ interface Props {
 
 const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots, onShowBenchmark, onShowPriceTrend }: Props) => {
   const [addOpen, setAddOpen] = useState(false);
+  const [screenshotOpen, setScreenshotOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
