@@ -181,6 +181,7 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
         }}
       />
       <LotFormModal open={addOpen} onOpenChange={setAddOpen} onSaved={onAdded} />
+      <ScreenshotModal open={screenshotOpen} onOpenChange={setScreenshotOpen} onSaved={onAdded} />
     </>
   );
 };
