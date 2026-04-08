@@ -18,7 +18,7 @@ type Step = "pin" | "capture" | "preview" | "review" | "done";
 
 const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
   const hasPin = () => !!sessionStorage.getItem("admin_pin");
-  const [step, setStep] = useState<Step>(hasPin() ? "capture" : "pin");
+  const [step, setStep] = useState<Step>("pin");
   const [imageSrc, setImageSrc] = useState<string>("");
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const [loading, setLoading] = useState(false);
