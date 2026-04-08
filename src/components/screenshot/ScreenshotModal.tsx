@@ -178,13 +178,15 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center gap-2 px-5 py-2 text-[10px] tracking-wider font-mono text-muted-foreground">
-          <span className={step === "capture" || step === "preview" ? "text-[#C9A84C]" : ""}>CAPTURE</span>
-          <span>→</span>
-          <span className={step === "review" ? "text-[#C9A84C]" : ""}>REVIEW</span>
-          <span>→</span>
-          <span className={step === "done" ? "text-[#C9A84C]" : ""}>CONFIRM</span>
-        </div>
+        {step !== "pin" && (
+          <div className="flex items-center gap-2 px-5 py-2 text-[10px] tracking-wider font-mono text-muted-foreground">
+            <span className={step === "capture" || step === "preview" ? "text-primary" : ""}>CAPTURE</span>
+            <span>→</span>
+            <span className={step === "review" ? "text-primary" : ""}>REVIEW</span>
+            <span>→</span>
+            <span className={step === "done" ? "text-primary" : ""}>CONFIRM</span>
+          </div>
+        )}
 
         {/* Body */}
         <div className="px-5 py-4">
