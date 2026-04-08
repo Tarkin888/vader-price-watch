@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import ScreenshotCapture from "./ScreenshotCapture";
 import ScreenshotPreview from "./ScreenshotPreview";
@@ -14,15 +14,43 @@ interface Props {
   onSaved: () => void;
 }
 
-type Step = "capture" | "preview" | "review" | "done";
+type Step = "pin" | "capture" | "preview" | "review" | "done";
 
 const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
-  const [step, setStep] = useState<Step>("capture");
+  const hasPin = () => !!sessionStorage.getItem("admin_pin");
+  const [step, setStep] = useState<Step>(hasPin() ? "capture" : "pin");
   const [imageSrc, setImageSrc] = useState<string>("");
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pin, setPin] = useState("");
+  const [pinChecking, setPinChecking] = useState(false);
+
+  // Re-check PIN state when modal opens
+  useEffect(() => {
+    if (open) setStep(hasPin() ? "capture" : "pin");
+  }, [open]);
+
+  const handlePinSubmit = async () => {
+    if (pinChecking || pin.length < 4) return;
+    setPinChecking(true);
+    try {
+      const { data } = await supabase.functions.invoke("admin-verify-pin", { body: { pin } });
+      if (data?.valid) {
+        sessionStorage.setItem("admin_auth", "true");
+        sessionStorage.setItem("admin_pin", pin);
+        setStep("capture");
+        setError(null);
+      } else {
+        setError("Invalid PIN");
+      }
+    } catch {
+      setError("Failed to verify PIN");
+    } finally {
+      setPinChecking(false);
+    }
+  };
 
   const reset = () => {
     setStep("capture");
