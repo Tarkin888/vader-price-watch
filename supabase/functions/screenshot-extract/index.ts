@@ -223,6 +223,12 @@ async function handleUrlMode(url: string) {
     extracted.lotUrl = canonical;
   }
 
+  // Inject og:image into imageUrls if Claude didn't extract one
+  if (ogImage && (!extracted.imageUrls || (extracted.imageUrls as string[]).length === 0)) {
+    const imgUrl = ogImage.startsWith("http") ? ogImage : new URL(ogImage, url).href;
+    extracted.imageUrls = [imgUrl];
+  }
+
   return { success: true, extracted, sourceUrl: url };
 }
 
