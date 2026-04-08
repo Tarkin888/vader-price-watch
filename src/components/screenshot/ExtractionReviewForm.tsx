@@ -35,6 +35,24 @@ function dot(c: Confidence) {
 
 const SOURCES = ["Heritage", "Hakes", "LCG", "Vectis", "CandT", "eBay", "Facebook", "Other"];
 
+// Map non-enum variant values Claude might return to valid enum values
+const VARIANT_ALIASES: Record<string, string> = {
+  "TRILOGO": "PAL-TL",
+  "TRI-LOGO": "PAL-TL",
+  "PALITOY": "PAL",
+  "CANADIAN": "CAN",
+  "BILINGUAL": "CAN",
+  "MEXICO": "MEX",
+  "LILI LEDY": "MEX",
+  "DOUBLE TELESCOPING": "SW-12-DT",
+};
+
+function normalizeVariant(val: string | null): string | null {
+  if (!val) return val;
+  const upper = val.toUpperCase().trim();
+  return VARIANT_ALIASES[upper] ?? val;
+}
+
 const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: Props) => {
   // Classify from title
   const classified = useMemo(() => {
@@ -51,7 +69,7 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
 
   const era = pick(extracted.era, classified.era);
   const cardback = pick(extracted.cardbackCode, classified.cardback_code);
-  const variant = pick(extracted.variantCode, classified.variant_code);
+  const variant = pick(normalizeVariant(extracted.variantCode), classified.variant_code);
   const grade = pick(extracted.gradeTierCode, classified.grade_tier_code);
 
   // State for all fields
