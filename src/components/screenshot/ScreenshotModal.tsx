@@ -53,12 +53,13 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
   };
 
   const reset = () => {
-    setStep("capture");
+    setStep(hasPin() ? "capture" : "pin");
     setImageSrc("");
     setExtracted(null);
     setLoading(false);
     setSaving(false);
     setError(null);
+    setPin("");
   };
 
   const close = () => {
