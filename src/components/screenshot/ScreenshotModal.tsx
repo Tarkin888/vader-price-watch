@@ -200,6 +200,30 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
             </div>
           )}
 
+          {step === "pin" && (
+            <div className="flex flex-col items-center gap-4 py-8">
+              <p className="text-xs tracking-wider font-mono text-muted-foreground">Enter Admin PIN to continue</p>
+              <input
+                type="password"
+                inputMode="numeric"
+                maxLength={4}
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handlePinSubmit()}
+                placeholder="PIN"
+                className="w-40 text-center text-2xl tracking-[0.5em] py-3 rounded border bg-background border-border text-primary font-mono"
+              />
+              <button
+                onClick={handlePinSubmit}
+                disabled={pinChecking || pin.length < 4}
+                className="px-6 py-2 rounded text-xs font-bold tracking-widest bg-primary text-primary-foreground disabled:opacity-50"
+                style={{ minHeight: 44 }}
+              >
+                {pinChecking ? "CHECKING…" : "AUTHENTICATE"}
+              </button>
+            </div>
+          )}
+
           {step === "capture" && (
             <ScreenshotCapture
               onImageCaptured={handleImageCaptured}
