@@ -108,7 +108,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
         }
       }
 
-      const res = await adminWrite({ table: "lots", operation: "insert", data: record });
+      const res = await adminWrite({ table: "lots", operation: "insert", data: record as Record<string, unknown> });
       if (!res.success) throw new Error(res.error || "Insert failed");
       toast.success("Record saved successfully");
       setStep("done");
