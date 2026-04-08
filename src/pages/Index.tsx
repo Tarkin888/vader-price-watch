@@ -17,7 +17,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Camera } from "lucide-react";
+import ScreenshotModal from "@/components/screenshot/ScreenshotModal";
 
 function calcQuickStats(lots: Lot[], isUSD: boolean) {
   const priced = lots.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
@@ -63,6 +64,7 @@ const Index = () => {
   const [showBenchmark, setShowBenchmark] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
+  const [quickImportOpen, setQuickImportOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(() => {
     const parseDate = (s: string | null): Date | null => {
       if (!s) return null;
@@ -249,15 +251,24 @@ const Index = () => {
             </button>
           </div>
         </div>
-        <ToolsDropdown
-          onReclassify={handleReclassify}
-          reclassifying={reclassifying}
-          onAdded={loadLots}
-          onImported={loadLots}
-          filteredLots={filtered}
-          onShowBenchmark={() => setShowBenchmark(true)}
-          onShowPriceTrend={() => setShowPriceTrend(true)}
-        />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setQuickImportOpen(true)}
+            title="Quick Import"
+            className="flex items-center gap-1.5 text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors border border-border rounded"
+          >
+            <Camera className="w-3.5 h-3.5" />
+          </button>
+          <ToolsDropdown
+            onReclassify={handleReclassify}
+            reclassifying={reclassifying}
+            onAdded={loadLots}
+            onImported={loadLots}
+            filteredLots={filtered}
+            onShowBenchmark={() => setShowBenchmark(true)}
+            onShowPriceTrend={() => setShowPriceTrend(true)}
+          />
+        </div>
       </div>
       <div className="flex-1">
         {activeTab === "dashboard" ? (
@@ -311,6 +322,8 @@ const Index = () => {
           <PriceTrendChart lots={filtered} alwaysExpanded />
         </SheetContent>
       </Sheet>
+
+      <ScreenshotModal open={quickImportOpen} onOpenChange={setQuickImportOpen} onSaved={loadLots} />
 
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
         IMPERIAL PRICE TERMINAL v4.1 · Galactic Empire · Classified
