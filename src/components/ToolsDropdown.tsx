@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
-import { Wrench, RefreshCw, Plus, Upload, Download, BarChart3, TrendingUp, LayoutGrid } from "lucide-react";
+import { Wrench, RefreshCw, Plus, Upload, Download, BarChart3, TrendingUp, LayoutGrid, Camera } from "lucide-react";
+import ScreenshotModal from "@/components/screenshot/ScreenshotModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,7 @@ interface Props {
 
 const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots, onShowBenchmark, onShowPriceTrend }: Props) => {
   const [addOpen, setAddOpen] = useState(false);
+  const [screenshotOpen, setScreenshotOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -122,6 +124,13 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
             {reclassifying ? "Re-classifying..." : "Re-classify Unknowns"}
           </DropdownMenuItem>
           <DropdownMenuItem
+            onClick={() => setScreenshotOpen(true)}
+            className="text-xs tracking-wider gap-2 cursor-pointer"
+          >
+            <Camera className="w-3.5 h-3.5" />
+            Quick Import
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={() => setAddOpen(true)}
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
@@ -172,6 +181,7 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
         }}
       />
       <LotFormModal open={addOpen} onOpenChange={setAddOpen} onSaved={onAdded} />
+      <ScreenshotModal open={screenshotOpen} onOpenChange={setScreenshotOpen} onSaved={onAdded} />
     </>
   );
 };
