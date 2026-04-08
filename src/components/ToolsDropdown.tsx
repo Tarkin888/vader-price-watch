@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
-import { Wrench, RefreshCw, Plus, Upload, Download, BarChart3, TrendingUp, LayoutGrid } from "lucide-react";
+import { Wrench, RefreshCw, Plus, Upload, Download, BarChart3, TrendingUp, LayoutGrid, Camera } from "lucide-react";
+import ScreenshotModal from "@/components/screenshot/ScreenshotModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
