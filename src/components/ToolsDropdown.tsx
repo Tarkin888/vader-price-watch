@@ -124,6 +124,13 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
             {reclassifying ? "Re-classifying..." : "Re-classify Unknowns"}
           </DropdownMenuItem>
           <DropdownMenuItem
+            onClick={() => setScreenshotOpen(true)}
+            className="text-xs tracking-wider gap-2 cursor-pointer"
+          >
+            <Camera className="w-3.5 h-3.5" />
+            Quick Import
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={() => setAddOpen(true)}
             className="text-xs tracking-wider gap-2 cursor-pointer"
           >
