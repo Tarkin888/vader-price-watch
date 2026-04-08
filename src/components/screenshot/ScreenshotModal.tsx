@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import ScreenshotCapture from "./ScreenshotCapture";
 import ScreenshotPreview from "./ScreenshotPreview";
@@ -14,23 +14,52 @@ interface Props {
   onSaved: () => void;
 }
 
-type Step = "capture" | "preview" | "review" | "done";
+type Step = "pin" | "capture" | "preview" | "review" | "done";
 
 const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
-  const [step, setStep] = useState<Step>("capture");
+  const hasPin = () => !!sessionStorage.getItem("admin_pin");
+  const [step, setStep] = useState<Step>(hasPin() ? "capture" : "pin");
   const [imageSrc, setImageSrc] = useState<string>("");
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pin, setPin] = useState("");
+  const [pinChecking, setPinChecking] = useState(false);
+
+  // Re-check PIN state when modal opens
+  useEffect(() => {
+    if (open) setStep(hasPin() ? "capture" : "pin");
+  }, [open]);
+
+  const handlePinSubmit = async () => {
+    if (pinChecking || pin.length < 4) return;
+    setPinChecking(true);
+    try {
+      const { data } = await supabase.functions.invoke("admin-verify-pin", { body: { pin } });
+      if (data?.valid) {
+        sessionStorage.setItem("admin_auth", "true");
+        sessionStorage.setItem("admin_pin", pin);
+        setStep("capture");
+        setError(null);
+      } else {
+        setError("Invalid PIN");
+      }
+    } catch {
+      setError("Failed to verify PIN");
+    } finally {
+      setPinChecking(false);
+    }
+  };
 
   const reset = () => {
-    setStep("capture");
+    setStep(hasPin() ? "capture" : "pin");
     setImageSrc("");
     setExtracted(null);
     setLoading(false);
     setSaving(false);
     setError(null);
+    setPin("");
   };
 
   const close = () => {
@@ -149,13 +178,15 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center gap-2 px-5 py-2 text-[10px] tracking-wider font-mono text-muted-foreground">
-          <span className={step === "capture" || step === "preview" ? "text-[#C9A84C]" : ""}>CAPTURE</span>
-          <span>→</span>
-          <span className={step === "review" ? "text-[#C9A84C]" : ""}>REVIEW</span>
-          <span>→</span>
-          <span className={step === "done" ? "text-[#C9A84C]" : ""}>CONFIRM</span>
-        </div>
+        {step !== "pin" && (
+          <div className="flex items-center gap-2 px-5 py-2 text-[10px] tracking-wider font-mono text-muted-foreground">
+            <span className={step === "capture" || step === "preview" ? "text-primary" : ""}>CAPTURE</span>
+            <span>→</span>
+            <span className={step === "review" ? "text-primary" : ""}>REVIEW</span>
+            <span>→</span>
+            <span className={step === "done" ? "text-primary" : ""}>CONFIRM</span>
+          </div>
+        )}
 
         {/* Body */}
         <div className="px-5 py-4">
@@ -168,6 +199,30 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
                   Fill Manually
                 </button>
               </div>
+            </div>
+          )}
+
+          {step === "pin" && (
+            <div className="flex flex-col items-center gap-4 py-8">
+              <p className="text-xs tracking-wider font-mono text-muted-foreground">Enter Admin PIN to continue</p>
+              <input
+                type="password"
+                inputMode="numeric"
+                maxLength={4}
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handlePinSubmit()}
+                placeholder="PIN"
+                className="w-40 text-center text-2xl tracking-[0.5em] py-3 rounded border bg-background border-border text-primary font-mono"
+              />
+              <button
+                onClick={handlePinSubmit}
+                disabled={pinChecking || pin.length < 4}
+                className="px-6 py-2 rounded text-xs font-bold tracking-widest bg-primary text-primary-foreground disabled:opacity-50"
+                style={{ minHeight: 44 }}
+              >
+                {pinChecking ? "CHECKING…" : "AUTHENTICATE"}
+              </button>
             </div>
           )}
 
