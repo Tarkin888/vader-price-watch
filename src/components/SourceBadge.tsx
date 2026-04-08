@@ -138,6 +138,14 @@ const BADGE_CONFIG: Record<string, {
     dividerX: [46, 34],
     nameX: [50, 38],
   },
+  eBay: {
+    monogram: "EB",
+    label: "EBAY",
+    currency: "USD",
+    monoX: 8,
+    dividerX: [40, 32],
+    nameX: [44, 36],
+  },
 };
 
 export default SourceBadge;
