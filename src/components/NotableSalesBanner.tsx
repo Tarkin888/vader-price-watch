@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";
 import type { Lot } from "@/lib/db";
+import { useConfig } from "@/hooks/use-config";
 
 interface Props {
   lots: Lot[];
 }
 
-const THRESHOLD = 5000;
+const DEFAULT_THRESHOLD = 5000;
 const TOP_COUNT = 3;
 
 const fmt = (n: number) =>
