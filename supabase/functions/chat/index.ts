@@ -219,12 +219,21 @@ serve(async (req) => {
       );
     }
 
+    // Authenticate the user from JWT
+    const authHeader = req.headers.get("Authorization");
+    let userId: string | null = null;
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user } } = await supabase.auth.getUser(token);
+      userId = user?.id ?? null;
+    }
+
     // 1. Create or use session
     let currentSessionId = sessionId;
     if (!currentSessionId) {
       const { data: session, error: sessionErr } = await supabase
         .from("chat_sessions")
-        .insert({ session_type: "GENERAL", status: "ACTIVE", metadata: {} })
+        .insert({ session_type: "GENERAL", status: "ACTIVE", metadata: {}, user_id: userId })
         .select("id")
         .single();
       if (sessionErr) throw sessionErr;
