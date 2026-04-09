@@ -93,7 +93,7 @@ const AdminBugReportsTab = () => {
       update.resolved_at = new Date().toISOString();
       update.resolution_notes = notes || null;
     }
-    const res = await adminWrite({ table: "bug_reports", operation: "update", data: update, match: { column: "id", value: id } });
+    const res = await adminWrite({ table: "chatbot_feedback", operation: "update", data: update, match: { column: "id", value: id } });
     if (!res.success) { toast.error("Update failed"); return; }
     toast.success(`Status updated to ${status}`);
     setResolvingId(null);
