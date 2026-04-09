@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";
 import type { Lot } from "@/lib/db";
+import { useConfig } from "@/hooks/use-config";
 
 interface Props {
   lots: Lot[];
 }
 
-const THRESHOLD = 5000;
+const DEFAULT_THRESHOLD = 5000;
 const TOP_COUNT = 3;
 
 const fmt = (n: number) =>
@@ -14,12 +15,14 @@ const fmt = (n: number) =>
 
 const NotableSalesBanner = ({ lots }: Props) => {
   const [expanded, setExpanded] = useState(false);
+  const config = useConfig();
+  const threshold = Number(config["notable_sales_threshold"]) || DEFAULT_THRESHOLD;
 
   const notable = useMemo(() => {
     return lots
-      .filter((l) => Number(l.total_paid_gbp) >= THRESHOLD)
+      .filter((l) => Number(l.total_paid_gbp) >= threshold)
       .sort((a, b) => Number(b.total_paid_gbp) - Number(a.total_paid_gbp));
-  }, [lots]);
+  }, [lots, threshold]);
 
   if (notable.length === 0) return null;
 
