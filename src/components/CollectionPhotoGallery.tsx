@@ -25,12 +25,23 @@ const CollectionPhotoGallery = () => {
         sortBy: { column: "created_at", order: "desc" },
       });
       if (error) throw error;
-      const mapped: GalleryPhoto[] = (data ?? [])
-        .filter((f) => f.name !== ".emptyFolderPlaceholder")
-        .map((f) => ({
-          name: f.name,
-          url: supabase.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl,
-        }));
+      const files = (data ?? []).filter((f) => f.name !== ".emptyFolderPlaceholder");
+      if (files.length === 0) {
+        setPhotos([]);
+        return;
+      }
+      // Use signed URLs since bucket is private
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrls(
+          files.map((f) => f.name),
+          3600 // 1 hour expiry
+        );
+      if (signedError) throw signedError;
+      const mapped: GalleryPhoto[] = (signedData ?? []).map((s, i) => ({
+        name: files[i].name,
+        url: s.signedUrl,
+      }));
       setPhotos(mapped);
     } catch (e: any) {
       toast.error("Failed to load gallery: " + e.message);
