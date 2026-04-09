@@ -80,7 +80,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       const { data, error: fnErr } = await supabase.functions.invoke("screenshot-extract", {
         body: { mode: "url", url },
       });
-      if (fnErr) throw new Error(fnErr.message);
+      if (fnErr) throw new Error(data?.error || fnErr.message);
       if (!data.success) throw new Error(data.error);
       if (!data.extracted) {
         setError(data.reason || "Could not identify auction data from this page.");
@@ -104,7 +104,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       const { data, error: fnErr } = await supabase.functions.invoke("screenshot-extract", {
         body: { mode: "image", image: base64 },
       });
-      if (fnErr) throw new Error(fnErr.message);
+      if (fnErr) throw new Error(data?.error || fnErr.message);
       if (!data.success) throw new Error(data.error);
       if (!data.extracted) {
         setError(data.reason || "Could not identify auction data in this image.");

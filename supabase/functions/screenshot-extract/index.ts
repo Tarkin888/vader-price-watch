@@ -232,44 +232,57 @@ async function handleUrlMode(url: string) {
   return { success: true, extracted, sourceUrl: url };
 }
 
+function respond(payload: Record<string, unknown>): Response {
+  return new Response(JSON.stringify(payload), {
+    status: 200,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  const startTime = Date.now();
+
   try {
     if (!ANTHROPIC_API_KEY) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Anthropic API key not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return respond({ success: false, error: "Anthropic API key not configured", error_stage: "config" });
     }
 
-    const body = await req.json();
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return respond({ success: false, error: "Invalid JSON in request body", error_stage: "parse" });
+    }
+
     const { mode } = body;
+
+    if (mode !== "image" && mode !== "url") {
+      return respond({ success: false, error: "Invalid mode. Use 'image' or 'url'.", error_stage: "validation" });
+    }
 
     let result: Record<string, unknown>;
 
     if (mode === "image") {
-      result = await handleImageMode(body.image);
-    } else if (mode === "url") {
-      result = await handleUrlMode(body.url);
+      result = await handleImageMode(body.image as string);
     } else {
-      return new Response(
-        JSON.stringify({ success: false, error: "Invalid mode. Use 'image' or 'url'." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      result = await handleUrlMode(body.url as string);
     }
 
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respond({ ...result, processing_time_ms: Date.now() - startTime });
   } catch (e: unknown) {
     console.error("screenshot-extract error:", e);
     const msg = e instanceof Error ? e.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ success: false, error: msg }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    const stack = e instanceof Error ? e.stack : undefined;
+    return respond({
+      success: false,
+      error: msg,
+      error_stage: "unhandled",
+      stack: stack?.split("\n").slice(0, 5).join("\n"),
+      processing_time_ms: Date.now() - startTime,
+    });
   }
 });
