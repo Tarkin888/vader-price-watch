@@ -80,7 +80,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
   }, [lots]);
 
 
-  const fmt = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 0 })}`;
+  
   const fmtFull = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
