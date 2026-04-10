@@ -30,8 +30,6 @@ const ERAS_ORDER = ["SW", "ESB", "ROTJ", "POTF"] as const;
 interface Props {
   lots: Lot[];
   allLots?: Lot[];
-  onLotClick?: (lotId: string) => void;
-  onViewResults?: () => void;
 }
 
 function calcEraStats(items: Lot[]) {
