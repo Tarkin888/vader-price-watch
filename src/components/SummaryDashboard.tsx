@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { Lot } from "@/lib/db";
+import type { Currency } from "@/components/FilterBar";
+
 const TOOLTIP_STYLE = {
   backgroundColor: "hsl(50, 14%, 6%)",
   border: "1px solid hsl(43, 20%, 18%)",
@@ -28,11 +30,17 @@ const ERAS_ORDER = ["SW", "ESB", "ROTJ", "POTF"] as const;
 interface Props {
   lots: Lot[];
   allLots?: Lot[];
+  currency?: Currency;
 }
 
-function calcEraStats(items: Lot[]) {
+function calcEraStats(items: Lot[], isUSD: boolean) {
   const priced = items.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
-  const prices = priced.map((l) => Number(l.total_paid_gbp));
+  const prices = priced.map((l) => {
+    const gbp = Number(l.total_paid_gbp);
+    if (!isUSD) return gbp;
+    const rate = Number(l.usd_to_gbp_rate);
+    return rate > 0 ? Math.round(gbp / rate) : 0;
+  });
   return {
     count: items.length,
     avg: prices.length > 0 ? prices.reduce((s, p) => s + p, 0) / prices.length : 0,
@@ -40,7 +48,12 @@ function calcEraStats(items: Lot[]) {
   };
 }
 
-const SummaryDashboard = ({ lots, allLots }: Props) => {
+const fmtPrice = (n: number, isUSD: boolean) =>
+  isUSD ? `$${Math.round(n).toLocaleString("en-US")}` : `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const SummaryDashboard = ({ lots, allLots, currency = "GBP" }: Props) => {
+  const isUSD = currency === "USD";
+  const sym = isUSD ? "$" : "£";
   const sourceLots = allLots ?? lots;
 
   const eraGroups = useMemo(() =>
@@ -68,27 +81,31 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
   }, [lots]);
 
   const avgByGrade = useMemo(() => {
-    const map: Record<string, { sum: number; count: number }> = {};
+    const map: Record<string, { sum: number; count: number; rates: number[] }> = {};
     lots.forEach((l) => {
-      if (!map[l.grade_tier_code]) map[l.grade_tier_code] = { sum: 0, count: 0 };
-      map[l.grade_tier_code].sum += Number(l.total_paid_gbp);
+      if (!map[l.grade_tier_code]) map[l.grade_tier_code] = { sum: 0, count: 0, rates: [] };
+      const gbp = Number(l.total_paid_gbp);
+      if (isUSD) {
+        const rate = Number(l.usd_to_gbp_rate);
+        map[l.grade_tier_code].sum += rate > 0 ? Math.round(gbp / rate) : 0;
+      } else {
+        map[l.grade_tier_code].sum += gbp;
+      }
       map[l.grade_tier_code].count += 1;
     });
     return Object.entries(map)
       .map(([name, { sum, count }]) => ({ name, avg: Math.round(sum / count) }))
       .sort((a, b) => b.avg - a.avg);
-  }, [lots]);
+  }, [lots, isUSD]);
 
-  const fmt = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 0 })}`;
-
-  const fmtFull = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const fmt = (n: number) => fmtPrice(n, isUSD);
 
   return (
     <div className="px-6 py-4 space-y-6">
       {/* Era summary cards */}
       <div className="flex flex-wrap gap-2">
         {eraGroups.map(({ era, lots: eraLots }) => {
-          const stats = calcEraStats(eraLots);
+          const stats = calcEraStats(eraLots, isUSD);
           const color = ERA_COLORS[era] ?? "hsl(0, 0%, 33%)";
           return (
             <div
@@ -109,11 +126,11 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
               <div className="flex gap-3 text-[10px] tracking-wider">
                 <span>
                   <span className="text-muted-foreground">Avg </span>
-                  <span className="text-primary font-bold">{fmtFull(stats.avg)}</span>
+                  <span className="text-primary font-bold">{fmt(stats.avg)}</span>
                 </span>
                 <span>
                   <span className="text-muted-foreground">High </span>
-                  <span className="text-primary font-bold">{fmtFull(stats.max)}</span>
+                  <span className="text-primary font-bold">{fmt(stats.max)}</span>
                 </span>
               </div>
             </div>
@@ -170,7 +187,7 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={avgByGrade} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 50%, 54%, 0.1)" />
-              <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `£${v.toLocaleString()}`} />
+              <XAxis type="number" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `${sym}${v.toLocaleString()}`} />
               <YAxis dataKey="name" type="category" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 9, fill: "hsl(40, 15%, 50%)" }} width={100} />
               <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [fmt(v), "Avg"]} />
               <Bar dataKey="avg" fill="hsl(140, 45%, 50%)" />

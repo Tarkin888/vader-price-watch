@@ -14,6 +14,7 @@ import {
   Cell,
 } from "recharts";
 import type { Lot } from "@/lib/db";
+import type { Currency } from "@/components/FilterBar";
 
 const VARIANT_COLORS: Record<string, string> = {
   "12A": "hsl(43, 50%, 54%)",
@@ -36,27 +37,40 @@ const TOOLTIP_STYLE = {
 interface Props {
   lots: Lot[];
   alwaysExpanded?: boolean;
+  currency?: Currency;
 }
 
 type ChartMode = "line" | "scatter";
 
-const ScatterTooltipContent = ({ active, payload }: any) => {
-  if (!active || !payload?.length) return null;
-  const d = payload[0].payload;
-  return (
-    <div style={TOOLTIP_STYLE} className="p-2 rounded text-xs space-y-0.5">
-      <div className="text-primary font-bold">{d.variant_grade_key}</div>
-      <div>Source: {d.source}</div>
-      <div>Lot: {d.lot_ref}</div>
-      <div>Date: {d.sale_date}</div>
-      <div>Total: £{Number(d.total_paid_gbp).toLocaleString()}</div>
-    </div>
-  );
-};
+function getPrice(l: Lot, isUSD: boolean): number {
+  const gbp = Number(l.total_paid_gbp);
+  if (!isUSD) return gbp;
+  const rate = Number(l.usd_to_gbp_rate);
+  return rate > 0 ? Math.round(gbp / rate) : 0;
+}
 
-const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
+const fmtVal = (v: number, isUSD: boolean) =>
+  isUSD ? `$${v.toLocaleString()}` : `£${v.toLocaleString()}`;
+
+const PriceTrendChart = ({ lots, alwaysExpanded = false, currency = "GBP" }: Props) => {
   const [mode, setMode] = useState<ChartMode>("line");
   const [expanded, setExpanded] = useState(alwaysExpanded);
+  const isUSD = currency === "USD";
+  const sym = isUSD ? "$" : "£";
+
+  const ScatterTooltipContent = ({ active, payload }: any) => {
+    if (!active || !payload?.length) return null;
+    const d = payload[0].payload;
+    return (
+      <div style={TOOLTIP_STYLE} className="p-2 rounded text-xs space-y-0.5">
+        <div className="text-primary font-bold">{d.variant_grade_key}</div>
+        <div>Source: {d.source}</div>
+        <div>Lot: {d.lot_ref}</div>
+        <div>Date: {d.sale_date}</div>
+        <div>Total: {fmtVal(d.price, isUSD)}</div>
+      </div>
+    );
+  };
 
   const { lineData, lineVariants } = useMemo(() => {
     const byVariant: Record<string, Lot[]> = {};
@@ -72,20 +86,20 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
     validVariants.forEach((v) => {
       byVariant[v].forEach((l) => {
         if (!dateMap[l.sale_date]) dateMap[l.sale_date] = {};
-        dateMap[l.sale_date][v] = Number(l.total_paid_gbp);
+        dateMap[l.sale_date][v] = getPrice(l, isUSD);
       });
     });
     const sorted = Object.keys(dateMap).sort();
     return { lineData: sorted.map((d) => ({ date: d, ...dateMap[d] })), lineVariants: validVariants };
-  }, [lots]);
+  }, [lots, isUSD]);
 
   const scatterData = useMemo(() => {
     return lots.map((l) => ({
       ...l,
       dateNum: new Date(l.sale_date).getTime(),
-      price: Number(l.total_paid_gbp),
+      price: getPrice(l, isUSD),
     }));
-  }, [lots]);
+  }, [lots, isUSD]);
 
   const scatterVariants = useMemo(() => {
     return [...new Set(lots.map((l) => l.variant_code))];
@@ -142,8 +156,8 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
             <LineChart data={lineData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(43, 20%, 18%)" />
               <XAxis dataKey="date" stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }} />
-              <YAxis stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `£${v.toLocaleString()}`} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => [`£${value.toLocaleString()}`, undefined]} />
+              <YAxis stroke="hsl(40, 15%, 50%)" tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }} tickFormatter={(v) => `${sym}${v.toLocaleString()}`} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(value: number) => [`${sym}${value.toLocaleString()}`, undefined]} />
               <Legend wrapperStyle={{ fontSize: 10, fontFamily: "'Aptos', sans-serif" }} />
               {lineVariants.map((v) => (
                 <Line key={v} type="monotone" dataKey={v} stroke={VARIANT_COLORS[v] ?? "hsl(0, 0%, 60%)"} strokeWidth={2} dot={{ r: 3 }} connectNulls />
@@ -169,7 +183,7 @@ const PriceTrendChart = ({ lots, alwaysExpanded = false }: Props) => {
               type="number"
               stroke="hsl(40, 15%, 50%)"
               tick={{ fontSize: 10, fill: "hsl(40, 15%, 50%)" }}
-              tickFormatter={(v) => `£${v.toLocaleString()}`}
+              tickFormatter={(v) => `${sym}${v.toLocaleString()}`}
               name="Total Paid"
             />
             <ZAxis range={[60, 60]} />

@@ -1,34 +1,47 @@
 import { useMemo } from "react";
 import { X } from "lucide-react";
 import type { Lot } from "@/lib/db";
+import type { Currency } from "@/components/FilterBar";
 
 interface Props {
   lot: Lot;
   allLots: Lot[];
   onClose: () => void;
+  currency?: Currency;
 }
 
-const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
+function getPrice(l: Lot, isUSD: boolean): number {
+  const gbp = Number(l.total_paid_gbp);
+  if (!isUSD) return gbp;
+  const rate = Number(l.usd_to_gbp_rate);
+  return rate > 0 ? Math.round(gbp / rate) : 0;
+}
+
+const fmtPrice = (n: number, isUSD: boolean) =>
+  isUSD ? `$${Math.round(n).toLocaleString("en-US")}` : `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const ComparableSalesPanel = ({ lot, allLots, onClose, currency = "GBP" }: Props) => {
+  const isUSD = currency === "USD";
+
   const { comparables, avgPrice, pctChange } = useMemo(() => {
     const same = allLots
       .filter((l) => l.variant_grade_key === lot.variant_grade_key && l.id !== lot.id)
       .sort((a, b) => b.sale_date.localeCompare(a.sale_date));
 
     const all = [lot, ...same].sort((a, b) => b.sale_date.localeCompare(a.sale_date));
-    const avg = all.reduce((s, l) => s + Number(l.total_paid_gbp), 0) / all.length;
+    const avg = all.reduce((s, l) => s + getPrice(l, isUSD), 0) / all.length;
 
     let pct: number | null = null;
     if (all.length >= 2) {
-      const newest = Number(all[0].total_paid_gbp);
-      const second = Number(all[1].total_paid_gbp);
+      const newest = getPrice(all[0], isUSD);
+      const second = getPrice(all[1], isUSD);
       if (second > 0) pct = ((newest - second) / second) * 100;
     }
 
     return { comparables: same, avgPrice: avg, pctChange: pct };
-  }, [lot, allLots]);
+  }, [lot, allLots, isUSD]);
 
-  const fmt = (n: number) =>
-    `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const fmt = (n: number) => fmtPrice(n, isUSD);
 
   return (
     <div className="fixed right-0 top-0 h-full w-80 bg-card border-l border-border z-50 flex flex-col shadow-2xl">
@@ -75,7 +88,7 @@ const ComparableSalesPanel = ({ lot, allLots, onClose }: Props) => {
                 <>
                   <div className="flex justify-between items-baseline">
                     <span className="text-[10px] text-muted-foreground">{c.sale_date}</span>
-                    <span className="text-primary font-bold text-xs">{fmt(Number(c.total_paid_gbp))}</span>
+                    <span className="text-primary font-bold text-xs">{fmt(getPrice(c, isUSD))}</span>
                   </div>
                   <div className="text-[10px] text-muted-foreground mt-0.5">
                     {c.source} • {c.lot_ref}
