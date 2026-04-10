@@ -42,7 +42,7 @@ function calcEraStats(items: Lot[]) {
   };
 }
 
-const SummaryDashboard = ({ lots, allLots, onLotClick, onViewResults }: Props) => {
+const SummaryDashboard = ({ lots, allLots }: Props) => {
   const sourceLots = allLots ?? lots;
 
   const eraGroups = useMemo(() =>
