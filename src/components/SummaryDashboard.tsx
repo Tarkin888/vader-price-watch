@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import {
   BarChart,
   Bar,
   XAxis,
@@ -8,8 +9,6 @@ import { useMemo } from "react";
   ResponsiveContainer,
 } from "recharts";
 import type { Lot } from "@/lib/db";
-import {
-
 const TOOLTIP_STYLE = {
   backgroundColor: "hsl(50, 14%, 6%)",
   border: "1px solid hsl(43, 20%, 18%)",
