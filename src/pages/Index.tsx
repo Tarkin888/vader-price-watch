@@ -294,7 +294,7 @@ const Index = () => {
             alwaysExpanded
             onSelectCardback={(code) => {
               updateFilters({ ...filters, cardbackCode: code });
-              changeTab("table");
+              changeTab("dashboard");
               setShowBenchmark(false);
             }}
           />
