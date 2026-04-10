@@ -118,7 +118,7 @@ const ERA_FILTERS = ["All", "SW", "ESB", "ROTJ", "POTF"] as const;
 
 const KnowledgeHub = () => {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>("Timeline");
+  const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>("Research Library");
   const [eraFilter, setEraFilter] = useState<string>("All");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
