@@ -260,8 +260,9 @@ const Index = () => {
             <SummaryDashboard
               lots={filtered}
               allLots={lots}
+              currency={filters.currency}
             />
-            <NotableSalesBanner lots={filtered} />
+            <NotableSalesBanner lots={filtered} currency={filters.currency} />
             <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} currency={filters.currency} highlightLotId={highlightLotId} />
           </>
         ) : (
@@ -295,7 +296,7 @@ const Index = () => {
           <SheetHeader className="px-6 pt-4 pb-2">
             <SheetTitle className="text-primary text-sm tracking-wider font-medium">Price Trend</SheetTitle>
           </SheetHeader>
-          <PriceTrendChart lots={filtered} alwaysExpanded />
+          <PriceTrendChart lots={filtered} alwaysExpanded currency={filters.currency} />
         </SheetContent>
       </Sheet>
 

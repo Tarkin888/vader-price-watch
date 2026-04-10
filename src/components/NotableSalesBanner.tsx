@@ -1,22 +1,32 @@
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";
 import type { Lot } from "@/lib/db";
+import type { Currency } from "@/components/FilterBar";
 import { useConfig } from "@/hooks/use-config";
 
 interface Props {
   lots: Lot[];
+  currency?: Currency;
 }
 
 const DEFAULT_THRESHOLD = 5000;
 const TOP_COUNT = 3;
 
-const fmt = (n: number) =>
-  `£${n.toLocaleString("en-GB", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+const fmtPrice = (n: number, isUSD: boolean) =>
+  isUSD ? `$${Math.round(n).toLocaleString("en-US")}` : `£${n.toLocaleString("en-GB", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
-const NotableSalesBanner = ({ lots }: Props) => {
+function getPrice(l: Lot, isUSD: boolean): number {
+  const gbp = Number(l.total_paid_gbp);
+  if (!isUSD) return gbp;
+  const rate = Number(l.usd_to_gbp_rate);
+  return rate > 0 ? Math.round(gbp / rate) : 0;
+}
+
+const NotableSalesBanner = ({ lots, currency = "GBP" }: Props) => {
   const [expanded, setExpanded] = useState(false);
   const config = useConfig();
   const threshold = Number(config["notable_sales_threshold"]) || DEFAULT_THRESHOLD;
+  const isUSD = currency === "USD";
 
   const notable = useMemo(() => {
     return lots
@@ -41,7 +51,7 @@ const NotableSalesBanner = ({ lots }: Props) => {
               {i > 0 && <span className="text-muted-foreground"> • </span>}
               <span className="text-primary font-bold">{l.variant_grade_key}</span>
               {" "}
-              <span>{fmt(Number(l.total_paid_gbp))}</span>
+              <span>{fmtPrice(getPrice(l, isUSD), isUSD)}</span>
             </span>
           ))}
         </span>
@@ -60,7 +70,7 @@ const NotableSalesBanner = ({ lots }: Props) => {
           {notable.map((l) => (
             <div key={l.id} className="text-[10px] tracking-wider flex items-center gap-3">
               <span className="text-primary font-bold w-40">{l.variant_grade_key}</span>
-              <span className="w-24">{fmt(Number(l.total_paid_gbp))}</span>
+              <span className="w-24">{fmtPrice(getPrice(l, isUSD), isUSD)}</span>
               <span className="text-muted-foreground">{l.source} • {l.sale_date}</span>
             </div>
           ))}
