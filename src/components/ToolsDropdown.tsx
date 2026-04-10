@@ -118,43 +118,47 @@ const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filte
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-card border-border min-w-[180px]">
-          <DropdownMenuItem
-            onClick={onReclassify}
-            disabled={reclassifying}
-            className="text-xs tracking-wider gap-2 cursor-pointer"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${reclassifying ? "animate-spin" : ""}`} />
-            {reclassifying ? "Re-classifying..." : "Re-classify Unknowns"}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => { setDropdownOpen(false); setScreenshotOpen(true); }}
-            className="text-xs tracking-wider gap-2 cursor-pointer"
-          >
-            <Camera className="w-3.5 h-3.5" />
-            Quick Import
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setAddOpen(true)}
-            className="text-xs tracking-wider gap-2 cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Lot
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={handleImportClick}
-            className="text-xs tracking-wider gap-2 cursor-pointer"
-          >
-            <Upload className="w-3.5 h-3.5" />
-            Import CSV
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={handleExport}
-            className="text-xs tracking-wider gap-2 cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Export CSV ({filteredLots.length})
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          {isAdmin && (
+            <>
+              <DropdownMenuItem
+                onClick={onReclassify}
+                disabled={reclassifying}
+                className="text-xs tracking-wider gap-2 cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${reclassifying ? "animate-spin" : ""}`} />
+                {reclassifying ? "Re-classifying..." : "Re-classify Unknowns"}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => { setDropdownOpen(false); setScreenshotOpen(true); }}
+                className="text-xs tracking-wider gap-2 cursor-pointer"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                Quick Import
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setAddOpen(true)}
+                className="text-xs tracking-wider gap-2 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add Lot
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleImportClick}
+                className="text-xs tracking-wider gap-2 cursor-pointer"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                Import CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleExport}
+                className="text-xs tracking-wider gap-2 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Export CSV ({filteredLots.length})
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem
             onClick={onShowBenchmark}
             className="text-xs tracking-wider gap-2 cursor-pointer"
