@@ -232,12 +232,6 @@ const Index = () => {
               Dashboard
             </button>
             <button
-              onClick={() => changeTab("table")}
-              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "table" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-            >
-              Results
-            </button>
-            <button
               onClick={() => changeTab("chart")}
               className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "chart" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
             >
