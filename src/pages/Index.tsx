@@ -8,7 +8,7 @@ import PriceTrendChart from "@/components/PriceTrendChart";
 
 import LotsTable from "@/components/LotsTable";
 import ToolsDropdown from "@/components/ToolsDropdown";
-import SessionLog from "@/components/SessionLog";
+
 import SummaryDashboard from "@/components/SummaryDashboard";
 import NotableSalesBanner from "@/components/NotableSalesBanner";
 
@@ -45,7 +45,7 @@ const Index = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-  const validTabs = ["dashboard", "chart", "session"] as const;
+  const validTabs = ["dashboard", "chart"] as const;
   type Tab = typeof validTabs[number];
   const tabFromUrl = searchParams.get("tab") as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -59,7 +59,6 @@ const Index = () => {
       return next;
     }, { replace: true });
   }, [setSearchParams]);
-  const [copiedRows, setCopiedRows] = useState<Lot[]>([]);
   const [highlightLotId, setHighlightLotId] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -147,9 +146,6 @@ const Index = () => {
     ? lots.reduce((latest, l) => (l.capture_date > latest ? l.capture_date : latest), lots[0].capture_date)
     : null;
 
-  const handleCopyRow = (lot: Lot) => {
-    setCopiedRows((prev) => [...prev, lot]);
-  };
 
   const [reclassifying, setReclassifying] = useState(false);
   const handleReclassify = async () => {
@@ -237,12 +233,6 @@ const Index = () => {
             >
               Price Chart
             </button>
-            <button
-              onClick={() => changeTab("session")}
-              className={`text-[10px] tracking-wider px-3 py-1 transition-colors whitespace-nowrap ${activeTab === "session" ? "text-primary border-b border-primary" : "text-muted-foreground hover:text-primary"}`}
-            >
-              Session Log {copiedRows.length > 0 && `(${copiedRows.length})`}
-            </button>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -272,12 +262,10 @@ const Index = () => {
               allLots={lots}
             />
             <NotableSalesBanner lots={filtered} />
-            <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} onCopyRow={handleCopyRow} currency={filters.currency} highlightLotId={highlightLotId} />
+            <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} currency={filters.currency} highlightLotId={highlightLotId} />
           </>
-        ) : activeTab === "chart" ? (
-          <ScatterChartPanel lots={lots} currency={filters.currency} />
         ) : (
-          <SessionLog copiedRows={copiedRows} onClear={() => setCopiedRows([])} />
+          <ScatterChartPanel lots={lots} currency={filters.currency} />
         )}
       </div>
 
