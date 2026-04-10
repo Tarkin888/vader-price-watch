@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
+import { useAuth } from "@/hooks/use-auth";
 import { Search, ArrowLeft, Plus, Upload, Edit2, Trash2, Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -99,7 +100,7 @@ const ResearchLibrary = () => {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isAdmin } = useAuth();
 
   // Admin state
   const [showForm, setShowForm] = useState(false);
@@ -286,14 +287,6 @@ const ResearchLibrary = () => {
       <div className="flex flex-wrap items-center gap-2 justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-medium text-primary tracking-wider">Research Library</h3>
-          <button
-            onClick={() => setIsAdmin(!isAdmin)}
-            className={`text-[9px] tracking-wider px-2 py-0.5 rounded border transition-colors ${
-              isAdmin ? "border-primary text-primary bg-primary/10" : "border-border text-muted-foreground hover:text-primary hover:border-primary/50"
-            }`}
-          >
-            Admin
-          </button>
         </div>
         {isAdmin && (
           <div className="flex items-center gap-2">
