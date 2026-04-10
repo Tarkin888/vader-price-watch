@@ -79,9 +79,6 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
       .sort((a, b) => b.avg - a.avg);
   }, [lots]);
 
-  const recentSales = useMemo(() => {
-    return [...lots].sort((a, b) => b.sale_date.localeCompare(a.sale_date)).slice(0, 5);
-  }, [lots]);
 
   const fmt = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 0 })}`;
   const fmtFull = (n: number) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -180,47 +177,6 @@ const SummaryDashboard = ({ lots, allLots }: Props) => {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
-      {/* Recent Sales */}
-      <div className="border border-border">
-        <div className="text-[10px] text-muted-foreground tracking-wider font-medium px-3 py-1.5 border-b border-border">
-          5 Most Recent Sales
-        </div>
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b border-border text-muted-foreground tracking-wider text-left">
-              <th className="px-3 py-1">Date</th>
-              <th className="px-3 py-1">Variant-Grade</th>
-              <th className="px-3 py-1">Source</th>
-              <th className="px-3 py-1 text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentSales.map((l) => (
-              <tr
-                key={l.id}
-                onClick={() => onLotClick?.(l.id)}
-                className="border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer"
-              >
-                <td className="px-3 py-1 text-foreground">{l.sale_date}</td>
-                <td className="px-3 py-1 text-primary font-bold">{l.variant_grade_key}</td>
-                <td className="px-3 py-1">
-                  <SourceBadge source={l.source} size="sm" className="scale-[0.55] origin-left" />
-                </td>
-                <td className="px-3 py-1 text-right text-primary font-bold">{fmt(Number(l.total_paid_gbp))}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {onViewResults && (
-          <button
-            onClick={onViewResults}
-            className="w-full text-[10px] text-muted-foreground hover:text-primary tracking-wider py-1.5 transition-colors text-center border-t border-border/50"
-          >
-            View all results →
-          </button>
-        )}
       </div>
     </div>
   );

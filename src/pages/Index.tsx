@@ -45,7 +45,7 @@ const Index = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-  const validTabs = ["dashboard", "table", "chart", "session"] as const;
+  const validTabs = ["dashboard", "chart", "session"] as const;
   type Tab = typeof validTabs[number];
   const tabFromUrl = searchParams.get("tab") as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -272,17 +272,11 @@ const Index = () => {
       </div>
       <div className="flex-1">
         {activeTab === "dashboard" ? (
-          <SummaryDashboard
-            lots={filtered}
-            allLots={lots}
-            onLotClick={(lotId) => {
-              setHighlightLotId(lotId);
-              changeTab("table");
-            }}
-            onViewResults={() => changeTab("table")}
-          />
-        ) : activeTab === "table" ? (
           <>
+            <SummaryDashboard
+              lots={filtered}
+              allLots={lots}
+            />
             <NotableSalesBanner lots={filtered} />
             <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} onCopyRow={handleCopyRow} currency={filters.currency} highlightLotId={highlightLotId} />
           </>
