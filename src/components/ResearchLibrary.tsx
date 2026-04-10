@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
+import { useAuth } from "@/hooks/use-auth";
 import { Search, ArrowLeft, Plus, Upload, Edit2, Trash2, Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
 
