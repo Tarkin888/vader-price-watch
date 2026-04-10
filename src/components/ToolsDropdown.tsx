@@ -28,6 +28,7 @@ interface Props {
 }
 
 const ToolsDropdown = ({ onReclassify, reclassifying, onAdded, onImported, filteredLots, onShowBenchmark, onShowPriceTrend }: Props) => {
+  const { isAdmin } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [screenshotOpen, setScreenshotOpen] = useState(false);
