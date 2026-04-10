@@ -287,14 +287,6 @@ const ResearchLibrary = () => {
       <div className="flex flex-wrap items-center gap-2 justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-medium text-primary tracking-wider">Research Library</h3>
-          <button
-            onClick={() => setIsAdmin(!isAdmin)}
-            className={`text-[9px] tracking-wider px-2 py-0.5 rounded border transition-colors ${
-              isAdmin ? "border-primary text-primary bg-primary/10" : "border-border text-muted-foreground hover:text-primary hover:border-primary/50"
-            }`}
-          >
-            Admin
-          </button>
         </div>
         {isAdmin && (
           <div className="flex items-center gap-2">
