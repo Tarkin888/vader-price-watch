@@ -10,7 +10,7 @@
  * 
  * Create a .env file with:
  *   SUPABASE_URL=https://rdtwgrznjkigghbwstqz.supabase.co
- *   SUPABASE_ANON_KEY=your-anon-key
+ *   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
  * 
  * Usage:
  *   node scrape-vectis.js
@@ -22,10 +22,10 @@ import "dotenv/config";
 
 // ─── Config ────────────────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error("ERROR: Set SUPABASE_URL and SUPABASE_ANON_KEY in .env file");
+  console.error("ERROR: Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env file");
   process.exit(1);
 }
 
