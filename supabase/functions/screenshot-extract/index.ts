@@ -81,6 +81,42 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+/** Extract sale/end date from eBay JSON-LD or structured data in HTML */
+function extractEbaySaleDate(html: string): string | null {
+  // Try JSON-LD first
+  const ldMatches = html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+  for (const m of ldMatches) {
+    try {
+      const ld = JSON.parse(m[1]);
+      // eBay uses Product/Offer schema with availabilityEnds or endDate
+      const endDate = ld?.offers?.availabilityEnds || ld?.offers?.priceValidUntil || ld?.endDate;
+      if (endDate) {
+        return endDate.slice(0, 10); // YYYY-MM-DD
+      }
+      // Could be nested in @graph
+      if (Array.isArray(ld?.["@graph"])) {
+        for (const node of ld["@graph"]) {
+          const d = node?.offers?.availabilityEnds || node?.endDate;
+          if (d) return d.slice(0, 10);
+        }
+      }
+    } catch { /* ignore parse errors */ }
+  }
+
+  // Fallback: look for "Ended:" or "Sold" date patterns in visible text
+  const endedMatch = html.match(/(?:Ended|Sold)\s*(?:on)?\s*(\w{3}\s+\d{1,2},?\s+\d{4})/i);
+  if (endedMatch) {
+    try {
+      const d = new Date(endedMatch[1]);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().slice(0, 10);
+      }
+    } catch { /* ignore */ }
+  }
+
+  return null;
+}
+
 async function callClaude(content: Array<Record<string, unknown>>): Promise<Record<string, unknown>> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
