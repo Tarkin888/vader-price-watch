@@ -144,9 +144,13 @@ serve(async (req) => {
     }
 
     if (result.error) {
+      const errMsg = (result.error as any).message || "Database error";
+      const errDetails = (result.error as any).details || "";
+      const errCode = (result.error as any).code || "";
+      console.error("admin-write DB error:", JSON.stringify({ errMsg, errDetails, errCode, table, operation }));
       return new Response(
-        JSON.stringify({ error: (result.error as any).message || "Database error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ success: false, error: errMsg, details: errDetails, code: errCode }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -155,9 +159,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
+    const errMsg = e instanceof Error ? e.message : "Server error";
+    console.error("admin-write exception:", errMsg);
     return new Response(
-      JSON.stringify({ error: "Server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: false, error: errMsg }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
