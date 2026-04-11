@@ -49,6 +49,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       if (data?.valid) {
         sessionStorage.setItem("admin_auth", "true");
         sessionStorage.setItem("admin_pin", pin);
+        setIsPinVerified(true);
         setStep("capture");
         setError(null);
       } else {
