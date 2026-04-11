@@ -178,6 +178,11 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
           <div>
             <label className={labelClass}>{dot(extracted.saleDate ? "extracted" : "missing")} Sale Date</label>
             <input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className={inputClass} />
+            {!saleDate && (
+              <p className="text-[9px] text-amber-400/80 tracking-wider font-mono mt-0.5">
+                Date not found — please enter manually
+              </p>
+            )}
           </div>
           <div>
             <label className={labelClass}>{dot(extracted.title ? "extracted" : "missing")} Lot Title</label>
