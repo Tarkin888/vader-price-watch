@@ -22,7 +22,7 @@ export async function adminWrite(params: AdminWriteParams): Promise<{ success: b
     body: { pin, ...params },
   });
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: data?.error || error.message };
   }
   if (!data?.success) {
     return { success: false, error: data?.error || "Unknown error" };
