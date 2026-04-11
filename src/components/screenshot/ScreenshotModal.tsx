@@ -30,7 +30,15 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
 
   // Re-check PIN state when modal opens
   useEffect(() => {
-    if (open) setStep(hasPin() ? "capture" : "pin");
+    if (open) {
+      if (hasPin()) {
+        setIsPinVerified(true);
+        setStep("capture");
+      } else {
+        setIsPinVerified(false);
+        setStep("pin");
+      }
+    }
   }, [open]);
 
   const handlePinSubmit = async () => {
