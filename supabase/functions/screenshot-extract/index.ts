@@ -259,6 +259,14 @@ async function handleUrlMode(url: string) {
     extracted.lotUrl = canonical;
   }
 
+  // For eBay: try to extract sale date from structured data if Claude didn't get it
+  if (detectedSource === "eBay" && !extracted.saleDate) {
+    const ebayDate = extractEbaySaleDate(html);
+    if (ebayDate) {
+      extracted.saleDate = ebayDate;
+    }
+  }
+
   // Inject og:image into imageUrls if Claude didn't extract one
   if (ogImage && (!extracted.imageUrls || (extracted.imageUrls as string[]).length === 0)) {
     const imgUrl = ogImage.startsWith("http") ? ogImage : new URL(ogImage, url).href;
