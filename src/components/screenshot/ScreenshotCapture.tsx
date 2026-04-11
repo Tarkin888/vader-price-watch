@@ -4,9 +4,10 @@ import { Clipboard, Upload, Link } from "lucide-react";
 interface Props {
   onImageCaptured: (base64: string) => void;
   onUrlSubmitted: (url: string) => void;
+  enabled?: boolean;
 }
 
-const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted }: Props) => {
+const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: Props) => {
   const [urlValue, setUrlValue] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -28,9 +29,10 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted }: Props) => {
   );
 
   useEffect(() => {
+    if (!enabled) return;
     document.addEventListener("paste", handlePaste);
     return () => document.removeEventListener("paste", handlePaste);
-  }, [handlePaste]);
+  }, [handlePaste, enabled]);
 
   const readFile = (file: File) => {
     if (file.size > 10 * 1024 * 1024) {

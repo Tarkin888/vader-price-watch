@@ -19,6 +19,7 @@ type Step = "pin" | "capture" | "preview" | "review" | "done";
 const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
   const hasPin = () => !!sessionStorage.getItem("admin_pin");
   const [step, setStep] = useState<Step>("pin");
+  const [isPinVerified, setIsPinVerified] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>("");
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,15 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
 
   // Re-check PIN state when modal opens
   useEffect(() => {
-    if (open) setStep(hasPin() ? "capture" : "pin");
+    if (open) {
+      if (hasPin()) {
+        setIsPinVerified(true);
+        setStep("capture");
+      } else {
+        setIsPinVerified(false);
+        setStep("pin");
+      }
+    }
   }, [open]);
 
   const handlePinSubmit = async () => {
@@ -40,6 +49,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       if (data?.valid) {
         sessionStorage.setItem("admin_auth", "true");
         sessionStorage.setItem("admin_pin", pin);
+        setIsPinVerified(true);
         setStep("capture");
         setError(null);
       } else {
@@ -54,6 +64,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
 
   const reset = () => {
     setStep(hasPin() ? "capture" : "pin");
+    setIsPinVerified(hasPin());
     setImageSrc("");
     setExtracted(null);
     setLoading(false);
@@ -230,6 +241,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
             <ScreenshotCapture
               onImageCaptured={handleImageCaptured}
               onUrlSubmitted={handleUrlSubmitted}
+              enabled={isPinVerified}
             />
           )}
 
