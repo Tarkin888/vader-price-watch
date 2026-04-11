@@ -4,6 +4,7 @@ import { Clipboard, Upload, Link } from "lucide-react";
 interface Props {
   onImageCaptured: (base64: string) => void;
   onUrlSubmitted: (url: string) => void;
+  enabled?: boolean;
 }
 
 const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted }: Props) => {
