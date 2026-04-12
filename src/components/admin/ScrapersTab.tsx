@@ -263,6 +263,9 @@ const AdminScrapersTab = () => {
           </div>
         </>
       )}
+
+      {/* Scrape History Panel */}
+      <ScrapeHistoryPanel />
     </div>
   );
 };
