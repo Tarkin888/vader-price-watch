@@ -7,8 +7,31 @@ interface Props {
   enabled?: boolean;
 }
 
+interface SourceHint {
+  label: string;
+  color: string;
+}
+
+const detectSource = (url: string): SourceHint | null => {
+  if (!url.trim()) return null;
+  const lower = url.toLowerCase();
+  if (lower.includes("ha.com")) return { label: "HERITAGE", color: "#3B82F6" };
+  if (lower.includes("ebay.")) return { label: "EBAY", color: "#22C55E" };
+  if (lower.includes("vectis.co.uk")) return { label: "VECTIS", color: "#A855F7" };
+  if (lower.includes("hakes.com")) return { label: "HAKES", color: "#F97316" };
+  if (lower.includes("candtauctions")) return { label: "C&T", color: "#F59E0B" };
+  if (lower.includes("lcgauctions")) return { label: "LCG", color: "#14B8A6" };
+  if (lower.includes("facebook.com")) return { label: "FACEBOOK", color: "#60A5FA" };
+  // Any other URL-like string → OTHER
+  if (lower.startsWith("http") || (lower.includes(".") && lower.length > 4)) {
+    return { label: "OTHER", color: "#6B7280" };
+  }
+  return null;
+};
+
 const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: Props) => {
   const [urlValue, setUrlValue] = useState("");
+  const [detectedSource, setDetectedSource] = useState<SourceHint | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handlePaste = useCallback(
@@ -56,6 +79,12 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) readFile(file);
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setUrlValue(val);
+    setDetectedSource(detectSource(val));
   };
 
   const zoneClass =
@@ -120,7 +149,7 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
             type="url"
             placeholder="https://..."
             value={urlValue}
-            onChange={(e) => setUrlValue(e.target.value)}
+            onChange={handleUrlChange}
             className="flex-1 bg-background border border-border rounded px-2 py-1 text-xs text-foreground font-mono"
             aria-label="Auction URL"
           />
@@ -134,6 +163,18 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
             Fetch
           </button>
         </div>
+        {detectedSource && (
+          <span
+            className="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider font-bold self-start"
+            style={{
+              backgroundColor: `${detectedSource.color}22`,
+              color: detectedSource.color,
+              border: `1px solid ${detectedSource.color}55`,
+            }}
+          >
+            {detectedSource.label}
+          </span>
+        )}
       </div>
     </div>
   );
