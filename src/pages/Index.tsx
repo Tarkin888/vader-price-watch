@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { Menu, X, Camera, LayoutGrid, List } from "lucide-react";
 import ScreenshotModal from "@/components/screenshot/ScreenshotModal";
 import PriceTrackerTileView from "@/components/PriceTrackerTileView";
+import Pagination from "@/components/Pagination";
 
 function calcQuickStats(lots: Lot[], isUSD: boolean) {
   const priced = lots.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
@@ -46,7 +47,7 @@ const Index = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [loading, setLoading] = useState(true);
-  const validTabs = ["dashboard", "chart"] as const;
+  const validTabs = ["dashboard", "table", "tile", "chart"] as const;
   type Tab = typeof validTabs[number];
   const tabFromUrl = searchParams.get("tab") as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -65,7 +66,9 @@ const Index = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
   const [quickImportOpen, setQuickImportOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"table" | "tile">("table");
+  // viewMode removed — activeTab now controls all views exclusively (dashboard | table | tile | chart)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const [filters, setFilters] = useState<Filters>(() => {
     const parseDate = (s: string | null): Date | null => {
       if (!s) return null;
@@ -168,6 +171,28 @@ const Index = () => {
   const isUSD = filters.currency === "USD";
   const quickStats = useMemo(() => calcQuickStats(filtered, isUSD), [filtered, isUSD]);
 
+  // Reset to page 1 whenever filters or tab change
+  useEffect(() => { setCurrentPage(1); }, [filters, activeTab]);
+
+  // Paginated slice for Table and Tile views
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedLots = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, safePage, pageSize]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    // Scroll to top of results
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [totalPages]);
+
+  const handlePageSizeChange = useCallback((size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  }, []);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -241,23 +266,23 @@ const Index = () => {
           {/* View toggle */}
           <div className="flex items-center border border-border rounded overflow-hidden">
             <button
-              onClick={() => setViewMode("table")}
+              onClick={() => changeTab("table")}
               title="Table view"
               className="flex items-center justify-center w-8 h-8 transition-colors"
               style={{
-                background: viewMode === "table" ? "rgba(201,168,76,0.15)" : "transparent",
-                color: viewMode === "table" ? "#C9A84C" : "rgba(224,216,192,0.4)",
+                background: activeTab === "table" ? "rgba(201,168,76,0.15)" : "transparent",
+                color: activeTab === "table" ? "#C9A84C" : "rgba(224,216,192,0.4)",
               }}
             >
               <List className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => setViewMode("tile")}
+              onClick={() => changeTab("tile")}
               title="Tile view"
               className="flex items-center justify-center w-8 h-8 transition-colors"
               style={{
-                background: viewMode === "tile" ? "rgba(201,168,76,0.15)" : "transparent",
-                color: viewMode === "tile" ? "#C9A84C" : "rgba(224,216,192,0.4)",
+                background: activeTab === "tile" ? "rgba(201,168,76,0.15)" : "transparent",
+                color: activeTab === "tile" ? "#C9A84C" : "rgba(224,216,192,0.4)",
               }}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -282,7 +307,7 @@ const Index = () => {
         </div>
       </div>
       <div className="flex-1">
-        {activeTab === "dashboard" ? (
+        {activeTab === "dashboard" && (
           <>
             <SummaryDashboard
               lots={filtered}
@@ -290,13 +315,35 @@ const Index = () => {
               currency={filters.currency}
             />
             <NotableSalesBanner lots={filtered} currency={filters.currency} />
-            {viewMode === "table" ? (
-              <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} currency={filters.currency} highlightLotId={highlightLotId} />
-            ) : (
-              <PriceTrackerTileView lots={filtered} currency={filters.currency} />
-            )}
           </>
-        ) : (
+        )}
+        {activeTab === "table" && (
+          <>
+            <LotsTable lots={paginatedLots} allLots={lots} onChanged={loadLots} currency={filters.currency} highlightLotId={highlightLotId} />
+            <Pagination
+              currentPage={safePage}
+              totalPages={totalPages}
+              totalRecords={filtered.length}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          </>
+        )}
+        {activeTab === "tile" && (
+          <>
+            <PriceTrackerTileView lots={paginatedLots} currency={filters.currency} />
+            <Pagination
+              currentPage={safePage}
+              totalPages={totalPages}
+              totalRecords={filtered.length}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          </>
+        )}
+        {activeTab === "chart" && (
           <ScatterChartPanel lots={lots} currency={filters.currency} />
         )}
       </div>
