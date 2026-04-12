@@ -237,7 +237,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
             </div>
           )}
 
-          {step === "capture" && (
+          {isPinVerified && step === "capture" && (
             <ScreenshotCapture
               onImageCaptured={handleImageCaptured}
               onUrlSubmitted={handleUrlSubmitted}
