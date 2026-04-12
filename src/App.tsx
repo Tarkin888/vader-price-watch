@@ -16,6 +16,7 @@ import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import KnowledgeHub from "./pages/KnowledgeHub";
 import Admin from "./pages/Admin";
+import Changelog from "./pages/Changelog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/knowledge" element={<KnowledgeHub />} />
         <Route path="/collection" element={<Collection />} />
+        <Route path="/changelog" element={<Changelog />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
