@@ -465,6 +465,63 @@ export type Database = {
         }
         Relationships: []
       }
+      scrape_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duplicates_skipped: number
+          duration_seconds: number | null
+          error_summary: string | null
+          errors: number
+          id: string
+          lots_visited: number
+          moc_passed: number
+          new_inserted: number
+          phase1_anchors: number
+          phase1_walks: number
+          scraper_version: string | null
+          source: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duplicates_skipped?: number
+          duration_seconds?: number | null
+          error_summary?: string | null
+          errors?: number
+          id?: string
+          lots_visited?: number
+          moc_passed?: number
+          new_inserted?: number
+          phase1_anchors?: number
+          phase1_walks?: number
+          scraper_version?: string | null
+          source: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duplicates_skipped?: number
+          duration_seconds?: number | null
+          error_summary?: string | null
+          errors?: number
+          id?: string
+          lots_visited?: number
+          moc_passed?: number
+          new_inserted?: number
+          phase1_anchors?: number
+          phase1_walks?: number
+          scraper_version?: string | null
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       scraper_logs: {
         Row: {
           completed_at: string | null

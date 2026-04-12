@@ -3,6 +3,7 @@ import { adminRead } from "@/lib/admin-read";
 import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
+import ScrapeHistoryPanel from "./ScrapeHistoryPanel";
 
 const SOURCES = ["Heritage", "Hakes", "LCG", "Vectis", "CandT"];
 const STATUS_OPTIONS = ["SUCCESS", "PARTIAL", "FAILED"];
@@ -262,6 +263,9 @@ const AdminScrapersTab = () => {
           </div>
         </>
       )}
+
+      {/* Scrape History Panel */}
+      <ScrapeHistoryPanel />
     </div>
   );
 };
