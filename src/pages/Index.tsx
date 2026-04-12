@@ -17,8 +17,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Menu, X, Camera } from "lucide-react";
+import { Menu, X, Camera, LayoutGrid, List } from "lucide-react";
 import ScreenshotModal from "@/components/screenshot/ScreenshotModal";
+import PriceTrackerTileView from "@/components/PriceTrackerTileView";
 
 function calcQuickStats(lots: Lot[], isUSD: boolean) {
   const priced = lots.filter((l) => (l as any).price_status !== "ESTIMATE_ONLY" && Number(l.total_paid_gbp) > 0);
@@ -64,6 +65,7 @@ const Index = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showPriceTrend, setShowPriceTrend] = useState(false);
   const [quickImportOpen, setQuickImportOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "tile">("table");
   const [filters, setFilters] = useState<Filters>(() => {
     const parseDate = (s: string | null): Date | null => {
       if (!s) return null;
@@ -236,6 +238,31 @@ const Index = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* View toggle */}
+          <div className="flex items-center border border-border rounded overflow-hidden">
+            <button
+              onClick={() => setViewMode("table")}
+              title="Table view"
+              className="flex items-center justify-center w-8 h-8 transition-colors"
+              style={{
+                background: viewMode === "table" ? "rgba(201,168,76,0.15)" : "transparent",
+                color: viewMode === "table" ? "#C9A84C" : "rgba(224,216,192,0.4)",
+              }}
+            >
+              <List className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setViewMode("tile")}
+              title="Tile view"
+              className="flex items-center justify-center w-8 h-8 transition-colors"
+              style={{
+                background: viewMode === "tile" ? "rgba(201,168,76,0.15)" : "transparent",
+                color: viewMode === "tile" ? "#C9A84C" : "rgba(224,216,192,0.4)",
+              }}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <button
             onClick={() => setQuickImportOpen(true)}
             title="Quick Import"
@@ -263,7 +290,11 @@ const Index = () => {
               currency={filters.currency}
             />
             <NotableSalesBanner lots={filtered} currency={filters.currency} />
-            <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} currency={filters.currency} highlightLotId={highlightLotId} />
+            {viewMode === "table" ? (
+              <LotsTable lots={filtered} allLots={lots} onChanged={loadLots} currency={filters.currency} highlightLotId={highlightLotId} />
+            ) : (
+              <PriceTrackerTileView lots={filtered} currency={filters.currency} />
+            )}
           </>
         ) : (
           <ScatterChartPanel lots={lots} currency={filters.currency} />
