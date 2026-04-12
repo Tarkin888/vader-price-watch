@@ -11,6 +11,7 @@ import AdminBugReportsTab from "@/components/admin/BugReportsTab";
 import AdminConfigTab from "@/components/admin/ConfigTab";
 import AdminAuditLogTab from "@/components/admin/AuditLogTab";
 import AdminUsersTab from "@/components/admin/UsersTab";
+import AdminChangelogTab from "@/components/admin/ChangelogTab";
 
 const TABS = [
   { key: "overview", label: "OVERVIEW" },
@@ -21,6 +22,7 @@ const TABS = [
   { key: "config", label: "CONFIG" },
   { key: "audit-log", label: "AUDIT LOG" },
   { key: "users", label: "USERS" },
+  { key: "changelog", label: "CHANGELOG" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -211,6 +213,7 @@ const Admin = () => {
         {activeTab === "config" && <AdminConfigTab />}
         {activeTab === "audit-log" && <AdminAuditLogTab />}
         {activeTab === "users" && <AdminUsersTab />}
+        {activeTab === "changelog" && <AdminChangelogTab />}
       </div>
 
       {/* Footer */}
