@@ -104,6 +104,39 @@ export type Database = {
         }
         Relationships: []
       }
+      changelog: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          release_date: string
+          title: string
+          version: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          release_date?: string
+          title: string
+          version: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          release_date?: string
+          title?: string
+          version?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
