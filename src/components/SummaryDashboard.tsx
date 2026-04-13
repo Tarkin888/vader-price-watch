@@ -54,7 +54,6 @@ const fmtPrice = (n: number, isUSD: boolean) =>
 const SummaryDashboard = ({ lots, allLots, currency = "GBP" }: Props) => {
   const isUSD = currency === "USD";
   const sym = isUSD ? "$" : "£";
-  const sourceLots = allLots ?? lots;
 
   // Defer chart rendering by one frame so ResponsiveContainer can measure its parent
   const [chartsReady, setChartsReady] = useState(false);
@@ -66,9 +65,9 @@ const SummaryDashboard = ({ lots, allLots, currency = "GBP" }: Props) => {
   const eraGroups = useMemo(() =>
     ERAS_ORDER.map((era) => ({
       era,
-      lots: sourceLots.filter((l) => l.era === era),
+      lots: lots.filter((l) => l.era === era),
     })).filter((g) => g.lots.length > 0),
-  [sourceLots]);
+  [lots]);
 
   const SOURCE_DISPLAY: Record<string, string> = { Heritage: "Heritage", Hakes: "Hake's", Vectis: "Vectis", LCG: "LCG", CandT: "C&T" };
 

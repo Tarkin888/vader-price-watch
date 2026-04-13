@@ -184,12 +184,12 @@ const KnowledgeHub = () => {
       </div>
 
       {/* content */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-3 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-3 space-y-4">
 
         {/* ──── SECTION 1: TIMELINE ──── */}
         <div ref={(el) => { sectionRefs.current["Timeline"] = el; }}>
           <SectionHeader title="Cardback Timeline" />
-          <div className="relative flex items-center justify-between mt-3 mb-2 px-4">
+          <div className="relative flex items-center justify-between mt-2 mb-1 px-4">
             {/* gold line */}
             <div className="absolute top-1/2 left-0 right-0 h-px bg-primary/60" />
             {TIMELINE_NODES.map((node) => (
@@ -199,9 +199,9 @@ const KnowledgeHub = () => {
                 className="relative z-10 flex flex-col items-center group"
               >
                 <div className="w-5 h-5 rounded-full border-2 border-primary bg-background group-hover:bg-primary/20 transition-colors shadow-[0_0_8px_hsl(43_50%_54%/0.4)]" />
-                <span className="mt-2 text-xs font-bold text-primary tracking-wider">{node.label}</span>
-                <span className="text-[10px] text-muted-foreground">{node.years}</span>
-                <span className="text-[9px] text-muted-foreground">{node.sub}</span>
+                <span className="mt-1 text-xs font-bold text-primary tracking-wider">{node.label}</span>
+                <span className="text-[10px] text-muted-foreground leading-tight">{node.years}</span>
+                <span className="text-[9px] text-muted-foreground leading-tight">{node.sub}</span>
               </button>
             ))}
           </div>

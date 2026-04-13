@@ -47,11 +47,14 @@ const AdminOverviewTab = () => {
         supabase.from("page_views").select("id", { count: "exact", head: true }).gte("viewed_at", new Date().toISOString().slice(0, 10)),
       ]);
 
-      const uniqueSources = new Set((sourcesRes.data ?? []).map((r: any) => r.source));
+      const SCRAPER_SOURCES = ["Heritage", "Hakes", "LCG", "Vectis", "CandT"];
+      const uniqueScraperSources = new Set(
+        (sourcesRes.data ?? []).map((r: any) => r.source).filter((s: string) => SCRAPER_SOURCES.includes(s))
+      );
 
       setStats({
         totalRecords: totalRes.count ?? 0,
-        activeSources: uniqueSources.size,
+        activeSources: uniqueScraperSources.size,
         openBugs: bugsRes.count ?? 0,
         visitorsToday: visitorsRes.count ?? 0,
       });
