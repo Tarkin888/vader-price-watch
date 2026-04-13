@@ -171,7 +171,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       <div
         role="dialog"
         aria-label="Import auction record from screenshot"
-        className="relative z-10 bg-[#0D0D0A] border border-[#C9A84C33] rounded-xl w-full max-w-[680px] max-h-[85vh] overflow-y-auto mx-4 sm:mx-auto max-sm:fixed max-sm:inset-0 max-sm:rounded-none max-sm:max-w-none max-sm:max-h-none max-sm:mx-0"
+        className="relative z-10 bg-[#0D0D0A] border border-[#C9A84C33] rounded-xl w-full max-w-[820px] max-h-[85vh] overflow-y-auto mx-4 sm:mx-auto max-sm:fixed max-sm:inset-0 max-sm:rounded-none max-sm:max-w-none max-sm:max-h-none max-sm:mx-0"
         onKeyDown={(e) => { if (e.key === "Escape") close(); }}
       >
         {/* Header */}
