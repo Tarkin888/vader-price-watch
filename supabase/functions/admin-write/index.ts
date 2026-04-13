@@ -34,6 +34,7 @@ const ALLOWED_TABLES = [
   "scraper_logs",
   "bug_reports",
   "knowledge_articles",
+  "chatbot_feedback",
 ];
 
 type Operation = "insert" | "update" | "delete";
