@@ -92,77 +92,80 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
   const zoneIdle = "border-[#C9A84C44] hover:border-[#C9A84C] hover:bg-[#C9A84C08]";
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      {/* Paste zone */}
-      <div
-        className={`${zoneClass} ${zoneIdle}`}
-        tabIndex={0}
-        role="button"
-        aria-label="Paste a screenshot from clipboard"
-        onClick={() => {
-          /* focus to enable paste */
-        }}
-      >
-        <Clipboard className="w-8 h-8 text-[#C9A84C]" />
-        <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
-          Paste a screenshot
-        </span>
-        <span className="text-muted-foreground text-[10px]">Ctrl+V / Cmd+V</span>
-      </div>
-
-      {/* Upload zone */}
-      <div
-        className={`${zoneClass} ${zoneIdle}`}
-        role="button"
-        aria-label="Upload an image file"
-        tabIndex={0}
-        onClick={() => fileRef.current?.click()}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-      >
-        <Upload className="w-8 h-8 text-[#C9A84C]" />
-        <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
-          Upload an image
-        </span>
-        <span className="text-muted-foreground text-[10px]">PNG, JPG, or WebP</span>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) readFile(f);
-            e.target.value = "";
+    <div className="flex flex-col gap-3">
+      {/* Paste & Upload — side by side on larger screens */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Paste zone */}
+        <div
+          className={`${zoneClass} ${zoneIdle}`}
+          tabIndex={0}
+          role="button"
+          aria-label="Paste a screenshot from clipboard"
+          onClick={() => {
+            /* focus to enable paste */
           }}
-        />
+        >
+          <Clipboard className="w-8 h-8 text-[#C9A84C]" />
+          <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
+            Paste a screenshot
+          </span>
+          <span className="text-muted-foreground text-[10px]">Ctrl+V / Cmd+V</span>
+        </div>
+
+        {/* Upload zone */}
+        <div
+          className={`${zoneClass} ${zoneIdle}`}
+          role="button"
+          aria-label="Upload an image file"
+          tabIndex={0}
+          onClick={() => fileRef.current?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+        >
+          <Upload className="w-8 h-8 text-[#C9A84C]" />
+          <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
+            Upload an image
+          </span>
+          <span className="text-muted-foreground text-[10px]">PNG, JPG, or WebP</span>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) readFile(f);
+              e.target.value = "";
+            }}
+          />
+        </div>
       </div>
 
-      {/* URL zone */}
-      <div className={`${zoneClass} ${zoneIdle}`} tabIndex={0}>
-        <Link className="w-8 h-8 text-[#C9A84C]" />
-        <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
-          Paste a web link
-        </span>
-        <div className="flex gap-1 w-full mt-1">
-          <input
-            type="url"
-            placeholder="https://..."
-            value={urlValue}
-            onChange={handleUrlChange}
-            className="flex-1 bg-background border border-border rounded px-2 py-1 text-xs text-foreground font-mono"
-            aria-label="Auction URL"
-          />
-          <button
-            onClick={() => {
-              if (urlValue.trim()) onUrlSubmitted(urlValue.trim());
-            }}
-            disabled={!urlValue.trim()}
-            className="px-2 py-1 text-[10px] tracking-wider bg-[#C9A84C] text-background rounded font-mono disabled:opacity-40"
-          >
-            Fetch
-          </button>
+      {/* URL zone — full width, stacked layout */}
+      <div className={`${zoneClass} ${zoneIdle} items-start`} tabIndex={0}>
+        <div className="flex items-center gap-2">
+          <Link className="w-6 h-6 text-[#C9A84C]" />
+          <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
+            Paste a web link
+          </span>
         </div>
+        <input
+          type="url"
+          placeholder="https://..."
+          value={urlValue}
+          onChange={handleUrlChange}
+          className="w-full bg-background border border-border rounded px-3 py-2 text-xs text-foreground font-mono overflow-x-auto"
+          aria-label="Auction URL"
+        />
+        <button
+          onClick={() => {
+            if (urlValue.trim()) onUrlSubmitted(urlValue.trim());
+          }}
+          disabled={!urlValue.trim()}
+          className="px-4 py-1.5 text-[10px] tracking-wider bg-[#C9A84C] text-background rounded font-mono disabled:opacity-40"
+        >
+          Fetch
+        </button>
         {detectedSource && (
           <span
             className="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider font-bold self-start"
