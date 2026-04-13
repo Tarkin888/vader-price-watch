@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import type { Lot } from "@/lib/db";
 import type { Currency } from "@/components/FilterBar";
 import SourceBadge from "@/components/SourceBadge";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, X } from "lucide-react";
 import { toast } from "sonner";
+import { adminWrite } from "@/lib/admin-write";
 
 /* ── image helpers (same as LotsTable) ── */
 function getLotImageUrl(imageUrls: string[]): string | null {
@@ -53,14 +54,72 @@ const ERA_COLORS: Record<string, string> = {
 interface Props {
   lots: Lot[];
   currency?: Currency;
+  onChanged?: () => void;
 }
 
-const PriceTrackerTileView = ({ lots, currency = "GBP" }: Props) => {
+const PriceTrackerTileView = ({ lots, currency = "GBP", onChanged }: Props) => {
   const isUSD = currency === "USD";
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+
+  const handleDelete = useCallback(async (lot: Lot) => {
+    // Optimistically hide the card
+    setDeletedIds((prev) => new Set(prev).add(lot.id));
+
+    const undoRestore = () => {
+      setDeletedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(lot.id);
+        return next;
+      });
+    };
+
+    // Attempt delete via admin-write
+    const res = await adminWrite({ table: "lots", operation: "delete", match: { column: "id", value: lot.id } });
+    if (!res.success) {
+      undoRestore();
+      toast.error(res.error || "Delete failed");
+      return;
+    }
+
+    toast("Record deleted. Undo?", {
+      duration: 5000,
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          // Re-insert the original lot data
+          const { id, created_at, updated_at, ...insertData } = lot as any;
+          const reinsert = await adminWrite({ table: "lots", operation: "insert", data: insertData });
+          if (reinsert.success) {
+            undoRestore();
+            onChanged?.();
+            toast.success("Record restored");
+          } else {
+            toast.error(reinsert.error || "Restore failed");
+          }
+        },
+      },
+      onAutoClose: () => {
+        setDeletedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(lot.id);
+          return next;
+        });
+        onChanged?.();
+      },
+      onDismiss: () => {
+        setDeletedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(lot.id);
+          return next;
+        });
+        onChanged?.();
+      },
+    });
+  }, [onChanged]);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 md:px-6">
-      {lots.map((lot) => {
+      {lots.filter((lot) => !deletedIds.has(lot.id)).map((lot) => {
         const imgUrl = getLotImageUrl(lot.image_urls);
         const era = (lot as any).era || "UNKNOWN";
         const cardback = (lot as any).cardback_code || "UNKNOWN";
@@ -105,6 +164,15 @@ const PriceTrackerTileView = ({ lots, currency = "GBP" }: Props) => {
                   ESTIMATE
                 </span>
               )}
+              {/* Quick delete button — visible on hover */}
+              <button
+                onClick={(e) => { e.stopPropagation(); handleDelete(lot); }}
+                className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: "rgba(26,26,26,0.8)" }}
+                title="Delete record"
+              >
+                <X className="w-3.5 h-3.5" style={{ color: "#C9A84C" }} />
+              </button>
             </div>
 
             {/* Content */}
