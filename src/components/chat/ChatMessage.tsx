@@ -1,5 +1,6 @@
 import PriceResultCards from "./PriceResultCard";
 import { useChat } from "./ChatProvider";
+import KennyAvatar from "./KennyAvatar";
 
 interface Props {
   msg: {
@@ -25,7 +26,12 @@ export default function ChatMessage({ msg }: Props) {
     .trim();
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2`}>
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2 ${!isUser ? "items-start gap-2" : ""}`}>
+      {!isUser && (
+        <div className="shrink-0 mt-1">
+          <KennyAvatar size={28} />
+        </div>
+      )}
       <div
         className="max-w-[85%] px-3 py-2 text-[13px] whitespace-pre-wrap"
         style={{

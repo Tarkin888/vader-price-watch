@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { MessageCircle } from "lucide-react";
 import { useChat } from "./ChatProvider";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
+import KennyAvatar from "./KennyAvatar";
 
 export default function ChatWidget() {
   const { isOpen, setIsOpen, unreadCount } = useChat();
@@ -59,7 +59,7 @@ export default function ChatWidget() {
         onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(1.1)")}
         onMouseLeave={(e) => (e.currentTarget.style.filter = "brightness(1)")}
       >
-        <MessageCircle size={24} color="#080806" />
+        <KennyAvatar size={28} />
         {unreadCount > 0 && !isOpen && (
           <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 border-2 border-[#0D0D0A]" />
         )}

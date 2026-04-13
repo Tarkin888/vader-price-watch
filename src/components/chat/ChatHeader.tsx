@@ -1,5 +1,6 @@
-import { RotateCcw, Bug, X, MessageCircle } from "lucide-react";
+import { RotateCcw, Bug, X } from "lucide-react";
 import { useChat } from "./ChatProvider";
+import KennyAvatar from "./KennyAvatar";
 
 export default function ChatHeader() {
   const { setIsOpen, resetSession, sendMessage } = useChat();
@@ -14,7 +15,7 @@ export default function ChatHeader() {
       style={{ background: "rgba(201,168,76,0.08)" }}
     >
       <div className="flex items-center gap-2">
-        <MessageCircle size={16} color="#C9A84C" />
+        <KennyAvatar size={32} />
         <span
           className="text-sm font-bold"
           style={{ color: "#C9A84C", fontFamily: "Aptos, 'Courier New', monospace" }}
