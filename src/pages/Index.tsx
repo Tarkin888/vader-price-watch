@@ -332,7 +332,7 @@ const Index = () => {
         )}
         {activeTab === "tile" && (
           <>
-            <PriceTrackerTileView lots={paginatedLots} currency={filters.currency} />
+            <PriceTrackerTileView lots={paginatedLots} currency={filters.currency} onChanged={loadLots} />
             <Pagination
               currentPage={safePage}
               totalPages={totalPages}
