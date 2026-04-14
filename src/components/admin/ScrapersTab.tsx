@@ -73,7 +73,7 @@ const AdminScrapersTab = () => {
         .from("lots")
         .select("id", { count: "exact", head: true })
         .is("cached_image_url", null)
-        .neq("image_urls", "{}");
+        .not("image_urls", "eq", "{}");
       setUncachedCount(count ?? 0);
     } catch { setUncachedCount(null); }
   }, []);
