@@ -99,6 +99,17 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
     if (prices.priceStatus === "ESTIMATE_ONLY") setEstimateOnly(true);
   }, [prices.priceStatus]);
 
+  // Keep Total Paid in sync with Hammer + Buyer's Premium as the user edits
+  // either field. Without this, a user who types a new hammer price sees
+  // Total stuck at 0 and the save validation blocks them.
+  useEffect(() => {
+    const h = parseFloat(hammerGBP);
+    const b = parseFloat(bpGBP);
+    const hNum = Number.isNaN(h) ? 0 : h;
+    const bNum = Number.isNaN(b) ? 0 : b;
+    setTotalGBP(String(+(hNum + bNum).toFixed(2)));
+  }, [hammerGBP, bpGBP]);
+
   // Inline field validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
   const sourceRef = useRef<HTMLSelectElement>(null);
