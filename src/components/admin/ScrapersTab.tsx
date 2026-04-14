@@ -31,6 +31,8 @@ const AdminScrapersTab = () => {
   const [loading, setLoading] = useState(true);
   const [spinning, setSpinning] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [uncachedCount, setUncachedCount] = useState<number | null>(null);
+  const [caching, setCaching] = useState(false);
   const [expandedError, setExpandedError] = useState<string | null>(null);
 
   // Form state
