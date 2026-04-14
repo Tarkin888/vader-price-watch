@@ -154,7 +154,8 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       setStep("done");
       onSaved();
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Failed to save record");
+      const msg = e instanceof Error ? e.message : "Failed to save record";
+      toast.error(`Save failed: ${msg}`);
     } finally {
       setSaving(false);
     }

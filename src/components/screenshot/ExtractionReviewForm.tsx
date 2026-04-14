@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { toast } from "sonner";
 import { classifyLot, deriveFromVariantCode } from "@/lib/classify-lot";
 import {
   calculatePrices,
@@ -98,6 +99,13 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
     if (prices.priceStatus === "ESTIMATE_ONLY") setEstimateOnly(true);
   }, [prices.priceStatus]);
 
+  // Inline field validation errors
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const sourceRef = useRef<HTMLSelectElement>(null);
+  const saleDateRef = useRef<HTMLInputElement>(null);
+  const hammerRef = useRef<HTMLInputElement>(null);
+  const cardbackRef = useRef<HTMLInputElement>(null);
+
   const recalculate = () => {
     const p = calculatePrices(extracted);
     setPrices(p);
@@ -110,12 +118,56 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
   const isUSD = source === "Heritage" || source === "Hakes" || lotUrl.includes("ebay.com");
 
   const handleSubmit = () => {
-    // Validation
-    if (!source) { alert("Source is required"); return; }
-    if (parseFloat(totalGBP) <= 0) { alert("Total paid must be greater than 0"); return; }
-    if (saleDate && (saleDate < "1977-01-01" || saleDate > new Date().toISOString().slice(0, 10))) {
-      alert("Sale date must be between 1977-01-01 and today"); return;
+    // Pre-submit validation — populate inline errors, focus the first invalid
+    // field, and never hit the edge function if anything is missing.
+    const newErrors: Record<string, string> = {};
+    const today = new Date().toISOString().slice(0, 10);
+
+    if (!source || !SOURCES.includes(source)) {
+      newErrors.source = "Source is required";
     }
+    if (!saleDate) {
+      newErrors.saleDate = "Sale date is required";
+    } else if (saleDate < "1977-01-01" || saleDate > today) {
+      newErrors.saleDate = "Sale date must be between 1977-01-01 and today";
+    }
+    const hammerNum = parseFloat(hammerGBP);
+    if (!hammerGBP || Number.isNaN(hammerNum) || hammerNum <= 0) {
+      newErrors.hammerGBP = "Hammer price must be greater than 0";
+    }
+    if (!cardbackVal || cardbackVal.trim() === "") {
+      newErrors.cardback = "Cardback code is required (UNKNOWN is acceptable)";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please complete the highlighted fields before saving.");
+      // Focus the first invalid field in top-to-bottom form order.
+      const focusOrder: Array<[string, React.RefObject<HTMLElement>]> = [
+        ["source", sourceRef],
+        ["saleDate", saleDateRef],
+        ["hammerGBP", hammerRef],
+        ["cardback", cardbackRef],
+      ];
+      for (const [key, ref] of focusOrder) {
+        if (newErrors[key]) {
+          ref.current?.focus();
+          break;
+        }
+      }
+      return;
+    }
+
+    // Also guard total_paid — computed from hammer + BP, but if the user has
+    // manually zeroed it, block the save rather than persisting a £0 record.
+    if (parseFloat(totalGBP) <= 0) {
+      setErrors({ hammerGBP: "Total paid must be greater than 0 — check hammer & BP" });
+      toast.error("Please complete the highlighted fields before saving.");
+      hammerRef.current?.focus();
+      return;
+    }
+
+    setErrors({});
 
     // Derive variant_grade_key
     const vgk = `${variantVal}-${gradeVal}`;
@@ -144,6 +196,9 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
   const labelClass = "text-[10px] tracking-wider text-muted-foreground font-mono flex items-center gap-1";
   const inputClass =
     "w-full bg-background border border-border rounded px-2 py-1.5 text-xs text-foreground font-mono focus:border-[#C9A84C] focus:outline-none";
+  const errorInputClass =
+    "w-full bg-background border border-red-500 rounded px-2 py-1.5 text-xs text-foreground font-mono focus:border-red-500 focus:outline-none";
+  const errorTextClass = "text-[9px] text-red-500 tracking-wider font-mono mt-0.5";
 
   return (
     <div className="space-y-4">
@@ -163,9 +218,16 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
         <div className="space-y-2">
           <div>
             <label className={labelClass}>{dot(extracted.source ? "extracted" : "missing")} Source</label>
-            <select value={source} onChange={(e) => setSource(e.target.value)} className={inputClass}>
+            <select
+              ref={sourceRef}
+              value={source}
+              onChange={(e) => { setSource(e.target.value); if (errors.source) setErrors((prev) => { const n = { ...prev }; delete n.source; return n; }); }}
+              className={errors.source ? errorInputClass : inputClass}
+              aria-invalid={!!errors.source}
+            >
               {SOURCES.map((s) => (<option key={s} value={s}>{s}</option>))}
             </select>
+            {errors.source && <p className={errorTextClass}>{errors.source}</p>}
           </div>
           <div>
             <label className={labelClass}>{dot(extracted.lotRef ? "extracted" : "missing")} Lot Reference</label>
@@ -177,12 +239,21 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
           </div>
           <div>
             <label className={labelClass}>{dot(extracted.saleDate ? "extracted" : "missing")} Sale Date</label>
-            <input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className={inputClass} />
-            {!saleDate && (
+            <input
+              ref={saleDateRef}
+              type="date"
+              value={saleDate}
+              onChange={(e) => { setSaleDate(e.target.value); if (errors.saleDate) setErrors((prev) => { const n = { ...prev }; delete n.saleDate; return n; }); }}
+              className={errors.saleDate ? errorInputClass : inputClass}
+              aria-invalid={!!errors.saleDate}
+            />
+            {errors.saleDate ? (
+              <p className={errorTextClass}>{errors.saleDate}</p>
+            ) : !saleDate ? (
               <p className="text-[9px] text-amber-400/80 tracking-wider font-mono mt-0.5">
                 Date not found — please enter manually
               </p>
-            )}
+            ) : null}
           </div>
           <div>
             <label className={labelClass}>{dot(extracted.title ? "extracted" : "missing")} Lot Title</label>
@@ -198,7 +269,14 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
           </div>
           <div>
             <label className={labelClass}>{dot(cardback.conf)} Cardback Code</label>
-            <input value={cardbackVal} onChange={(e) => setCardbackVal(e.target.value)} className={inputClass} />
+            <input
+              ref={cardbackRef}
+              value={cardbackVal}
+              onChange={(e) => { setCardbackVal(e.target.value); if (errors.cardback) setErrors((prev) => { const n = { ...prev }; delete n.cardback; return n; }); }}
+              className={errors.cardback ? errorInputClass : inputClass}
+              aria-invalid={!!errors.cardback}
+            />
+            {errors.cardback && <p className={errorTextClass}>{errors.cardback}</p>}
           </div>
           <div>
             <label className={labelClass}>{dot(variant.conf)} Variant Code</label>
@@ -212,7 +290,16 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
           {/* Prices */}
           <div>
             <label className={labelClass}>{dot("extracted")} Hammer Price (GBP)</label>
-            <input type="number" step="0.01" value={hammerGBP} onChange={(e) => setHammerGBP(e.target.value)} className={inputClass} />
+            <input
+              ref={hammerRef}
+              type="number"
+              step="0.01"
+              value={hammerGBP}
+              onChange={(e) => { setHammerGBP(e.target.value); if (errors.hammerGBP) setErrors((prev) => { const n = { ...prev }; delete n.hammerGBP; return n; }); }}
+              className={errors.hammerGBP ? errorInputClass : inputClass}
+              aria-invalid={!!errors.hammerGBP}
+            />
+            {errors.hammerGBP && <p className={errorTextClass}>{errors.hammerGBP}</p>}
           </div>
           <div>
             <label className={labelClass}>{dot("inferred")} Buyer's Premium (GBP)</label>
