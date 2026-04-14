@@ -148,7 +148,16 @@ const AdminScrapersTab = () => {
     <div className="space-y-6 relative">
       <div className="flex items-center justify-between">
         <h2 className="text-xs tracking-wider font-bold" style={{ color: "#C9A84C" }}>SCRAPER STATUS</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={handleCacheImages}
+            disabled={caching}
+            className="text-[11px] font-bold tracking-wider px-4 py-2 rounded flex items-center gap-2"
+            style={{ border: "1px solid #C9A84C", color: "#C9A84C", background: "transparent", minHeight: 44, opacity: caching ? 0.5 : 1 }}
+          >
+            <ImageDown className={`w-4 h-4 ${caching ? "animate-spin" : ""}`} />
+            {caching ? "CACHING…" : `CACHE IMAGES${uncachedCount != null ? ` (${uncachedCount})` : ""}`}
+          </button>
           <button
             onClick={() => setModalOpen(true)}
             className="text-[11px] font-bold tracking-wider px-4 py-2 rounded"
