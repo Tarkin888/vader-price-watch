@@ -32,4 +32,5 @@ export interface Lot {
   imageUrls: string[];
   conditionNotes: string;
   gradeSubgrades: string;
+  cached_image_url?: string | null;
 }
