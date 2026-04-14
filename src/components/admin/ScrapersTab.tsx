@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { adminRead } from "@/lib/admin-read";
 import { adminWrite } from "@/lib/admin-write";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ImageDown } from "lucide-react";
 import ScrapeHistoryPanel from "./ScrapeHistoryPanel";
 
 const SOURCES = ["Heritage", "Hakes", "LCG", "Vectis", "CandT"];
