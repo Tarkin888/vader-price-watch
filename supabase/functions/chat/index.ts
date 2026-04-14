@@ -379,6 +379,15 @@ serve(async (req) => {
           if (queryResult.resultCount === 0) {
             responseContent =
               "I couldn't find any matching records. Try broadening your search — perhaps widen the date range or remove a filter.";
+          } else {
+            const agg = actions.priceQuery.aggregation || "list";
+            if (agg === "count") {
+              responseContent = `I found ${queryResult.results.count} matching record${queryResult.results.count === 1 ? "" : "s"}.`;
+            } else if (agg === "average") {
+              responseContent = `Here's the average across ${queryResult.results.count} sale${queryResult.results.count === 1 ? "" : "s"}:`;
+            } else {
+              responseContent = `I found ${queryResult.totalMatches} matching record${queryResult.totalMatches === 1 ? "" : "s"}. Here are the results:`;
+            }
           }
         } catch (e) {
           console.error("Price query error:", e);

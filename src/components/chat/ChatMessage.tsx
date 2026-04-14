@@ -71,7 +71,8 @@ export default function ChatMessage({ msg }: Props) {
           </button>
         )}
 
-        {msg.message_type === "PRICE_RESULT" && msg.metadata && (
+        {msg.message_type === "PRICE_RESULT" && msg.metadata &&
+          ["list", "highest", "lowest", "average", "count"].includes(msg.metadata.aggregation) && (
           <PriceResultCards metadata={msg.metadata} />
         )}
       </div>
