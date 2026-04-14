@@ -78,6 +78,7 @@ export default function PriceResultCards({ metadata }: PriceResultCardsProps) {
 }
 
 function ResultRow({ item }: { item: any }) {
+  if (!item || item.total_paid_gbp == null) return null;
   const imgUrl = item.cached_image_url ?? item.image_urls?.[0];
   const srcColor = SOURCE_COLORS[item.source] || "#888";
 
