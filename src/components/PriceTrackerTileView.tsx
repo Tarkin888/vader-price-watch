@@ -120,7 +120,7 @@ const PriceTrackerTileView = ({ lots, currency = "GBP", onChanged }: Props) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 md:px-6">
       {lots.filter((lot) => !deletedIds.has(lot.id)).map((lot) => {
-        const imgUrl = getLotImageUrl(lot.image_urls);
+        const imgUrl = (lot as any).cached_image_url ?? getLotImageUrl(lot.image_urls);
         const era = (lot as any).era || "UNKNOWN";
         const cardback = (lot as any).cardback_code || "UNKNOWN";
         const total = Number(lot.total_paid_gbp) || 0;

@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { adminRead } from "@/lib/admin-read";
 import { adminWrite } from "@/lib/admin-write";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ImageDown } from "lucide-react";
 import ScrapeHistoryPanel from "./ScrapeHistoryPanel";
 
 const SOURCES = ["Heritage", "Hakes", "LCG", "Vectis", "CandT"];
@@ -30,6 +31,8 @@ const AdminScrapersTab = () => {
   const [loading, setLoading] = useState(true);
   const [spinning, setSpinning] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [uncachedCount, setUncachedCount] = useState<number | null>(null);
+  const [caching, setCaching] = useState(false);
   const [expandedError, setExpandedError] = useState<string | null>(null);
 
   // Form state
@@ -62,6 +65,40 @@ const AdminScrapersTab = () => {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
   useEffect(() => { const id = setInterval(fetchAll, 300000); return () => clearInterval(id); }, [fetchAll]);
+
+  // Fetch uncached image count
+  const fetchUncachedCount = useCallback(async () => {
+    try {
+      const { count } = await supabase
+        .from("lots")
+        .select("id", { count: "exact", head: true })
+        .is("cached_image_url", null)
+        .not("image_urls", "eq", "{}");
+      setUncachedCount(count ?? 0);
+    } catch { setUncachedCount(null); }
+  }, []);
+
+  useEffect(() => { fetchUncachedCount(); }, [fetchUncachedCount]);
+
+  const handleCacheImages = async () => {
+    setCaching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cache-images", {
+        body: { source: "all", limit: 50 },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        toast.success(`Cached ${data.cached} images (${data.skipped} skipped)`);
+        fetchUncachedCount();
+      } else {
+        toast.error(data?.error || "Cache failed");
+      }
+    } catch (e: any) {
+      toast.error("Cache failed: " + e.message);
+    } finally {
+      setCaching(false);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -111,7 +148,16 @@ const AdminScrapersTab = () => {
     <div className="space-y-6 relative">
       <div className="flex items-center justify-between">
         <h2 className="text-xs tracking-wider font-bold" style={{ color: "#C9A84C" }}>SCRAPER STATUS</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={handleCacheImages}
+            disabled={caching}
+            className="text-[11px] font-bold tracking-wider px-4 py-2 rounded flex items-center gap-2"
+            style={{ border: "1px solid #C9A84C", color: "#C9A84C", background: "transparent", minHeight: 44, opacity: caching ? 0.5 : 1 }}
+          >
+            <ImageDown className={`w-4 h-4 ${caching ? "animate-spin" : ""}`} />
+            {caching ? "CACHING…" : `CACHE IMAGES${uncachedCount != null ? ` (${uncachedCount})` : ""}`}
+          </button>
           <button
             onClick={() => setModalOpen(true)}
             className="text-[11px] font-bold tracking-wider px-4 py-2 rounded"

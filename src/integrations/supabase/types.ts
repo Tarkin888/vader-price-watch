@@ -369,6 +369,7 @@ export type Database = {
       lots: {
         Row: {
           buyers_premium_gbp: number | null
+          cached_image_url: string | null
           capture_date: string
           cardback_code: string
           condition_notes: string
@@ -394,6 +395,7 @@ export type Database = {
         }
         Insert: {
           buyers_premium_gbp?: number | null
+          cached_image_url?: string | null
           capture_date: string
           cardback_code?: string
           condition_notes?: string
@@ -419,6 +421,7 @@ export type Database = {
         }
         Update: {
           buyers_premium_gbp?: number | null
+          cached_image_url?: string | null
           capture_date?: string
           cardback_code?: string
           condition_notes?: string

@@ -78,7 +78,7 @@ export default function PriceResultCards({ metadata }: PriceResultCardsProps) {
 }
 
 function ResultRow({ item }: { item: any }) {
-  const imgUrl = item.image_urls?.[0];
+  const imgUrl = item.cached_image_url ?? item.image_urls?.[0];
   const srcColor = SOURCE_COLORS[item.source] || "#888";
 
   const handleCopy = () => {

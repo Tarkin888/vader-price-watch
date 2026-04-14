@@ -444,7 +444,7 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
         <div className="px-3 py-2 space-y-2">
           {sorted.map((l) => {
             const isExpanded = expandedRowId === l.id;
-            const imgUrl = getLotImageUrl(l.image_urls);
+            const imgUrl = (l as any).cached_image_url ?? getLotImageUrl(l.image_urls);
             return (
               <div
                 key={l.id}
@@ -590,7 +590,7 @@ const LotsTable = ({ lots, allLots, onChanged, onCopyRow, currency = "GBP", high
                         {colVisible("img") && (
                           <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                             {(() => {
-                              const imgUrl = getLotImageUrl(l.image_urls);
+                              const imgUrl = (l as any).cached_image_url ?? getLotImageUrl(l.image_urls);
                               return imgUrl ? (
                                 <button onClick={() => setLightboxUrl(imgUrl)}>
                                   <img src={imgUrl} alt="lot" className="w-8 h-10 object-cover border border-border hover:border-primary transition-colors"
