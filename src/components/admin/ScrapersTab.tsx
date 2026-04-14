@@ -66,6 +66,40 @@ const AdminScrapersTab = () => {
   useEffect(() => { fetchAll(); }, [fetchAll]);
   useEffect(() => { const id = setInterval(fetchAll, 300000); return () => clearInterval(id); }, [fetchAll]);
 
+  // Fetch uncached image count
+  const fetchUncachedCount = useCallback(async () => {
+    try {
+      const { count } = await supabase
+        .from("lots")
+        .select("id", { count: "exact", head: true })
+        .is("cached_image_url", null)
+        .neq("image_urls", "{}");
+      setUncachedCount(count ?? 0);
+    } catch { setUncachedCount(null); }
+  }, []);
+
+  useEffect(() => { fetchUncachedCount(); }, [fetchUncachedCount]);
+
+  const handleCacheImages = async () => {
+    setCaching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cache-images", {
+        body: { source: "all", limit: 50 },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        toast.success(`Cached ${data.cached} images (${data.skipped} skipped)`);
+        fetchUncachedCount();
+      } else {
+        toast.error(data?.error || "Cache failed");
+      }
+    } catch (e: any) {
+      toast.error("Cache failed: " + e.message);
+    } finally {
+      setCaching(false);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
