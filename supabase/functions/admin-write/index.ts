@@ -35,6 +35,7 @@ const ALLOWED_TABLES = [
   "bug_reports",
   "knowledge_articles",
   "chatbot_feedback",
+  "user_bug_reports",
 ];
 
 type Operation = "insert" | "update" | "delete";
