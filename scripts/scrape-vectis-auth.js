@@ -36,7 +36,7 @@ const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 const LOGIN_URL = "https://www.vectis.co.uk/login";
-const BUYER_PREMIUM_RATE = 0.225; // 22.5% buyer's premium
+const BUYER_PREMIUM_RATE = 0.27; // 22.5% BP + 20% VAT on BP = 27% effective (vectis.co.uk/content/terms §26)
 
 // ─── Helpers ───────────────────────────────────────────────────
 function sleep(min, max) {
