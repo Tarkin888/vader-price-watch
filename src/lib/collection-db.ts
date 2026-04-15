@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { adminWrite } from "@/lib/admin-write";
 
 async function getCurrentUserId(): Promise<string> {
   const { data: { session } } = await supabase.auth.getSession();
