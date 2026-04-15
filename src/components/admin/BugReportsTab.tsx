@@ -368,6 +368,8 @@ const AdminBugReportsTab = () => {
           </div>
         </>
       )}
+      </>
+      )}
     </div>
   );
 };
