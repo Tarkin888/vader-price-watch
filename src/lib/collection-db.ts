@@ -77,18 +77,27 @@ export async function upsertCollectionItem(
 ) {
   const userId = await getCurrentUserId();
   if (existingId) {
-    // Don't send user_id in update payload
-    const { user_id, ...updateData } = item as any;
-    const res = await adminWrite({ table: "collection", operation: "update", data: updateData as Record<string, unknown>, match: { column: "id", value: existingId } });
-    if (!res.success) throw new Error(res.error);
+    const { user_id, id, created_at, ...updateData } = item as any;
+    const { error } = await supabase
+      .from("collection")
+      .update(updateData)
+      .eq("id", existingId)
+      .eq("user_id", userId);
+    if (error) throw new Error(error.message);
   } else {
-    const itemWithUser = { ...item, user_id: userId };
-    const res = await adminWrite({ table: "collection", operation: "insert", data: itemWithUser as Record<string, unknown> });
-    if (!res.success) throw new Error(res.error);
+    const { error } = await supabase
+      .from("collection")
+      .insert({ ...item, user_id: userId });
+    if (error) throw new Error(error.message);
   }
 }
 
 export async function deleteCollectionItem(id: string) {
-  const res = await adminWrite({ table: "collection", operation: "delete", match: { column: "id", value: id } });
-  if (!res.success) throw new Error(res.error);
+  const userId = await getCurrentUserId();
+  const { error } = await supabase
+    .from("collection")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
+  if (error) throw new Error(error.message);
 }
