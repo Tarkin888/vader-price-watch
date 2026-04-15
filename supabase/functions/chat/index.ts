@@ -382,9 +382,11 @@ serve(async (req) => {
           } else {
             const agg = actions.priceQuery.aggregation || "list";
             if (agg === "count") {
-              responseContent = `I found ${queryResult.results.count} matching record${queryResult.results.count === 1 ? "" : "s"}.`;
+              const cnt = (queryResult.results as any)?.count ?? queryResult.resultCount;
+              responseContent = `I found ${cnt} matching record${cnt === 1 ? "" : "s"}.`;
             } else if (agg === "average") {
-              responseContent = `Here's the average across ${queryResult.results.count} sale${queryResult.results.count === 1 ? "" : "s"}:`;
+              const cnt = (queryResult.results as any)?.count ?? queryResult.resultCount;
+              responseContent = `Here's the average across ${cnt} sale${cnt === 1 ? "" : "s"}:`;
             } else {
               responseContent = `I found ${queryResult.totalMatches} matching record${queryResult.totalMatches === 1 ? "" : "s"}. Here are the results:`;
             }
