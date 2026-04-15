@@ -39,6 +39,7 @@ interface BugReport {
 }
 
 const AdminBugReportsTab = () => {
+  const [subTab, setSubTab] = useState<"chatbot" | "user">("chatbot");
   const [bugs, setBugs] = useState<BugReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [spinning, setSpinning] = useState(false);
