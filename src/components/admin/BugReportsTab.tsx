@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import AdminUserReportsPanel from "./UserReportsPanel";
 
 const BUG_CATEGORIES = ["SCRAPER", "CLASSIFICATION", "UI", "DATA", "OTHER"] as const;
 const STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "DISMISSED"] as const;
