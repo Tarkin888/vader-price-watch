@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
 import { RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import AdminUserReportsPanel from "./UserReportsPanel";
 
 const BUG_CATEGORIES = ["SCRAPER", "CLASSIFICATION", "UI", "DATA", "OTHER"] as const;
 const STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "DISMISSED"] as const;
@@ -38,6 +39,7 @@ interface BugReport {
 }
 
 const AdminBugReportsTab = () => {
+  const [subTab, setSubTab] = useState<"chatbot" | "user">("chatbot");
   const [bugs, setBugs] = useState<BugReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [spinning, setSpinning] = useState(false);
@@ -161,6 +163,36 @@ const AdminBugReportsTab = () => {
 
   return (
     <div className="space-y-4 relative">
+      {/* Sub-tab toggle */}
+      <div className="flex items-center gap-0 rounded overflow-hidden" style={{ border: "1px solid rgba(201,168,76,0.3)", width: "fit-content" }}>
+        <button
+          onClick={() => setSubTab("chatbot")}
+          className="px-4 py-2 text-[11px] font-bold tracking-wider transition-colors"
+          style={{
+            background: subTab === "chatbot" ? "rgba(201,168,76,0.2)" : "transparent",
+            color: subTab === "chatbot" ? "#C9A84C" : "rgba(224,216,192,0.5)",
+            minHeight: 44,
+          }}
+        >
+          CHATBOT FEEDBACK
+        </button>
+        <button
+          onClick={() => setSubTab("user")}
+          className="px-4 py-2 text-[11px] font-bold tracking-wider transition-colors"
+          style={{
+            background: subTab === "user" ? "rgba(201,168,76,0.2)" : "transparent",
+            color: subTab === "user" ? "#C9A84C" : "rgba(224,216,192,0.5)",
+            minHeight: 44,
+          }}
+        >
+          USER REPORTS
+        </button>
+      </div>
+
+      {subTab === "user" ? (
+        <AdminUserReportsPanel />
+      ) : (
+      <>
       <div className="flex items-center justify-between">
         <h2 className="text-xs tracking-wider font-bold" style={{ color: "#C9A84C" }}>BUG REPORTS</h2>
         <div className="flex items-center gap-2">
@@ -335,6 +367,8 @@ const AdminBugReportsTab = () => {
             </div>
           </div>
         </>
+      )}
+      </>
       )}
     </div>
   );

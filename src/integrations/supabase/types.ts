@@ -573,6 +573,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_bug_reports: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          id: string
+          page_or_feature: string
+          screenshot_url: string | null
+          severity: string
+          status: string
+          user_email: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          page_or_feature: string
+          screenshot_url?: string | null
+          severity?: string
+          status?: string
+          user_email: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          page_or_feature?: string
+          screenshot_url?: string | null
+          severity?: string
+          status?: string
+          user_email?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           approved_at: string | null
