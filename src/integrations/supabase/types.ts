@@ -639,6 +639,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          linked_lot_ref: string | null
+          linked_lot_source: string | null
+          pinned: boolean
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          linked_lot_ref?: string | null
+          linked_lot_source?: string | null
+          pinned?: boolean
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          linked_lot_ref?: string | null
+          linked_lot_source?: string | null
+          pinned?: boolean
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           approved_at: string | null
