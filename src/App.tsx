@@ -16,6 +16,7 @@ import Index from "./pages/Index";
 import Collection from "./pages/Collection";
 import KnowledgeHub from "./pages/KnowledgeHub";
 import Admin from "./pages/Admin";
+import Stats from "./pages/Stats";
 import Changelog from "./pages/Changelog";
 import NotFound from "./pages/NotFound";
 
@@ -49,6 +50,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/knowledge" element={<KnowledgeHub />} />
         <Route path="/collection" element={<Collection />} />
+        <Route path="/stats" element={<Stats />} />
         <Route path="/changelog" element={<Changelog />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
