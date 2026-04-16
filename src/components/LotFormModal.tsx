@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import type { Lot, LotInsert } from "@/lib/db";
 import { deriveFromVariantCode } from "@/lib/classify-lot";
+import { logActivity } from "@/lib/activity-log";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -191,12 +192,13 @@ const LotFormModal = ({ open, onOpenChange, onSaved, editLot }: Props) => {
         }
 
         toast.success("Lot updated successfully");
+        logActivity("record_edited", editLot.lot_ref, { lot_id: editLot.id, fields_changed: auditEntries.length });
       } else {
         const res = await adminWrite({ table: "lots", operation: "insert", data });
         if (!res.success) throw new Error(res.error);
-        // Audit log for insert
         adminWrite({ table: "audit_log", operation: "insert", data: { lot_ref: data.lot_ref, action: "INSERT" } });
         toast.success("Lot added successfully");
+        logActivity("record_added", data.lot_ref);
       }
 
       onOpenChange(false);
