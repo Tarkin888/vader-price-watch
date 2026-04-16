@@ -20,6 +20,18 @@ Here's what I found for ESB-41 sales:
 
 Available filter fields: era, cardback_code, source, grade_tier_code, variant_code, date_from, date_to. Only populate filters the user mentions. IMPORTANT: You MUST include both the opening [PRICE_QUERY] and closing [/PRICE_QUERY] tags.
 
+FOLLOW-UP QUERIES: When a user says things like "list them", "show them", "what are they", "show me", "which ones" after a count or summary query, you should output a [FOLLOW_UP_LIST] tag (no body needed). This tells the system to re-run the previous query as a list. Example:
+
+Here are those records:
+
+[FOLLOW_UP_LIST][/FOLLOW_UP_LIST]
+
+If the follow-up adds a new constraint (e.g. "list the ones over £2000"), output a [PRICE_QUERY] block but ONLY include the additional filter. The system will merge it with the cached filters. Add "merge_with_previous": true to signal this:
+
+[PRICE_QUERY]
+{ "type": "price_query", "filters": { "min_price": 2000 }, "aggregation": "list", "merge_with_previous": true }
+[/PRICE_QUERY]
+
 2. BUG REPORTS — If a user describes a problem with the app, DO NOT immediately generate a [BUG_REPORT] block. Instead, follow this two-step process:
 
    Step 1 (first response): Acknowledge the issue and ask clarifying questions to gather enough detail for a useful report. Ask about:
@@ -46,7 +58,6 @@ Style rules:
 - You can only READ data — never suggest you can modify or delete records.`;
 
 function enhanceMessage(message: string): string {
-  const lower = message.toLowerCase();
   const notes: string[] = [];
 
   if (/twelve back|12[ -]?back/i.test(message)) {
@@ -78,18 +89,19 @@ function enhanceMessage(message: string): string {
 }
 
 function parseActionBlocks(content: string) {
-  // Try with closing tag first, then fall back to unclosed block (to end of string)
   const priceMatch = content.match(/\[PRICE_QUERY\]([\s\S]*?)\[\/PRICE_QUERY\]/) ||
     content.match(/\[PRICE_QUERY\]([\s\S]*$)/);
   const bugMatch = content.match(/\[BUG_REPORT\]([\s\S]*?)\[\/BUG_REPORT\]/) ||
     content.match(/\[BUG_REPORT\]([\s\S]*$)/);
   const feedbackMatch = content.match(/\[FEEDBACK\]([\s\S]*?)\[\/FEEDBACK\]/) ||
     content.match(/\[FEEDBACK\]([\s\S]*$)/);
+  const followUpMatch = /\[FOLLOW_UP_LIST\]/.test(content);
 
   return {
     priceQuery: priceMatch ? JSON.parse(priceMatch[1].trim()) : null,
     bugReport: bugMatch ? JSON.parse(bugMatch[1].trim()) : null,
     feedback: feedbackMatch ? JSON.parse(feedbackMatch[1].trim()) : null,
+    followUpList: followUpMatch,
   };
 }
 
@@ -98,6 +110,7 @@ function stripActionBlocks(content: string): string {
     .replace(/\[PRICE_QUERY\][\s\S]*?(\[\/PRICE_QUERY\]|$)/g, "")
     .replace(/\[BUG_REPORT\][\s\S]*?(\[\/BUG_REPORT\]|$)/g, "")
     .replace(/\[FEEDBACK\][\s\S]*?(\[\/FEEDBACK\]|$)/g, "")
+    .replace(/\[FOLLOW_UP_LIST\][\s\S]*?(\[\/FOLLOW_UP_LIST\]|$)/g, "")
     .trim();
 }
 
@@ -109,8 +122,31 @@ function applyFilters(q: any, filters: any) {
   if (filters.variant_code) q = q.eq("variant_code", filters.variant_code);
   if (filters.date_from) q = q.gte("sale_date", filters.date_from);
   if (filters.date_to) q = q.lte("sale_date", filters.date_to);
+  if (filters.min_price) q = q.gte("total_paid_gbp", filters.min_price);
+  if (filters.max_price) q = q.lte("total_paid_gbp", filters.max_price);
   q = q.not("total_paid_gbp", "is", null).gt("total_paid_gbp", 0);
   return q;
+}
+
+function buildFilterLabel(filters: any): string {
+  const parts: string[] = [];
+  if (filters.cardback_code) parts.push(filters.cardback_code);
+  if (filters.variant_code && filters.variant_code !== filters.cardback_code) parts.push(filters.variant_code);
+  if (filters.era) parts.push(filters.era);
+  if (filters.grade_tier_code) parts.push(filters.grade_tier_code);
+  if (filters.source) parts.push(filters.source);
+  if (filters.date_from && filters.date_to) {
+    const yearFrom = filters.date_from.substring(0, 4);
+    const yearTo = filters.date_to.substring(0, 4);
+    parts.push(yearFrom === yearTo ? yearFrom : `${yearFrom}–${yearTo}`);
+  } else if (filters.date_from) {
+    parts.push(`from ${filters.date_from.substring(0, 4)}`);
+  } else if (filters.date_to) {
+    parts.push(`to ${filters.date_to.substring(0, 4)}`);
+  }
+  if (filters.min_price) parts.push(`≥£${filters.min_price}`);
+  if (filters.max_price) parts.push(`≤£${filters.max_price}`);
+  return parts.join(" · ");
 }
 
 async function executePriceQuery(
@@ -121,28 +157,34 @@ async function executePriceQuery(
   const aggregation = query.aggregation || "list";
   const limit = Math.min(query.limit || 10, 25);
 
-  // COUNT — head-only query
+  // COUNT
   if (aggregation === "count") {
     let q = supabase.from("lots").select("*", { count: "exact", head: true });
     q = applyFilters(q, filters);
     const { count, error } = await q;
     if (error) throw error;
+
+    // Also fetch the IDs for caching
+    let idsQ = supabase.from("lots").select("id");
+    idsQ = applyFilters(idsQ, filters);
+    const { data: idRows } = await idsQ;
+    const cachedIds = (idRows || []).map((r: any) => r.id);
+
     return {
       results: { count: count || 0 },
       resultCount: count || 0,
       totalMatches: count || 0,
+      cachedIds,
     };
   }
 
-  // AVERAGE — fetch all matching total_paid_gbp values
+  // AVERAGE
   if (aggregation === "average") {
-    // First get total count
     let countQ = supabase.from("lots").select("*", { count: "exact", head: true });
     countQ = applyFilters(countQ, filters);
     const { count: totalCount, error: countErr } = await countQ;
     if (countErr) throw countErr;
 
-    // Fetch values in pages to avoid 1000-row limit
     const allValues: number[] = [];
     const pageSize = 1000;
     const total = totalCount || 0;
@@ -165,9 +207,9 @@ async function executePriceQuery(
     };
   }
 
-  // LIST / HIGHEST / LOWEST — fetch rows
+  // LIST / HIGHEST / LOWEST
   const selectCols =
-    "sale_date, source, era, cardback_code, variant_code, grade_tier_code, total_paid_gbp, hammer_price_gbp, lot_ref, lot_url, image_urls, condition_notes";
+    "id, sale_date, source, era, cardback_code, variant_code, grade_tier_code, total_paid_gbp, hammer_price_gbp, lot_ref, lot_url, image_urls, condition_notes";
 
   let q = supabase.from("lots").select(selectCols, { count: "exact" });
   q = applyFilters(q, filters);
@@ -189,6 +231,32 @@ async function executePriceQuery(
     resultCount: (data || []).length,
     totalMatches: count || 0,
   };
+}
+
+// Fetch cached records by IDs
+async function fetchByIds(
+  supabase: ReturnType<typeof createClient>,
+  ids: string[],
+  extraFilters?: any,
+  limit = 25
+) {
+  const selectCols =
+    "id, sale_date, source, era, cardback_code, variant_code, grade_tier_code, total_paid_gbp, hammer_price_gbp, lot_ref, lot_url, image_urls, condition_notes";
+
+  let q = supabase.from("lots").select(selectCols, { count: "exact" }).in("id", ids);
+
+  // Apply any extra filters (e.g. min_price from follow-up)
+  if (extraFilters) {
+    if (extraFilters.min_price) q = q.gte("total_paid_gbp", extraFilters.min_price);
+    if (extraFilters.max_price) q = q.lte("total_paid_gbp", extraFilters.max_price);
+    if (extraFilters.source) q = q.eq("source", extraFilters.source);
+    if (extraFilters.grade_tier_code) q = q.eq("grade_tier_code", extraFilters.grade_tier_code);
+  }
+
+  q = q.order("sale_date", { ascending: false }).limit(limit);
+  const { data, error, count } = await q;
+  if (error) throw error;
+  return { results: data || [], resultCount: (data || []).length, totalMatches: count || 0 };
 }
 
 serve(async (req) => {
@@ -219,7 +287,6 @@ serve(async (req) => {
       );
     }
 
-    // Authenticate the user from JWT
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
     if (authHeader?.startsWith("Bearer ")) {
@@ -239,6 +306,14 @@ serve(async (req) => {
       if (sessionErr) throw sessionErr;
       currentSessionId = session.id;
     }
+
+    // Load session metadata (contains cached filters)
+    const { data: sessionData } = await supabase
+      .from("chat_sessions")
+      .select("metadata")
+      .eq("id", currentSessionId)
+      .single();
+    const sessionMeta: any = sessionData?.metadata || {};
 
     // 2. Insert user message
     const enhancedMessage = enhanceMessage(message);
@@ -263,9 +338,16 @@ serve(async (req) => {
       content: m.content,
     }));
 
-    // Replace last user message with enhanced version for Claude
     if (conversationHistory.length > 0) {
       conversationHistory[conversationHistory.length - 1].content = enhancedMessage;
+    }
+
+    // Inject context about cached filters so Claude knows about them
+    let systemWithContext = SYSTEM_PROMPT;
+    if (sessionMeta.cached_filters) {
+      const label = buildFilterLabel(sessionMeta.cached_filters);
+      const count = sessionMeta.cached_ids?.length || 0;
+      systemWithContext += `\n\nCONTEXT: The previous query used filters: ${JSON.stringify(sessionMeta.cached_filters)} and returned ${count} records. The filter label is "${label}". If the user asks to list/show/enumerate these results, output [FOLLOW_UP_LIST][/FOLLOW_UP_LIST]. If they add a constraint, use merge_with_previous.`;
     }
 
     // 4. Call Anthropic
@@ -281,7 +363,7 @@ serve(async (req) => {
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 1024,
-          system: SYSTEM_PROMPT,
+          system: systemWithContext,
           messages: conversationHistory,
         }),
       });
@@ -332,70 +414,140 @@ serve(async (req) => {
       actions = parseActionBlocks(rawContent);
     } catch (e) {
       console.error("Failed to parse action blocks:", e);
-      actions = { priceQuery: null, bugReport: null, feedback: null };
+      actions = { priceQuery: null, bugReport: null, feedback: null, followUpList: false };
     }
 
     let responseContent = stripActionBlocks(rawContent) || rawContent;
     let messageType = "TEXT";
     let messageMetadata: any = {};
 
-    // 6. Handle price query
-    if (actions.priceQuery) {
-      // Check rate limit
-      const { data: sessionData } = await supabase
-        .from("chat_sessions")
-        .select("metadata")
-        .eq("id", currentSessionId)
-        .single();
-
-      const sessionMeta = sessionData?.metadata || {};
-      const queryCount = (sessionMeta as any).price_query_count || 0;
-
+    // 6a. Handle follow-up list (re-use cached filters/IDs)
+    if (actions.followUpList && sessionMeta.cached_ids?.length > 0) {
+      const queryCount = sessionMeta.price_query_count || 0;
       if (queryCount >= 10) {
-        responseContent =
-          "You've reached the query limit for this session. Please start a new chat or use the Price Tracker page directly.";
+        responseContent = "You've reached the query limit for this session. Please start a new chat or use the Price Tracker page directly.";
         messageType = "ERROR";
       } else {
         try {
-          const queryResult = await executePriceQuery(supabase as any, actions.priceQuery);
+          const queryResult = await fetchByIds(supabase as any, sessionMeta.cached_ids);
           messageType = "PRICE_RESULT";
           messageMetadata = {
-            query: actions.priceQuery.filters || {},
-            aggregation: actions.priceQuery.aggregation || "list",
+            query: sessionMeta.cached_filters || {},
+            aggregation: "list",
             results: queryResult.results,
             resultCount: queryResult.resultCount,
             totalMatches: queryResult.totalMatches,
+            activeFilter: buildFilterLabel(sessionMeta.cached_filters || {}),
           };
+          responseContent = `Here are all ${queryResult.totalMatches} matching record${queryResult.totalMatches === 1 ? "" : "s"}:`;
 
-          // Update query count
           await supabase
             .from("chat_sessions")
-            .update({
-              session_type: "PRICE_QUERY",
-              metadata: { ...(sessionMeta as object), price_query_count: queryCount + 1 },
-            })
+            .update({ metadata: { ...sessionMeta, price_query_count: queryCount + 1 } })
             .eq("id", currentSessionId);
-
-          if (queryResult.resultCount === 0) {
-            responseContent =
-              "I couldn't find any matching records. Try broadening your search — perhaps widen the date range or remove a filter.";
-          } else {
-            const agg = actions.priceQuery.aggregation || "list";
-            if (agg === "count") {
-              const cnt = (queryResult.results as any)?.count ?? queryResult.resultCount;
-              responseContent = `I found ${cnt} matching record${cnt === 1 ? "" : "s"}.`;
-            } else if (agg === "average") {
-              const cnt = (queryResult.results as any)?.count ?? queryResult.resultCount;
-              responseContent = `Here's the average across ${cnt} sale${cnt === 1 ? "" : "s"}:`;
-            } else {
-              responseContent = `I found ${queryResult.totalMatches} matching record${queryResult.totalMatches === 1 ? "" : "s"}. Here are the results:`;
-            }
-          }
         } catch (e) {
-          console.error("Price query error:", e);
-          responseContent =
-            "I had trouble running that query. Please try again or use the Price Tracker page directly.";
+          console.error("Follow-up list error:", e);
+          responseContent = "I had trouble retrieving those records. Please try again.";
           messageType = "ERROR";
+        }
+      }
+    }
+    // 6b. Handle price query (new or merged)
+    else if (actions.priceQuery) {
+      const queryCount = sessionMeta.price_query_count || 0;
+
+      if (queryCount >= 10) {
+        responseContent = "You've reached the query limit for this session. Please start a new chat or use the Price Tracker page directly.";
+        messageType = "ERROR";
+      } else {
+        // Merge with previous filters if requested
+        let effectiveFilters = actions.priceQuery.filters || {};
+        if (actions.priceQuery.merge_with_previous && sessionMeta.cached_filters) {
+          effectiveFilters = { ...sessionMeta.cached_filters, ...effectiveFilters };
+        }
+
+        // If merge + cached IDs, filter within cached set
+        if (actions.priceQuery.merge_with_previous && sessionMeta.cached_ids?.length > 0) {
+          try {
+            const extraFilters = actions.priceQuery.filters || {};
+            const queryResult = await fetchByIds(supabase as any, sessionMeta.cached_ids, extraFilters);
+            messageType = "PRICE_RESULT";
+            messageMetadata = {
+              query: effectiveFilters,
+              aggregation: "list",
+              results: queryResult.results,
+              resultCount: queryResult.resultCount,
+              totalMatches: queryResult.totalMatches,
+              activeFilter: buildFilterLabel(effectiveFilters),
+            };
+            if (queryResult.resultCount === 0) {
+              responseContent = "None of the previous results matched that additional filter.";
+            } else {
+              responseContent = `Here are ${queryResult.totalMatches} matching record${queryResult.totalMatches === 1 ? "" : "s"}:`;
+            }
+            await supabase
+              .from("chat_sessions")
+              .update({
+                session_type: "PRICE_QUERY",
+                metadata: { ...sessionMeta, price_query_count: queryCount + 1 },
+              })
+              .eq("id", currentSessionId);
+          } catch (e) {
+            console.error("Merged query error:", e);
+            responseContent = "I had trouble running that query. Please try again.";
+            messageType = "ERROR";
+          }
+        } else {
+          // Fresh query
+          const fullQuery = { ...actions.priceQuery, filters: effectiveFilters };
+          try {
+            const queryResult = await executePriceQuery(supabase as any, fullQuery);
+            messageType = "PRICE_RESULT";
+
+            // Cache filters and IDs in session
+            const newCachedIds = queryResult.cachedIds ||
+              (Array.isArray(queryResult.results) ? queryResult.results.map((r: any) => r.id).filter(Boolean) : []);
+
+            const updatedMeta = {
+              ...sessionMeta,
+              price_query_count: queryCount + 1,
+              cached_filters: effectiveFilters,
+              cached_ids: newCachedIds,
+            };
+
+            messageMetadata = {
+              query: effectiveFilters,
+              aggregation: fullQuery.aggregation || "list",
+              results: queryResult.results,
+              resultCount: queryResult.resultCount,
+              totalMatches: queryResult.totalMatches,
+              activeFilter: buildFilterLabel(effectiveFilters),
+            };
+
+            await supabase
+              .from("chat_sessions")
+              .update({ session_type: "PRICE_QUERY", metadata: updatedMeta })
+              .eq("id", currentSessionId);
+
+            if (queryResult.resultCount === 0) {
+              responseContent = "I couldn't find any matching records. Try broadening your search.";
+            } else {
+              const agg = fullQuery.aggregation || "list";
+              if (agg === "count") {
+                const cnt = (queryResult.results as any)?.count ?? queryResult.resultCount;
+                responseContent = `I found ${cnt} matching record${cnt === 1 ? "" : "s"}.`;
+              } else if (agg === "average") {
+                const cnt = (queryResult.results as any)?.count ?? queryResult.resultCount;
+                responseContent = `Here's the average across ${cnt} sale${cnt === 1 ? "" : "s"}:`;
+              } else {
+                responseContent = `I found ${queryResult.totalMatches} matching record${queryResult.totalMatches === 1 ? "" : "s"}. Here are the results:`;
+              }
+            }
+          } catch (e) {
+            console.error("Price query error:", e);
+            responseContent = "I had trouble running that query. Please try again or use the Price Tracker page directly.";
+            messageType = "ERROR";
+          }
         }
       }
     }

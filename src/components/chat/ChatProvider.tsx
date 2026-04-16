@@ -15,6 +15,7 @@ interface ChatContextType {
   isOpen: boolean;
   isLoading: boolean;
   unreadCount: number;
+  activeFilter: string | null;
   setIsOpen: (open: boolean) => void;
   sendMessage: (text: string) => Promise<void>;
   resetSession: () => void;
@@ -35,6 +36,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpenRaw] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const isOpenRef = React.useRef(false);
 
   const setIsOpen = useCallback((open: boolean) => {
@@ -72,6 +74,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         };
         setMessages((prev) => [...prev, assistantMsg]);
         if (!isOpenRef.current) setUnreadCount((c) => c + 1);
+
+        // Update active filter from metadata
+        if (data.message.metadata?.activeFilter) {
+          setActiveFilter(data.message.metadata.activeFilter);
+        }
       }
     } catch (e) {
       console.error("Chat error:", e);
@@ -93,12 +100,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setSessionId(null);
     setMessages([]);
     setUnreadCount(0);
+    setActiveFilter(null);
   }, []);
 
   const retryLast = useCallback(async () => {
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
     if (!lastUser) return;
-    // Remove the last error message
     setMessages((prev) => {
       const last = prev[prev.length - 1];
       if (last?.message_type === "ERROR") return prev.slice(0, -1);
@@ -109,10 +116,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ChatContext.Provider
-      value={{ sessionId, messages, isOpen, isLoading, unreadCount, setIsOpen, sendMessage, resetSession, retryLast }}
+      value={{ sessionId, messages, isOpen, isLoading, unreadCount, activeFilter, setIsOpen, sendMessage, resetSession, retryLast }}
     >
       {children}
     </ChatContext.Provider>
   );
 }
-

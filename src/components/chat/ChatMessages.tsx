@@ -2,9 +2,10 @@ import { useRef, useEffect } from "react";
 import { useChat } from "./ChatProvider";
 import ChatMessage from "./ChatMessage";
 import ChatWelcome from "./ChatWelcome";
+import { Filter } from "lucide-react";
 
 export default function ChatMessages() {
-  const { messages, isLoading } = useChat();
+  const { messages, isLoading, activeFilter } = useChat();
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,6 +16,19 @@ export default function ChatMessages() {
 
   return (
     <div className="flex-1 overflow-y-auto px-3 py-3">
+      {activeFilter && (
+        <div
+          className="flex items-center gap-1.5 px-2.5 py-1 mb-2 rounded-full text-[10px] w-fit"
+          style={{
+            background: "rgba(201,168,76,0.12)",
+            border: "1px solid rgba(201,168,76,0.25)",
+            color: "#C9A84C",
+          }}
+        >
+          <Filter size={10} />
+          <span>Filter: {activeFilter}</span>
+        </div>
+      )}
       {messages.map((m) => (
         <ChatMessage key={m.id} msg={m} />
       ))}
