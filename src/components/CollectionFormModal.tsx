@@ -10,6 +10,7 @@ import {
   upsertCollectionItem, getNextItemId,
   type CollectionItem,
 } from "@/lib/collection-db";
+import { logActivity } from "@/lib/activity-log";
 
 const MIN_DATE = "1977-01-01";
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -107,6 +108,7 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
         editItem?.id
       );
       toast.success(editItem ? "Item updated" : "Item added");
+      logActivity(editItem ? "collection_edited" : "collection_added", itemId, { category, grading });
       onSaved();
       onOpenChange(false);
     } catch (e: any) {
