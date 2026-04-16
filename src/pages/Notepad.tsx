@@ -120,7 +120,7 @@ export default function Notepad() {
       toast.error("Failed to load notes");
       return;
     }
-    setNotes((data || []) as Note[]);
+    setNotes((data as unknown as Note[]) || []);
     setLoading(false);
   }, [profile]);
 
@@ -183,7 +183,7 @@ export default function Notepad() {
       }
       return;
     }
-    const created = data as Note;
+    const created = data as unknown as Note;
     setNotes((prev) => [created, ...prev]);
     selectNote(created);
     logActivity("note_created", created.id);
@@ -295,7 +295,7 @@ export default function Notepad() {
       }
       return;
     }
-    const created = data as Note;
+    const created = data as unknown as Note;
     setNotes((prev) => [created, ...prev]);
     selectNote(created);
     logActivity("note_created", created.id);
