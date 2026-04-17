@@ -100,12 +100,49 @@ export default function SaveToNotepadPopover({
   const [linkedLot, setLinkedLot] = useState<LotPick | null>(metadataLot);
   const [lotQuery, setLotQuery] = useState("");
   const [lotResults, setLotResults] = useState<LotPick[]>([]);
+  const [recentLots, setRecentLots] = useState<LotPick[]>(getRecentLots);
   const [showPicker, setShowPicker] = useState(false);
   const [saving, setSaving] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  // Default list = 20 most recently viewed lots
-  const recentLots = useMemo(getRecentLots, []);
+  // Backfill the recents list from the user's recent record_viewed activity
+  useEffect(() => {
+    if (!profile || recentLots.length >= RECENT_LIMIT) return;
+    let cancelled = false;
+    (async () => {
+      const { data: views } = await supabase
+        .from("user_activity" as any)
+        .select("entity_ref, metadata, created_at")
+        .eq("user_id", profile.id)
+        .in("event_type", ["record_viewed", "record.view"])
+        .order("created_at", { ascending: false })
+        .limit(60);
+      if (cancelled || !views || views.length === 0) return;
+      const seen = new Set<string>();
+      const refs: string[] = [];
+      for (const v of views as any[]) {
+        const ref = v.entity_ref as string | null;
+        if (!ref || seen.has(ref)) continue;
+        seen.add(ref);
+        refs.push(ref);
+        if (refs.length >= RECENT_LIMIT) break;
+      }
+      if (refs.length === 0) return;
+      const { data: lots } = await supabase
+        .from("lots")
+        .select("lot_ref, source, cardback_code")
+        .in("lot_ref", refs);
+      if (cancelled || !lots) return;
+      // Preserve recency order
+      const map = new Map((lots as LotPick[]).map((l) => [l.lot_ref, l]));
+      const ordered = refs.map((r) => map.get(r)).filter(Boolean) as LotPick[];
+      if (ordered.length > 0) setRecentLots(ordered);
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
 
   // Search lots when user types (full RLS-scoped search, not capped to 20)
   useEffect(() => {
