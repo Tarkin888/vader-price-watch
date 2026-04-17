@@ -4,9 +4,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import {
-  CATEGORIES, GRADINGS, PURCHASE_SOURCES,
+  CATEGORIES, GRADINGS, PURCHASE_SOURCES, ERAS,
   upsertCollectionItem, getNextItemId,
   type CollectionItem,
 } from "@/lib/collection-db";

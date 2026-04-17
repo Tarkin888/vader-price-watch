@@ -24,7 +24,19 @@ export interface CollectionItem {
   created_at: string;
   updated_at: string;
   estimation_tier: string | null;
+  // Auction-style variant identity (added for CSV round-trip)
+  era?: string | null;
+  cardback_code?: string | null;
+  variant_code?: string | null;
+  grade_tier_code?: string | null;
+  variant_grade_key?: string | null;
+  lot_ref?: string | null;
+  lot_url?: string | null;
+  character?: string | null;
+  figure_id?: string | null;
 }
+
+export const ERAS = ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"] as const;
 
 export const CATEGORIES = [
   "SW-12", "SW-12A", "SW-12A-DT", "SW-12B", "SW-12B-DT", "SW-12C", "SW-12-DT",
