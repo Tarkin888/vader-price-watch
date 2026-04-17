@@ -45,6 +45,15 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
+  // Auction Details (collapsible)
+  const [auctionOpen, setAuctionOpen] = useState(false);
+  const [era, setEra] = useState<string>("UNKNOWN");
+  const [cardbackCode, setCardbackCode] = useState("");
+  const [variantCode, setVariantCode] = useState("");
+  const [gradeTierCode, setGradeTierCode] = useState("");
+  const [lotRef, setLotRef] = useState("");
+  const [lotUrl, setLotUrl] = useState("");
+
   useEffect(() => {
     if (!open) return;
     setErrors({});
@@ -65,11 +74,21 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
       }
       setEstimatedValue(editItem.current_estimated_value != null ? String(editItem.current_estimated_value) : "");
       setNotes(editItem.notes);
+      setEra(editItem.era || "UNKNOWN");
+      setCardbackCode(editItem.cardback_code || "");
+      setVariantCode(editItem.variant_code || "");
+      setGradeTierCode(editItem.grade_tier_code || "");
+      setLotRef(editItem.lot_ref || "");
+      setLotUrl(editItem.lot_url || "");
+      setAuctionOpen(!!(editItem.era || editItem.cardback_code || editItem.variant_code || editItem.grade_tier_code || editItem.lot_ref || editItem.lot_url));
     } else {
       getNextItemId().then(setItemId);
       setDescription(""); setCategory(CATEGORIES[0]); setGrading(GRADINGS[0]);
       setPurchasePrice(""); setPurchaseDate(""); setPurchaseSource(PURCHASE_SOURCES[0]);
       setCustomSource(""); setEstimatedValue(""); setNotes("");
+      setEra("UNKNOWN"); setCardbackCode(""); setVariantCode("");
+      setGradeTierCode(""); setLotRef(""); setLotUrl("");
+      setAuctionOpen(false);
     }
   }, [open, editItem]);
 
