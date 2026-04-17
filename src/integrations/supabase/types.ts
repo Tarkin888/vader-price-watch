@@ -674,6 +674,7 @@ export type Database = {
           linked_lot_ref: string | null
           linked_lot_source: string | null
           pinned: boolean
+          source_context: Json | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -686,6 +687,7 @@ export type Database = {
           linked_lot_ref?: string | null
           linked_lot_source?: string | null
           pinned?: boolean
+          source_context?: Json | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -698,6 +700,7 @@ export type Database = {
           linked_lot_ref?: string | null
           linked_lot_source?: string | null
           pinned?: boolean
+          source_context?: Json | null
           tags?: string[] | null
           title?: string
           updated_at?: string
