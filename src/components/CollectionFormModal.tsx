@@ -4,9 +4,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import {
-  CATEGORIES, GRADINGS, PURCHASE_SOURCES,
+  CATEGORIES, GRADINGS, PURCHASE_SOURCES, ERAS,
   upsertCollectionItem, getNextItemId,
   type CollectionItem,
 } from "@/lib/collection-db";
@@ -44,6 +45,15 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
+  // Auction Details (collapsible)
+  const [auctionOpen, setAuctionOpen] = useState(false);
+  const [era, setEra] = useState<string>("UNKNOWN");
+  const [cardbackCode, setCardbackCode] = useState("");
+  const [variantCode, setVariantCode] = useState("");
+  const [gradeTierCode, setGradeTierCode] = useState("");
+  const [lotRef, setLotRef] = useState("");
+  const [lotUrl, setLotUrl] = useState("");
+
   useEffect(() => {
     if (!open) return;
     setErrors({});
@@ -64,11 +74,21 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
       }
       setEstimatedValue(editItem.current_estimated_value != null ? String(editItem.current_estimated_value) : "");
       setNotes(editItem.notes);
+      setEra(editItem.era || "UNKNOWN");
+      setCardbackCode(editItem.cardback_code || "");
+      setVariantCode(editItem.variant_code || "");
+      setGradeTierCode(editItem.grade_tier_code || "");
+      setLotRef(editItem.lot_ref || "");
+      setLotUrl(editItem.lot_url || "");
+      setAuctionOpen(!!(editItem.era || editItem.cardback_code || editItem.variant_code || editItem.grade_tier_code || editItem.lot_ref || editItem.lot_url));
     } else {
       getNextItemId().then(setItemId);
       setDescription(""); setCategory(CATEGORIES[0]); setGrading(GRADINGS[0]);
       setPurchasePrice(""); setPurchaseDate(""); setPurchaseSource(PURCHASE_SOURCES[0]);
       setCustomSource(""); setEstimatedValue(""); setNotes("");
+      setEra("UNKNOWN"); setCardbackCode(""); setVariantCode("");
+      setGradeTierCode(""); setLotRef(""); setLotUrl("");
+      setAuctionOpen(false);
     }
   }, [open, editItem]);
 
@@ -104,7 +124,13 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
           purchase_source: source,
           current_estimated_value: estimatedValue ? parseFloat(estimatedValue) : null,
           notes,
-        },
+          era: era || "UNKNOWN",
+          cardback_code: cardbackCode || null,
+          variant_code: variantCode || null,
+          grade_tier_code: gradeTierCode || null,
+          lot_ref: lotRef || null,
+          lot_url: lotUrl || null,
+        } as any,
         editItem?.id
       );
       toast.success(editItem ? "Item updated" : "Item added");
@@ -184,6 +210,52 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
             <label className={labelClass}>Notes</label>
             <Input value={notes} onChange={(e) => setNotes(e.target.value)} className="bg-secondary border-border text-xs tracking-wider h-8" />
           </div>
+        </div>
+
+        {/* Auction Details — collapsible */}
+        <div className="border-t border-border mt-2 pt-2">
+          <button
+            type="button"
+            onClick={() => setAuctionOpen(!auctionOpen)}
+            className="flex items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary tracking-widest uppercase transition-colors"
+          >
+            {auctionOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            Auction Details
+          </button>
+          {auctionOpen && (
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Era</label>
+                <select className={selectClass} value={era} onChange={(e) => setEra(e.target.value)}>
+                  {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Cardback Code</label>
+                <Input value={cardbackCode} onChange={(e) => setCardbackCode(e.target.value)} placeholder="e.g. SW-12A" className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Variant Code</label>
+                <Input value={variantCode} onChange={(e) => setVariantCode(e.target.value)} placeholder="e.g. SW-12A" className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Grade Tier Code</label>
+                <Input value={gradeTierCode} onChange={(e) => setGradeTierCode(e.target.value)} placeholder="e.g. AFA-85" className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1 col-span-2">
+                <label className={labelClass}>Variant Grade Key (auto)</label>
+                <Input value={`${variantCode || ""}-${gradeTierCode || ""}`} readOnly className="bg-secondary border-border text-xs tracking-wider h-8 opacity-60" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Lot Ref</label>
+                <Input value={lotRef} onChange={(e) => setLotRef(e.target.value)} className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Lot URL</label>
+                <Input value={lotUrl} onChange={(e) => setLotUrl(e.target.value)} className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex justify-end gap-2 mt-2">
           <Button variant="ghost" size="sm" className="text-xs tracking-wider" onClick={() => onOpenChange(false)}>CANCEL</Button>
