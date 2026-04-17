@@ -129,6 +129,21 @@ export default function Notepad() {
 
   useEffect(() => { fetchNotes(); }, [fetchNotes]);
 
+  // Auto-select note from ?noteId= deep link (e.g. from Kenny "Save to Notepad" toast)
+  useEffect(() => {
+    const target = searchParams.get("noteId");
+    if (!target || notes.length === 0) return;
+    const match = notes.find((n) => n.id === target);
+    if (match && match.id !== selectedId) {
+      selectNote(match);
+      // Clear the param so refresh doesn't keep re-selecting
+      const next = new URLSearchParams(searchParams);
+      next.delete("noteId");
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notes, searchParams]);
+
   // ── Select a note ──
   const selectNote = useCallback((note: Note) => {
     // Save current if dirty before switching
