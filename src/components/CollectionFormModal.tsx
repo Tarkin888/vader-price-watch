@@ -124,7 +124,13 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
           purchase_source: source,
           current_estimated_value: estimatedValue ? parseFloat(estimatedValue) : null,
           notes,
-        },
+          era: era || "UNKNOWN",
+          cardback_code: cardbackCode || null,
+          variant_code: variantCode || null,
+          grade_tier_code: gradeTierCode || null,
+          lot_ref: lotRef || null,
+          lot_url: lotUrl || null,
+        } as any,
         editItem?.id
       );
       toast.success(editItem ? "Item updated" : "Item added");
