@@ -32,19 +32,6 @@ const LoadingScreen = () => (
   </div>
 );
 
-const AppRoutes = () => {
-  const { isLoading, isAuthenticated, isApproved, profile } = useAuth();
-
-  useEffect(() => {
-    supabase.from("page_views").insert({
-      page: window.location.pathname,
-      user_agent: navigator.userAgent,
-    });
-  }, []);
-
-  return isAuthenticated && isApproved ? <AuthedRoutes /> : <UnauthedRoutes isLoading={isLoading} isAuthenticated={isAuthenticated} />;
-};
-
 const PageViewLogger = () => {
   const location = useLocation();
   useEffect(() => {
@@ -56,7 +43,15 @@ const PageViewLogger = () => {
   return null;
 };
 
-const AuthedRoutes = () => {
+const AppRoutes = () => {
+  const { isLoading, isAuthenticated, isApproved } = useAuth();
+
+  useEffect(() => {
+    supabase.from("page_views").insert({
+      page: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+  }, []);
 
   if (isLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <SignOn />;
@@ -64,6 +59,7 @@ const AuthedRoutes = () => {
 
   return (
     <>
+      <PageViewLogger />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/knowledge" element={<KnowledgeHub />} />
