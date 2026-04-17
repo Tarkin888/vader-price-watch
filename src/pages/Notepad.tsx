@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import Header from "@/components/Header";
@@ -32,6 +33,7 @@ interface Note {
   pinned: boolean;
   created_at: string;
   updated_at: string;
+  source_context: { source?: string; question?: string; chat_session_id?: string; timestamp?: string } | null;
 }
 
 interface LinkedLot {
@@ -66,6 +68,7 @@ function relativeTime(dateStr: string) {
 
 export default function Notepad() {
   const { profile } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -125,6 +128,21 @@ export default function Notepad() {
   }, [profile]);
 
   useEffect(() => { fetchNotes(); }, [fetchNotes]);
+
+  // Auto-select note from ?noteId= deep link (e.g. from Kenny "Save to Notepad" toast)
+  useEffect(() => {
+    const target = searchParams.get("noteId");
+    if (!target || notes.length === 0) return;
+    const match = notes.find((n) => n.id === target);
+    if (match && match.id !== selectedId) {
+      selectNote(match);
+      // Clear the param so refresh doesn't keep re-selecting
+      const next = new URLSearchParams(searchParams);
+      next.delete("noteId");
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notes, searchParams]);
 
   // ── Select a note ──
   const selectNote = useCallback((note: Note) => {
@@ -495,6 +513,19 @@ export default function Notepad() {
                       <div className="flex items-center gap-1.5 mb-0.5">
                         {note.pinned && <Pin size={10} className="text-primary shrink-0" />}
                         <span className="text-xs font-medium text-foreground truncate">{note.title}</span>
+                        {note.source_context?.source === "kenny_chat" && (
+                          <span
+                            className="shrink-0 px-1 py-0.5 rounded text-[8px] tracking-wider"
+                            style={{
+                              background: "rgba(201,168,76,0.15)",
+                              color: "hsl(43, 50%, 54%)",
+                              border: "1px solid rgba(201,168,76,0.35)",
+                            }}
+                            title="Saved from a Kenny chat reply"
+                          >
+                            FROM KENNY
+                          </span>
+                        )}
                       </div>
                       <p className="text-[10px] text-muted-foreground line-clamp-2 leading-tight">{note.body || "Empty note"}</p>
                       <div className="flex items-center gap-1.5 mt-1">
@@ -560,6 +591,34 @@ export default function Notepad() {
 
                   {/* Editor fields */}
                   <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                    {/* From Kenny badge + quoted question */}
+                    {selectedNote?.source_context?.source === "kenny_chat" && (
+                      <div
+                        className="px-3 py-2 rounded"
+                        style={{
+                          background: "rgba(201,168,76,0.08)",
+                          border: "1px solid rgba(201,168,76,0.25)",
+                        }}
+                      >
+                        <span
+                          className="inline-block px-1.5 py-0.5 rounded text-[9px] tracking-wider mb-1.5"
+                          style={{
+                            background: "rgba(201,168,76,0.2)",
+                            color: "hsl(43, 50%, 54%)",
+                            border: "1px solid rgba(201,168,76,0.4)",
+                          }}
+                        >
+                          FROM KENNY
+                        </span>
+                        {selectedNote.source_context.question && (
+                          <div className="text-[11px] text-muted-foreground italic leading-snug">
+                            <span className="opacity-70">You asked Kenny: </span>
+                            "{selectedNote.source_context.question}"
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Title */}
                     <div>
                       <label className="text-[10px] text-muted-foreground tracking-widest uppercase block mb-1">Title *</label>
