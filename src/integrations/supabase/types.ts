@@ -267,60 +267,87 @@ export type Database = {
       collection: {
         Row: {
           back_image_url: string | null
+          cardback_code: string
           category: string
+          character: string
           created_at: string
           current_estimated_value: number | null
           description: string
+          era: string
           estimation_tier: string | null
+          figure_id: string
           front_image_url: string | null
+          grade_tier_code: string
           grading: string
           id: string
           image_urls: string[]
           item_id: string
+          lot_ref: string | null
+          lot_url: string | null
           notes: string
           purchase_date: string
           purchase_price: number
           purchase_source: string
           updated_at: string
           user_id: string
+          variant_code: string
+          variant_grade_key: string
         }
         Insert: {
           back_image_url?: string | null
+          cardback_code?: string
           category?: string
+          character?: string
           created_at?: string
           current_estimated_value?: number | null
           description?: string
+          era?: string
           estimation_tier?: string | null
+          figure_id?: string
           front_image_url?: string | null
+          grade_tier_code?: string
           grading?: string
           id?: string
           image_urls?: string[]
           item_id: string
+          lot_ref?: string | null
+          lot_url?: string | null
           notes?: string
           purchase_date: string
           purchase_price?: number
           purchase_source?: string
           updated_at?: string
           user_id: string
+          variant_code?: string
+          variant_grade_key?: string
         }
         Update: {
           back_image_url?: string | null
+          cardback_code?: string
           category?: string
+          character?: string
           created_at?: string
           current_estimated_value?: number | null
           description?: string
+          era?: string
           estimation_tier?: string | null
+          figure_id?: string
           front_image_url?: string | null
+          grade_tier_code?: string
           grading?: string
           id?: string
           image_urls?: string[]
           item_id?: string
+          lot_ref?: string | null
+          lot_url?: string | null
           notes?: string
           purchase_date?: string
           purchase_price?: number
           purchase_source?: string
           updated_at?: string
           user_id?: string
+          variant_code?: string
+          variant_grade_key?: string
         }
         Relationships: []
       }
