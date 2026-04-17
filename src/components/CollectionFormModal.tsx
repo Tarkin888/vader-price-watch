@@ -211,6 +211,52 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
             <Input value={notes} onChange={(e) => setNotes(e.target.value)} className="bg-secondary border-border text-xs tracking-wider h-8" />
           </div>
         </div>
+
+        {/* Auction Details — collapsible */}
+        <div className="border-t border-border mt-2 pt-2">
+          <button
+            type="button"
+            onClick={() => setAuctionOpen(!auctionOpen)}
+            className="flex items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary tracking-widest uppercase transition-colors"
+          >
+            {auctionOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            Auction Details
+          </button>
+          {auctionOpen && (
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Era</label>
+                <select className={selectClass} value={era} onChange={(e) => setEra(e.target.value)}>
+                  {ERAS.map((e) => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Cardback Code</label>
+                <Input value={cardbackCode} onChange={(e) => setCardbackCode(e.target.value)} placeholder="e.g. SW-12A" className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Variant Code</label>
+                <Input value={variantCode} onChange={(e) => setVariantCode(e.target.value)} placeholder="e.g. SW-12A" className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Grade Tier Code</label>
+                <Input value={gradeTierCode} onChange={(e) => setGradeTierCode(e.target.value)} placeholder="e.g. AFA-85" className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1 col-span-2">
+                <label className={labelClass}>Variant Grade Key (auto)</label>
+                <Input value={`${variantCode || ""}-${gradeTierCode || ""}`} readOnly className="bg-secondary border-border text-xs tracking-wider h-8 opacity-60" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Lot Ref</label>
+                <Input value={lotRef} onChange={(e) => setLotRef(e.target.value)} className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Lot URL</label>
+                <Input value={lotUrl} onChange={(e) => setLotUrl(e.target.value)} className="bg-secondary border-border text-xs tracking-wider h-8" />
+              </div>
+            </div>
+          )}
+        </div>
         <div className="flex justify-end gap-2 mt-2">
           <Button variant="ghost" size="sm" className="text-xs tracking-wider" onClick={() => onOpenChange(false)}>CANCEL</Button>
           <Button size="sm" className="text-xs tracking-wider" onClick={handleSave} disabled={saving}>
