@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type ActivityEventType =
+  // Legacy snake_case (do not rename — IPT-53 depends on these)
   | "scrape_run"
   | "record_added"
   | "record_edited"
@@ -13,7 +14,26 @@ export type ActivityEventType =
   | "favourite_removed"
   | "collection_added"
   | "collection_edited"
-  | "collection_removed";
+  | "collection_removed"
+  // Dotted (new spec)
+  | "auth.login"
+  | "auth.logout"
+  | "auth.signup"
+  | "auth.approved"
+  | "page.view"
+  | "scrape.run"
+  | "record.edit"
+  | "record.view"
+  | "record.favourite"
+  | "classification.correct"
+  | "note.create"
+  | "note.update"
+  | "note.delete"
+  | "note.create_from_kenny"
+  | "chat.message"
+  | "inventory.add"
+  | "inventory.edit"
+  | "inventory.csv_import";
 
 /**
  * Fire-and-forget activity log insert.

@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { ConfigProvider } from "@/hooks/use-config";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logActivity } from "@/lib/activity-log";
 import { ChatProvider } from "@/components/chat/ChatProvider";
 import ChatWidget from "@/components/chat/ChatWidget";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
@@ -40,6 +41,22 @@ const AppRoutes = () => {
       user_agent: navigator.userAgent,
     });
   }, []);
+
+  return isAuthenticated && isApproved ? <AuthedRoutes /> : <UnauthedRoutes isLoading={isLoading} isAuthenticated={isAuthenticated} />;
+};
+
+const PageViewLogger = () => {
+  const location = useLocation();
+  useEffect(() => {
+    logActivity("page.view", null, {
+      path: location.pathname,
+      referrer: document.referrer || null,
+    });
+  }, [location.pathname]);
+  return null;
+};
+
+const AuthedRoutes = () => {
 
   if (isLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <SignOn />;

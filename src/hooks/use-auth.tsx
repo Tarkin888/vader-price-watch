@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logActivity } from "@/lib/activity-log";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface UserProfile {
@@ -90,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 page: "USER_SIGNED_IN:" + sess.user.email,
                 user_agent: navigator.userAgent,
               });
+              logActivity("auth.login", sess.user.email ?? null, { provider: sess.user.app_metadata?.provider ?? "email" });
             }
             setIsLoading(false);
           }, 0);
@@ -116,18 +118,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     const email = user?.email;
+    const userId = user?.id;
+    // Log BEFORE signOut so RLS still allows the insert
+    if (userId) {
+      await supabase.from("user_activity" as any).insert({
+        user_id: userId,
+        event_type: "auth.logout",
+        entity_ref: email ?? null,
+        metadata: null,
+      });
+    }
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);
-    // Fire-and-forget audit
     if (email) {
       supabase.from("page_views").insert({
         page: "USER_SIGNED_OUT:" + email,
         user_agent: navigator.userAgent,
       });
     }
-  }, [user?.email]);
+  }, [user?.email, user?.id]);
 
   const value: AuthContextType = {
     user,
