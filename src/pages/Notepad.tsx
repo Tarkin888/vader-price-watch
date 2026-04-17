@@ -513,6 +513,19 @@ export default function Notepad() {
                       <div className="flex items-center gap-1.5 mb-0.5">
                         {note.pinned && <Pin size={10} className="text-primary shrink-0" />}
                         <span className="text-xs font-medium text-foreground truncate">{note.title}</span>
+                        {note.source_context?.source === "kenny_chat" && (
+                          <span
+                            className="shrink-0 px-1 py-0.5 rounded text-[8px] tracking-wider"
+                            style={{
+                              background: "rgba(201,168,76,0.15)",
+                              color: "hsl(43, 50%, 54%)",
+                              border: "1px solid rgba(201,168,76,0.35)",
+                            }}
+                            title="Saved from a Kenny chat reply"
+                          >
+                            FROM KENNY
+                          </span>
+                        )}
                       </div>
                       <p className="text-[10px] text-muted-foreground line-clamp-2 leading-tight">{note.body || "Empty note"}</p>
                       <div className="flex items-center gap-1.5 mt-1">
