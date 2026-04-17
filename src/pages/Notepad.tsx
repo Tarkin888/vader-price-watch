@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import Header from "@/components/Header";
@@ -32,6 +33,7 @@ interface Note {
   pinned: boolean;
   created_at: string;
   updated_at: string;
+  source_context: { source?: string; question?: string; chat_session_id?: string; timestamp?: string } | null;
 }
 
 interface LinkedLot {
