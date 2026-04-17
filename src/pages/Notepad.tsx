@@ -591,6 +591,34 @@ export default function Notepad() {
 
                   {/* Editor fields */}
                   <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                    {/* From Kenny badge + quoted question */}
+                    {selectedNote?.source_context?.source === "kenny_chat" && (
+                      <div
+                        className="px-3 py-2 rounded"
+                        style={{
+                          background: "rgba(201,168,76,0.08)",
+                          border: "1px solid rgba(201,168,76,0.25)",
+                        }}
+                      >
+                        <span
+                          className="inline-block px-1.5 py-0.5 rounded text-[9px] tracking-wider mb-1.5"
+                          style={{
+                            background: "rgba(201,168,76,0.2)",
+                            color: "hsl(43, 50%, 54%)",
+                            border: "1px solid rgba(201,168,76,0.4)",
+                          }}
+                        >
+                          FROM KENNY
+                        </span>
+                        {selectedNote.source_context.question && (
+                          <div className="text-[11px] text-muted-foreground italic leading-snug">
+                            <span className="opacity-70">You asked Kenny: </span>
+                            "{selectedNote.source_context.question}"
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Title */}
                     <div>
                       <label className="text-[10px] text-muted-foreground tracking-widest uppercase block mb-1">Title *</label>
