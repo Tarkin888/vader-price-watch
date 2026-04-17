@@ -56,6 +56,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     };
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
+    // Log chat.message — count + length only, NEVER the body
+    logActivity("chat.message", null, { role: "user", length: text.length });
 
     try {
       const { data, error } = await supabase.functions.invoke("chat", {
