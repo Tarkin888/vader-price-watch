@@ -68,6 +68,7 @@ function relativeTime(dateStr: string) {
 
 export default function Notepad() {
   const { profile } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
