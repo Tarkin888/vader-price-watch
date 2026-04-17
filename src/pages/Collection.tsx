@@ -2,9 +2,10 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllCollectionItems, deleteCollectionItem, CATEGORIES, GRADINGS, type CollectionItem } from "@/lib/collection-db";
 import CollectionFormModal from "@/components/CollectionFormModal";
+import CollectionImportModal from "@/components/CollectionImportModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
 import CollectionPhotoGallery from "@/components/CollectionPhotoGallery";
-import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu, X } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu, X, Download, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { adminWrite } from "@/lib/admin-write";
@@ -13,6 +14,8 @@ import ImageDropCell from "@/components/ImageDropCell";
 import EstimatedValueCell, { calculateEstimatedValue } from "@/components/EstimatedValueCell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { downloadTemplate } from "@/lib/inventory-csv";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
