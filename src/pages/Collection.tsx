@@ -479,6 +479,12 @@ const Collection = () => {
         editItem={editItem}
       />
 
+      <CollectionImportModal
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImported={load}
+      />
+
       <AlertDialog open={!!deleteItem} onOpenChange={(o) => { if (!o) setDeleteItem(null); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
