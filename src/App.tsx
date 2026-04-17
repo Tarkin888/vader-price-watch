@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { ConfigProvider } from "@/hooks/use-config";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logActivity } from "@/lib/activity-log";
 import { ChatProvider } from "@/components/chat/ChatProvider";
 import ChatWidget from "@/components/chat/ChatWidget";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
@@ -31,8 +32,19 @@ const LoadingScreen = () => (
   </div>
 );
 
+const PageViewLogger = () => {
+  const location = useLocation();
+  useEffect(() => {
+    logActivity("page.view", null, {
+      path: location.pathname,
+      referrer: document.referrer || null,
+    });
+  }, [location.pathname]);
+  return null;
+};
+
 const AppRoutes = () => {
-  const { isLoading, isAuthenticated, isApproved, profile } = useAuth();
+  const { isLoading, isAuthenticated, isApproved } = useAuth();
 
   useEffect(() => {
     supabase.from("page_views").insert({
@@ -47,6 +59,7 @@ const AppRoutes = () => {
 
   return (
     <>
+      <PageViewLogger />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/knowledge" element={<KnowledgeHub />} />

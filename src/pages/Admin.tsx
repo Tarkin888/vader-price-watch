@@ -12,6 +12,7 @@ import AdminConfigTab from "@/components/admin/ConfigTab";
 import AdminAuditLogTab from "@/components/admin/AuditLogTab";
 import AdminUsersTab from "@/components/admin/UsersTab";
 import AdminChangelogTab from "@/components/admin/ChangelogTab";
+import AdminActivityTab from "@/components/admin/ActivityTab";
 
 const TABS = [
   { key: "overview", label: "OVERVIEW" },
@@ -21,6 +22,7 @@ const TABS = [
   { key: "bug-reports", label: "BUG REPORTS" },
   { key: "config", label: "CONFIG" },
   { key: "audit-log", label: "AUDIT LOG" },
+  { key: "activity", label: "ACTIVITY" },
   { key: "users", label: "USERS" },
   { key: "changelog", label: "CHANGELOG" },
 ] as const;
@@ -212,6 +214,7 @@ const Admin = () => {
         {activeTab === "bug-reports" && <AdminBugReportsTab />}
         {activeTab === "config" && <AdminConfigTab />}
         {activeTab === "audit-log" && <AdminAuditLogTab />}
+        {activeTab === "activity" && <AdminActivityTab />}
         {activeTab === "users" && <AdminUsersTab />}
         {activeTab === "changelog" && <AdminChangelogTab />}
       </div>

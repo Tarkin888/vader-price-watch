@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logActivity } from "@/lib/activity-log";
 
 interface ChatMessage {
   id: string;
@@ -55,6 +56,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     };
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
+    // Log chat.message — count + length only, NEVER the body
+    logActivity("chat.message", null, { role: "user", length: text.length });
 
     try {
       const { data, error } = await supabase.functions.invoke("chat", {
