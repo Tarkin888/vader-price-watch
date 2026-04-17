@@ -36,6 +36,7 @@ const Collection = () => {
   const [filters, setFilters] = useState<CollectionFilters>({ category: null, grading: null, search: "" });
   const [editItem, setEditItem] = useState<CollectionItem | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState<CollectionItem | null>(null);
   const [subTab, setSubTab] = useState<"inventory" | "analytics" | "gallery">("inventory");
   const [privacyMode, setPrivacyMode] = useState(false);
@@ -181,6 +182,38 @@ const Collection = () => {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs tracking-wider"
+                    onClick={downloadTemplate}
+                  >
+                    <Download className="w-3 h-3 mr-1" /> Template
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-[11px] tracking-wider max-w-xs">
+                  Download a sample CSV with the exact column headers required for bulk import.
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs tracking-wider"
+                    onClick={() => setImportOpen(true)}
+                  >
+                    <Upload className="w-3 h-3 mr-1" /> Import CSV
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-[11px] tracking-wider max-w-xs">
+                  Upload a CSV to bulk-add items. Rows are validated and duplicates (same lot ref + source) are skipped.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Button
               size="sm"
               className="text-xs tracking-wider"
