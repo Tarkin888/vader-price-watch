@@ -29,6 +29,9 @@ interface CollectionFilters {
   search: string;
 }
 
+// React Fragment alias that accepts a key prop (the shorthand <>...</> doesn't).
+const FragmentWithKey = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+
 const Collection = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
@@ -382,8 +385,8 @@ const Collection = () => {
                   const isExpanded = expandedRows.has(item.id);
                   const colCount = 11 + (privacyMode ? 0 : 3);
                   return (
-                    <>
-                      <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors" style={{ height: "7rem" }}>
+                    <FragmentWithKey key={item.id}>
+                      <tr className="border-b border-border/50 hover:bg-secondary/50 transition-colors" style={{ height: "7rem" }}>
                         <td className="px-1.5 py-2 text-muted-foreground whitespace-nowrap align-middle">{item.item_id}</td>
                         <td className="px-1.5 py-2 align-middle">
                           <ImageDropCell imageUrl={item.front_image_url || ""} itemId={item.id} field="front_image_url" onUpdated={load} />
@@ -430,13 +433,13 @@ const Collection = () => {
                         </td>
                       </tr>
                       {isExpanded && (
-                        <tr key={`${item.id}-related`} className="border-b border-border/50">
+                        <tr className="border-b border-border/50">
                           <td colSpan={colCount} className="px-3 py-3 bg-secondary/20">
                             <RelatedSalesPanel item={item} defaultExpanded />
                           </td>
                         </tr>
                       )}
-                    </>
+                    </FragmentWithKey>
                   );
                 })}
               </tbody>
