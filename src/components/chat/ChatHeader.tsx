@@ -1,6 +1,6 @@
 import { RotateCcw, Bug, X } from "lucide-react";
 import { useChat } from "./ChatProvider";
-import KennyAvatar from "./KennyAvatar";
+import KennyAvatar from "@/components/kenny/KennyAvatar";
 
 export default function ChatHeader() {
   const { setIsOpen, resetSession, sendMessage } = useChat();
@@ -15,7 +15,7 @@ export default function ChatHeader() {
       style={{ background: "rgba(201,168,76,0.08)" }}
     >
       <div className="flex items-center gap-2">
-        <KennyAvatar size={32} />
+        <KennyAvatar size="sm" />
         <span
           className="text-sm font-bold"
           style={{ color: "#C9A84C", fontFamily: "Aptos, 'Courier New', monospace" }}

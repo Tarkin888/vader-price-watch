@@ -20,6 +20,7 @@ import Admin from "./pages/Admin";
 import Stats from "./pages/Stats";
 import Notepad from "./pages/Notepad";
 import Changelog from "./pages/Changelog";
+import DevKennyAvatar from "./pages/DevKennyAvatar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +69,7 @@ const AppRoutes = () => {
         <Route path="/notepad" element={<Notepad />} />
         <Route path="/changelog" element={<Changelog />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/dev/kenny-avatar" element={<DevKennyAvatar />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ConditionalChatWidget />
