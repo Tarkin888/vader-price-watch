@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PriceResultCards from "./PriceResultCard";
 import { useChat } from "./ChatProvider";
-import KennyAvatar from "./KennyAvatar";
+import KennyAvatar from "@/components/kenny/KennyAvatar";
 import SaveToNotepadPopover from "./SaveToNotepadPopover";
 import { Bookmark, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -59,10 +59,10 @@ export default function ChatMessage({ msg }: Props) {
   };
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2 ${!isUser ? "items-start gap-2" : ""}`}>
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2 ${!isUser ? "items-start" : ""}`} style={!isUser ? { gap: "8px" } : undefined}>
       {!isUser && (
         <div className="shrink-0 mt-1">
-          <KennyAvatar size={28} />
+          <KennyAvatar size="xs" />
         </div>
       )}
       <div className={isUser ? "" : "flex-1 min-w-0"} style={{ maxWidth: isUser ? "80%" : "85%" }}>
