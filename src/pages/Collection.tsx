@@ -5,13 +5,14 @@ import CollectionFormModal from "@/components/CollectionFormModal";
 import CollectionImportModal from "@/components/CollectionImportModal";
 import CollectionAnalytics from "@/components/CollectionAnalytics";
 import CollectionPhotoGallery from "@/components/CollectionPhotoGallery";
-import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu, X, Download, Upload } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, ArrowRight, Eye, EyeOff, Calculator, Menu, X, Download, Upload, ChevronDown, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { adminWrite } from "@/lib/admin-write";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
 import EstimatedValueCell, { calculateEstimatedValue } from "@/components/EstimatedValueCell";
+import RelatedSalesPanel from "@/components/RelatedSalesPanel";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -28,6 +29,9 @@ interface CollectionFilters {
   search: string;
 }
 
+// React Fragment alias that accepts a key prop (the shorthand <>...</> doesn't).
+const FragmentWithKey = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+
 const Collection = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
@@ -42,6 +46,12 @@ const Collection = () => {
   const [privacyMode, setPrivacyMode] = useState(false);
   const [bulkCalcing, setBulkCalcing] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const toggleRow = (id: string) => setExpandedRows((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
 
   const load = useCallback(async () => {
     try {
@@ -338,6 +348,9 @@ const Collection = () => {
                       <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </div>
+                  <div className="mt-2">
+                    <RelatedSalesPanel item={item} compact />
+                  </div>
                 </div>
               );
             })}
@@ -369,50 +382,64 @@ const Collection = () => {
               <tbody>
                 {filtered.map((item) => {
                   const pnl = getPnl(item);
+                  const isExpanded = expandedRows.has(item.id);
+                  const colCount = 11 + (privacyMode ? 0 : 3);
                   return (
-                    <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors" style={{ height: "7rem" }}>
-                      <td className="px-1.5 py-2 text-muted-foreground whitespace-nowrap align-middle">{item.item_id}</td>
-                      <td className="px-1.5 py-2 align-middle">
-                        <ImageDropCell imageUrl={item.front_image_url || ""} itemId={item.id} field="front_image_url" onUpdated={load} />
-                      </td>
-                      <td className="px-1.5 py-2 align-middle">
-                        <ImageDropCell imageUrl={item.back_image_url || ""} itemId={item.id} field="back_image_url" onUpdated={load} />
-                      </td>
-                      <td className="px-1.5 py-2 text-primary font-bold max-w-[200px] truncate align-middle" title={item.description}>{item.description}</td>
-                      <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.category}</td>
-                      <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.grading}</td>
-                      {!privacyMode && <td className="px-1.5 py-2 text-right align-middle text-foreground">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>}
-                      <td className="px-1.5 py-2 whitespace-nowrap align-middle text-foreground">{item.purchase_date}</td>
-                      <td className="px-1.5 py-2 align-middle text-foreground">{item.purchase_source}</td>
-                      {!privacyMode && (
-                        <td className="px-1.5 py-2 text-right align-middle">
-                          <EstimatedValueCell item={item} onUpdated={load} />
+                    <FragmentWithKey key={item.id}>
+                      <tr className="border-b border-border/50 hover:bg-secondary/50 transition-colors" style={{ height: "7rem" }}>
+                        <td className="px-1.5 py-2 text-muted-foreground whitespace-nowrap align-middle">{item.item_id}</td>
+                        <td className="px-1.5 py-2 align-middle">
+                          <ImageDropCell imageUrl={item.front_image_url || ""} itemId={item.id} field="front_image_url" onUpdated={load} />
                         </td>
-                      )}
-                      {!privacyMode && (
-                        <td className={`px-1.5 py-2 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
-                          {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
+                        <td className="px-1.5 py-2 align-middle">
+                          <ImageDropCell imageUrl={item.back_image_url || ""} itemId={item.id} field="back_image_url" onUpdated={load} />
                         </td>
-                      )}
-                      <td className="px-1.5 py-2 align-middle max-w-[120px] truncate text-muted-foreground" title={item.notes || ""}>
-                        {item.notes || <span className="text-muted-foreground/50">—</span>}
-                      </td>
-                      <td className="px-1.5 py-2 align-middle">
-                        <div className="flex items-center gap-1.5">
-                          <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary transition-colors" title="Edit">
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                          {item.category.startsWith("SW-12") && (
-                            <button onClick={(e) => handleFindComps(item, e)} className="text-muted-foreground hover:text-primary transition-colors" title="Find Comps">
-                              <ArrowRight className="w-3.5 h-3.5" />
+                        <td className="px-1.5 py-2 text-primary font-bold max-w-[200px] truncate align-middle" title={item.description}>{item.description}</td>
+                        <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.category}</td>
+                        <td className="px-1.5 py-2 whitespace-nowrap align-middle">{item.grading}</td>
+                        {!privacyMode && <td className="px-1.5 py-2 text-right align-middle text-foreground">£{Number(item.purchase_price).toLocaleString("en-GB")}</td>}
+                        <td className="px-1.5 py-2 whitespace-nowrap align-middle text-foreground">{item.purchase_date}</td>
+                        <td className="px-1.5 py-2 align-middle text-foreground">{item.purchase_source}</td>
+                        {!privacyMode && (
+                          <td className="px-1.5 py-2 text-right align-middle">
+                            <EstimatedValueCell item={item} onUpdated={load} />
+                          </td>
+                        )}
+                        {!privacyMode && (
+                          <td className={`px-1.5 py-2 text-right font-bold align-middle ${getPnlColor(pnl, item)}`}>
+                            {pnl != null ? `${pnl >= 0 ? "+" : ""}£${pnl.toLocaleString("en-GB")}` : <span className="text-muted-foreground">—</span>}
+                          </td>
+                        )}
+                        <td className="px-1.5 py-2 align-middle max-w-[120px] truncate text-muted-foreground" title={item.notes || ""}>
+                          {item.notes || <span className="text-muted-foreground/50">—</span>}
+                        </td>
+                        <td className="px-1.5 py-2 align-middle">
+                          <div className="flex items-center gap-1.5">
+                            <button onClick={() => toggleRow(item.id)} className="text-muted-foreground hover:text-primary transition-colors" title={isExpanded ? "Hide related sales" : "Show related sales"} aria-expanded={isExpanded}>
+                              {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                            <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary transition-colors" title="Edit">
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive transition-colors" title="Delete">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                            {item.category.startsWith("SW-12") && (
+                              <button onClick={(e) => handleFindComps(item, e)} className="text-muted-foreground hover:text-primary transition-colors" title="Find Comps">
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                      {isExpanded && (
+                        <tr className="border-b border-border/50">
+                          <td colSpan={colCount} className="px-3 py-3 bg-secondary/20">
+                            <RelatedSalesPanel item={item} defaultExpanded />
+                          </td>
+                        </tr>
+                      )}
+                    </FragmentWithKey>
                   );
                 })}
               </tbody>

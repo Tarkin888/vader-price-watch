@@ -12,6 +12,7 @@ import {
   type CollectionItem,
 } from "@/lib/collection-db";
 import { logActivity } from "@/lib/activity-log";
+import RelatedSalesPanel from "@/components/RelatedSalesPanel";
 
 const MIN_DATE = "1977-01-01";
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -257,6 +258,14 @@ const CollectionFormModal = ({ open, onOpenChange, onSaved, editItem }: Props) =
             </div>
           )}
         </div>
+
+        {/* Related Sales — detail view (always expanded by default) */}
+        {editItem && (
+          <div className="border-t border-border mt-3 pt-3">
+            <RelatedSalesPanel item={editItem} defaultExpanded />
+          </div>
+        )}
+
         <div className="flex justify-end gap-2 mt-2">
           <Button variant="ghost" size="sm" className="text-xs tracking-wider" onClick={() => onOpenChange(false)}>CANCEL</Button>
           <Button size="sm" className="text-xs tracking-wider" onClick={handleSave} disabled={saving}>
