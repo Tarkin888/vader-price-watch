@@ -12,6 +12,7 @@ import { adminWrite } from "@/lib/admin-write";
 import ThemeToggle from "@/components/ThemeToggle";
 import ImageDropCell from "@/components/ImageDropCell";
 import EstimatedValueCell, { calculateEstimatedValue } from "@/components/EstimatedValueCell";
+import RelatedSalesPanel from "@/components/RelatedSalesPanel";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -337,6 +338,9 @@ const Collection = () => {
                       <button onClick={() => setEditItem(item)} className="text-muted-foreground hover:text-primary"><Pencil className="w-3.5 h-3.5" /></button>
                       <button onClick={() => setDeleteItem(item)} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
+                  </div>
+                  <div className="mt-2">
+                    <RelatedSalesPanel item={item} compact />
                   </div>
                 </div>
               );
