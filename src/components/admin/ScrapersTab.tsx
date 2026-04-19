@@ -49,6 +49,8 @@ const AdminScrapersTab = () => {
   const [caching, setCaching] = useState(false);
   const [expandedError, setExpandedError] = useState<string | null>(null);
 
+  const { data: freshness } = useScraperFreshness(SOURCES);
+
   // Form state
   const [fSource, setFSource] = useState(SOURCES[0]);
   const [fStatus, setFStatus] = useState("SUCCESS");
