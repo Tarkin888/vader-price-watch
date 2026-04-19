@@ -7,6 +7,7 @@ import ScatterChartPanel from "@/components/ScatterChartPanel";
 import PriceTrendChart from "@/components/PriceTrendChart";
 
 import LotsTable from "@/components/LotsTable";
+import EraPriceTrendChart from "@/components/charts/EraPriceTrendChart";
 import ToolsDropdown from "@/components/ToolsDropdown";
 
 import SummaryDashboard from "@/components/SummaryDashboard";
@@ -319,6 +320,7 @@ const Index = () => {
         )}
         {activeTab === "table" && (
           <>
+            <EraPriceTrendChart lots={filtered} currency={filters.currency} />
             <LotsTable lots={paginatedLots} allLots={lots} onChanged={loadLots} currency={filters.currency} highlightLotId={highlightLotId} />
             <Pagination
               currentPage={safePage}
