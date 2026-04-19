@@ -31,13 +31,13 @@ export const useScraperFreshness = (sources: string[]) => {
       // Single round-trip: pull recent successful logs and reduce client-side.
       const { data } = await adminRead({
         table: "scraper_logs",
-        filters: { status: "SUCCESS" },
         order_by: "started_at",
         order_asc: false,
         limit: 200,
       });
 
-      const rows = (data ?? []) as Array<{ source: string; started_at: string | null; created_at: string | null }>;
+      const rows = ((data ?? []) as Array<{ source: string; status: string; started_at: string | null; created_at: string | null }>)
+        .filter((r) => (r.status ?? "").toUpperCase() === "SUCCESS");
       const latest: Record<string, string> = {};
       for (const r of rows) {
         const ts = r.started_at ?? r.created_at;
