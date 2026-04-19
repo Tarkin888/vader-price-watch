@@ -349,7 +349,57 @@ export default function Notepad() {
     scheduleAutosave();
   };
 
-  // ── Keyboard shortcuts ──
+  // ── Export to Markdown ──
+  const escapeYaml = (v: string) => v.replace(/"/g, '\\"');
+  const handleExport = () => {
+    if (notes.length === 0) return;
+
+    // Sort: pinned DESC, updated_at DESC. Cap at 100 as safety.
+    const sorted = [...notes]
+      .sort((a, b) => {
+        if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      })
+      .slice(0, 100);
+
+    const blocks = sorted.map((n) => {
+      const tagsArr = (n.tags ?? []).map((t) => `"${escapeYaml(t)}"`).join(", ");
+      const origin = n.source_context?.source ?? "manual";
+      const linked = n.linked_lot_ref ?? "";
+      return [
+        "---",
+        `title: "${escapeYaml(n.title || "Untitled note")}"`,
+        `tags: [${tagsArr}]`,
+        `pinned: ${n.pinned ? "true" : "false"}`,
+        `linked_lot: "${escapeYaml(linked)}"`,
+        `source: "${escapeYaml(origin)}"`,
+        `created: ${new Date(n.created_at).toISOString()}`,
+        `updated: ${new Date(n.updated_at).toISOString()}`,
+        "---",
+        "",
+        n.body ?? "",
+      ].join("\n");
+    });
+
+    const md = blocks.join("\n\n---\n\n") + "\n";
+
+    const today = new Date().toLocaleDateString("en-GB").split("/").reverse().join("-"); // YYYY-MM-DD
+    const filename = `imperial-notepad-${today}.md`;
+
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+
+    logActivity("notepad.export", null, { count: sorted.length });
+    toast.success(`Exported ${sorted.length} note${sorted.length === 1 ? "" : "s"} to ${filename}`);
+  };
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
