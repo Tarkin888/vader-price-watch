@@ -22,6 +22,7 @@ import Notepad from "./pages/Notepad";
 import Changelog from "./pages/Changelog";
 import DevKennyAvatar from "./pages/DevKennyAvatar";
 import NotFound from "./pages/NotFound";
+import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +92,7 @@ const App = () => {
           <TooltipProvider>
             <Toaster />
             <Sonner />
+            <KeyboardShortcutsModal />
             <AuthProvider>
               <ChatProvider>
                 <BrowserRouter>
