@@ -519,6 +519,23 @@ export default function Notepad() {
                     </TooltipTrigger>
                     {isFull && <TooltipContent>Notepad full — delete an entry first</TooltipContent>}
                   </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 w-7 p-0"
+                        disabled={notes.length === 0}
+                        onClick={handleExport}
+                        aria-label="Export notes to Markdown"
+                      >
+                        <Download size={14} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {notes.length === 0 ? "No notes to export" : "Export all notes (.md)"}
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
 
                 {/* Tag chips */}
