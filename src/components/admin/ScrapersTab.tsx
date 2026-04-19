@@ -194,7 +194,30 @@ const AdminScrapersTab = () => {
           return (
             <div key={src} className="rounded p-3 space-y-1" style={{ border: "1px solid rgba(201,168,76,0.3)", background: "#0D0D0B" }}>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold" style={{ color: "#C9A84C" }}>{src}</span>
+                <span className="text-sm font-bold inline-flex items-center" style={{ color: "#C9A84C", fontFamily: "'Courier New', monospace" }}>
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span
+                          aria-label={`Freshness: ${freshness?.[src]?.level ?? "unknown"}`}
+                          style={{
+                            display: "inline-block",
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            marginRight: 4,
+                            border: "1px solid #C9A84C",
+                            background: freshness ? FRESHNESS_FILL[freshness[src].level] : "transparent",
+                          }}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" style={{ fontFamily: "'Courier New', monospace", color: "#e0d8c0" }}>
+                        {fmtFreshDate(freshness?.[src]?.lastSuccessAt ?? null)}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  {src}
+                </span>
                 {log ? (
                   <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${STATUS_COLORS[log.status] || "#666"}33`, color: STATUS_COLORS[log.status] || "#666" }}>
                     {log.status}
