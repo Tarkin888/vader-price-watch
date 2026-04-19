@@ -5,6 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RefreshCw, ImageDown } from "lucide-react";
 import ScrapeHistoryPanel from "./ScrapeHistoryPanel";
+import { useScraperFreshness, type Freshness } from "@/hooks/useScraperFreshness";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+
+const FRESHNESS_FILL: Record<Freshness, string> = {
+  green: "#4CAF50",
+  amber: "#FF9800",
+  red: "#F44336",
+};
+
+const fmtFreshDate = (iso: string | null) => {
+  if (!iso) return "Never run";
+  const d = new Date(iso);
+  return `Last run: ${d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}`;
+};
 
 const SOURCES = ["Heritage", "Hakes", "LCG", "Vectis", "CandT"];
 const STATUS_OPTIONS = ["SUCCESS", "PARTIAL", "FAILED"];
