@@ -33,7 +33,8 @@ export type ActivityEventType =
   | "chat.message"
   | "inventory.add"
   | "inventory.edit"
-  | "inventory.csv_import";
+  | "inventory.csv_import"
+  | "notepad.export";
 
 /**
  * Fire-and-forget activity log insert.

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import {
-  Pin, PinOff, Plus, Search, Trash2, Copy, X, ExternalLink, StickyNote,
+  Pin, PinOff, Plus, Search, Trash2, Copy, X, ExternalLink, StickyNote, Download,
 } from "lucide-react";
 import { logActivity } from "@/lib/activity-log";
 
