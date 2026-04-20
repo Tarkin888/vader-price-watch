@@ -201,11 +201,11 @@ const Collection = () => {
                     className="text-xs tracking-wider"
                     onClick={downloadTemplate}
                   >
-                    <Download className="w-3 h-3 mr-1" /> Template
+                    <Download className="w-3 h-3 mr-1" /> Inventory Data Template
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="text-[11px] tracking-wider max-w-xs">
-                  Download a sample CSV with the exact column headers required for bulk import.
+                  Download the Inventory Data Template — a sample CSV with the exact column headers required for bulk import.
                 </TooltipContent>
               </Tooltip>
               <Tooltip>

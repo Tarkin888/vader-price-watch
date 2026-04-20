@@ -111,7 +111,7 @@ const CollectionImportModal = ({ open, onOpenChange, onImported }: Props) => {
         <DialogHeader>
           <DialogTitle className="text-primary tracking-wider text-sm">IMPORT INVENTORY CSV</DialogTitle>
           <DialogDescription id="csv-import-desc" className="text-muted-foreground text-[11px] tracking-wider">
-            Drop a CSV file to validate and import. Use the template for the correct column format.
+            Drop a CSV file to validate and import. Use the Inventory Data Template for the correct column format.
           </DialogDescription>
         </DialogHeader>
 
