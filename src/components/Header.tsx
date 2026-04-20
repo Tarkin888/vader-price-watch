@@ -17,7 +17,7 @@ const Header = ({ totalRecords, lastScrapeDate, currency = "GBP", onCurrencyTogg
     <header className="border-b border-border px-4 md:px-6 flex flex-col md:flex-row md:items-center justify-between py-2 md:py-0 md:h-[60px] gap-1 md:gap-0">
       <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-3">
         <Link to="/" className="cursor-pointer">
-          <h1 className="text-base md:text-lg font-bold text-primary tracking-widest">
+          <h1 className="text-base font-bold text-primary tracking-widest md:text-xl">
             IMPERIAL PRICE TERMINAL
           </h1>
         </Link>
