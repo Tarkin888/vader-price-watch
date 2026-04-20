@@ -34,7 +34,8 @@ export type ActivityEventType =
   | "inventory.add"
   | "inventory.edit"
   | "inventory.csv_import"
-  | "notepad.export";
+  | "notepad.export"
+  | "quickimport.text";
 
 /**
  * Fire-and-forget activity log insert.

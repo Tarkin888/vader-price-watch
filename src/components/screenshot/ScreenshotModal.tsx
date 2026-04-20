@@ -5,6 +5,7 @@ import ScreenshotPreview from "./ScreenshotPreview";
 import ExtractionReviewForm from "./ExtractionReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
+import { logActivity } from "@/lib/activity-log";
 import { toast } from "sonner";
 import type { ExtractedData } from "@/lib/screenshot-prices";
 
@@ -99,6 +100,29 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       }
       setExtracted(data.extracted as ExtractedData);
       setStep("review");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to extract data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTextSubmitted = async (text: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("screenshot-extract", {
+        body: { mode: "text", text },
+      });
+      if (fnErr) throw new Error(data?.error || fnErr.message);
+      if (!data.success) throw new Error(data.error);
+      if (!data.extracted) {
+        setError(data.reason || "Could not identify auction data in this text.");
+        return;
+      }
+      setExtracted(data.extracted as ExtractedData);
+      setStep("review");
+      logActivity("quickimport.text");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to extract data");
     } finally {
@@ -242,6 +266,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
             <ScreenshotCapture
               onImageCaptured={handleImageCaptured}
               onUrlSubmitted={handleUrlSubmitted}
+              onTextSubmitted={handleTextSubmitted}
               enabled={isPinVerified}
             />
           )}
