@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Clipboard, Upload, Link } from "lucide-react";
+import { Clipboard, Upload, Link, FileText } from "lucide-react";
+
+type Method = "paste" | "upload" | "url" | "text";
 
 interface Props {
   onImageCaptured: (base64: string) => void;
   onUrlSubmitted: (url: string) => void;
+  onTextSubmitted?: (text: string) => void;
   enabled?: boolean;
 }
 
@@ -12,7 +15,7 @@ interface SourceHint {
   color: string;
 }
 
-const detectSource = (url: string): SourceHint | null => {
+const detectSourceFromUrl = (url: string): SourceHint | null => {
   if (!url.trim()) return null;
   const lower = url.toLowerCase();
   if (lower.includes("ha.com")) return { label: "HERITAGE", color: "#3B82F6" };
@@ -22,20 +25,36 @@ const detectSource = (url: string): SourceHint | null => {
   if (lower.includes("candtauctions")) return { label: "C&T", color: "#F59E0B" };
   if (lower.includes("lcgauctions")) return { label: "LCG", color: "#14B8A6" };
   if (lower.includes("facebook.com")) return { label: "FACEBOOK", color: "#60A5FA" };
-  // Any other URL-like string → OTHER
   if (lower.startsWith("http") || (lower.includes(".") && lower.length > 4)) {
     return { label: "OTHER", color: "#6B7280" };
   }
   return null;
 };
 
-const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: Props) => {
+const detectSourceFromText = (text: string): SourceHint | null => {
+  if (!text.trim()) return null;
+  const lower = text.toLowerCase();
+  if (/\bha\.com\b/.test(lower)) return { label: "HERITAGE", color: "#3B82F6" };
+  if (/\bhakes\.com\b/.test(lower)) return { label: "HAKES", color: "#F97316" };
+  if (/\blcgauctions\.com\b/.test(lower)) return { label: "LCG", color: "#14B8A6" };
+  if (/\bvectis\.co\.uk\b/.test(lower)) return { label: "VECTIS", color: "#A855F7" };
+  if (/\bcandtauctions\.co\.uk\b/.test(lower)) return { label: "C&T", color: "#F59E0B" };
+  if (/\bebay\.(com|co\.uk)\b/.test(lower)) return { label: "EBAY", color: "#22C55E" };
+  if (/\bfacebook\.com\b/.test(lower)) return { label: "FACEBOOK", color: "#60A5FA" };
+  return null;
+};
+
+const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, enabled = true }: Props) => {
+  const [method, setMethod] = useState<Method>("paste");
   const [urlValue, setUrlValue] = useState("");
-  const [detectedSource, setDetectedSource] = useState<SourceHint | null>(null);
+  const [urlSource, setUrlSource] = useState<SourceHint | null>(null);
+  const [textValue, setTextValue] = useState("");
+  const [textSource, setTextSource] = useState<SourceHint | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handlePaste = useCallback(
     (e: ClipboardEvent) => {
+      if (method !== "paste") return;
       const items = e.clipboardData?.items;
       if (!items) return;
       for (const item of items) {
@@ -48,7 +67,7 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [method]
   );
 
   useEffect(() => {
@@ -84,8 +103,51 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setUrlValue(val);
-    setDetectedSource(detectSource(val));
+    setUrlSource(detectSourceFromUrl(val));
   };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setTextValue(val);
+    setTextSource(detectSourceFromText(val));
+  };
+
+  // Switching method with pasted text → confirm
+  const switchMethod = (next: Method) => {
+    if (next === method) return;
+    if (method === "text" && textValue.trim().length > 0) {
+      const ok = confirm("Discard pasted text?");
+      if (!ok) return;
+      setTextValue("");
+      setTextSource(null);
+    }
+    setMethod(next);
+  };
+
+  const tabBtn = (m: Method, Icon: typeof Clipboard, label: string) => (
+    <button
+      key={m}
+      onClick={() => switchMethod(m)}
+      className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 text-[10px] tracking-wider font-mono border transition-colors min-h-[40px] ${
+        method === m
+          ? "bg-[#C9A84C15] border-[#C9A84C] text-[#C9A84C]"
+          : "border-[#C9A84C33] text-muted-foreground hover:border-[#C9A84C66] hover:text-[#C9A84C]"
+      }`}
+    >
+      <Icon className="w-3.5 h-3.5" />
+      <span className="hidden sm:inline">{label}</span>
+    </button>
+  );
+
+  const charCount = textValue.length;
+  const counterColor =
+    charCount > 20000
+      ? "#EF4444"
+      : charCount >= 500
+      ? "#22C55E"
+      : charCount >= 50
+      ? "#F59E0B"
+      : "#6B7280";
 
   const zoneClass =
     "flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-lg cursor-pointer transition-all min-h-[140px]";
@@ -93,17 +155,20 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Paste & Upload — side by side on larger screens */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Paste zone */}
+      {/* Method tabs */}
+      <div className="flex gap-1 rounded overflow-hidden">
+        {tabBtn("paste", Clipboard, "Paste Screenshot")}
+        {tabBtn("upload", Upload, "Upload File")}
+        {tabBtn("url", Link, "Web URL")}
+        {tabBtn("text", FileText, "Paste Text")}
+      </div>
+
+      {method === "paste" && (
         <div
           className={`${zoneClass} ${zoneIdle}`}
           tabIndex={0}
           role="button"
           aria-label="Paste a screenshot from clipboard"
-          onClick={() => {
-            /* focus to enable paste */
-          }}
         >
           <Clipboard className="w-8 h-8 text-[#C9A84C]" />
           <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
@@ -111,8 +176,9 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
           </span>
           <span className="text-muted-foreground text-[10px]">Ctrl+V / Cmd+V</span>
         </div>
+      )}
 
-        {/* Upload zone */}
+      {method === "upload" && (
         <div
           className={`${zoneClass} ${zoneIdle}`}
           role="button"
@@ -139,46 +205,109 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, enabled = true }: 
             }}
           />
         </div>
-      </div>
+      )}
 
-      {/* URL zone — full width, stacked layout */}
-      <div className={`${zoneClass} ${zoneIdle} items-start`} tabIndex={0}>
-        <div className="flex items-center gap-2">
-          <Link className="w-6 h-6 text-[#C9A84C]" />
-          <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
-            Paste a web link
-          </span>
-        </div>
-        <input
-          type="url"
-          placeholder="https://..."
-          value={urlValue}
-          onChange={handleUrlChange}
-          className="w-full bg-background border border-border rounded px-3 py-2 text-xs text-foreground font-mono overflow-x-auto"
-          aria-label="Auction URL"
-        />
-        <button
-          onClick={() => {
-            if (urlValue.trim()) onUrlSubmitted(urlValue.trim());
-          }}
-          disabled={!urlValue.trim()}
-          className="px-4 py-1.5 text-[10px] tracking-wider bg-[#C9A84C] text-background rounded font-mono disabled:opacity-40"
-        >
-          Fetch
-        </button>
-        {detectedSource && (
-          <span
-            className="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider font-bold self-start"
-            style={{
-              backgroundColor: `${detectedSource.color}22`,
-              color: detectedSource.color,
-              border: `1px solid ${detectedSource.color}55`,
+      {method === "url" && (
+        <div className={`${zoneClass} ${zoneIdle} items-start`} tabIndex={0}>
+          <div className="flex items-center gap-2">
+            <Link className="w-6 h-6 text-[#C9A84C]" />
+            <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
+              Paste a web link
+            </span>
+          </div>
+          <input
+            type="url"
+            placeholder="https://..."
+            value={urlValue}
+            onChange={handleUrlChange}
+            className="w-full bg-background border border-border rounded px-3 py-2 text-xs text-foreground font-mono overflow-x-auto"
+            aria-label="Auction URL"
+          />
+          <button
+            onClick={() => {
+              if (urlValue.trim()) onUrlSubmitted(urlValue.trim());
             }}
+            disabled={!urlValue.trim()}
+            className="px-4 py-1.5 text-[10px] tracking-wider bg-[#C9A84C] text-background rounded font-mono disabled:opacity-40"
           >
-            {detectedSource.label}
-          </span>
-        )}
-      </div>
+            Fetch
+          </button>
+          {urlSource && (
+            <span
+              className="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider font-bold self-start"
+              style={{
+                backgroundColor: `${urlSource.color}22`,
+                color: urlSource.color,
+                border: `1px solid ${urlSource.color}55`,
+              }}
+            >
+              {urlSource.label}
+            </span>
+          )}
+        </div>
+      )}
+
+      {method === "text" && (
+        <div className="flex flex-col gap-2 p-4 border-2 border-dashed border-[#C9A84C44] rounded-lg">
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#C9A84C]" />
+            <span className="text-[#C9A84C] text-xs tracking-wider font-mono">
+              Paste raw text
+            </span>
+          </div>
+          <textarea
+            value={textValue}
+            onChange={handleTextChange}
+            rows={12}
+            placeholder="Paste raw text from a scraper run, auction page, email, or forum post. The classifier will extract the first identifiable lot."
+            className="w-full bg-background border border-border rounded px-3 py-2 text-xs text-foreground resize-y min-h-[260px] max-h-[480px]"
+            style={{ fontFamily: '"Courier New", monospace' }}
+            aria-label="Auction text"
+          />
+          <div className="flex items-center justify-between">
+            <span
+              className="text-[10px] font-mono tracking-wider"
+              style={{ color: counterColor }}
+            >
+              {charCount.toLocaleString()} / 20,000
+            </span>
+            {textSource ? (
+              <span
+                className="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider font-bold"
+                style={{
+                  backgroundColor: `${textSource.color}22`,
+                  color: textSource.color,
+                  border: `1px solid ${textSource.color}55`,
+                }}
+              >
+                {textSource.label}
+              </span>
+            ) : (
+              <span
+                className="px-2 py-0.5 rounded text-[9px] font-mono tracking-wider"
+                style={{
+                  backgroundColor: "#6B728022",
+                  color: "#a39580",
+                  border: "1px solid #6B728055",
+                }}
+              >
+                SOURCE: AUTO-DETECT ON EXTRACT
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => {
+              if (textValue.trim().length >= 50 && onTextSubmitted) {
+                onTextSubmitted(textValue.trim());
+              }
+            }}
+            disabled={textValue.trim().length < 50}
+            className="self-end px-4 py-1.5 text-[10px] tracking-wider bg-[#C9A84C] text-background rounded font-mono disabled:opacity-40"
+          >
+            Extract
+          </button>
+        </div>
+      )}
     </div>
   );
 };
