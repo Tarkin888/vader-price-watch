@@ -149,6 +149,49 @@ async function callClaude(content: Array<Record<string, unknown>>): Promise<Reco
   return JSON.parse(jsonStr);
 }
 
+const TEXT_EXTRACTION_PROMPT = `You are a data extraction specialist for vintage Kenner Star Wars action figure auction records. The user has pasted raw unstructured text that may be: scraper output, a copy-paste from an auction site, an email forward, a forum post, or a chat message referencing a sold lot. Extract every field you can identify. Return ONLY a JSON object with these fields (use null for anything you cannot determine):
+
+{
+  "source": "Heritage | Hakes | LCG | Vectis | CandT | eBay | Facebook | Other",
+  "lotRef": "lot number or reference as shown",
+  "lotUrl": "URL if one appears in the text",
+  "saleDate": "YYYY-MM-DD format",
+  "era": "SW | ESB | ROTJ | POTF | UNKNOWN",
+  "cardbackCode": "e.g. SW-12A, ESB-41, ROTJ-65, POTF-92, or UNKNOWN",
+  "variantCode": "e.g. SW-12A, CAN, PAL, MEX, VP, DT, or the cardbackCode if standard",
+  "gradeTierCode": "e.g. AFA-85, UKG-80, CAS-80, RAW-NM, or UNKNOWN",
+  "hammerPriceRaw": "numeric value as shown, before buyer's premium",
+  "hammerCurrency": "GBP | USD",
+  "buyersPremiumRate": "decimal, e.g. 0.20 for 20%",
+  "totalPaidRaw": "numeric total if shown (hammer + premium)",
+  "totalPaidCurrency": "GBP | USD",
+  "conditionNotes": "any condition description, grade sub-scores, or notes mentioned",
+  "imageUrls": ["any image URLs that appear in the text"],
+  "title": "the most likely full lot title"
+}
+
+Apply the same classification priority rules used in Section 4.7 of the Knowledge Base (era, cardback code, variant, grade tier). If the text mentions multiple lots, extract ONLY the first clearly-identifiable one and ignore the rest — the user will paste each lot separately. If the text is clearly not an auction record (e.g. plain prose, code, random chat), return: { "error": "not_auction_data" }`;
+
+async function handleTextMode(text: unknown) {
+  if (!text || typeof text !== "string" || text.trim().length < 50) {
+    return { success: false, error: "Please paste at least 50 characters of auction text." };
+  }
+  let input = text.trim();
+  if (input.length > 20000) input = input.slice(0, 20000);
+
+  const content = [
+    { type: "text", text: `${TEXT_EXTRACTION_PROMPT}\n\n--- PASTED TEXT ---\n${input}` },
+  ];
+
+  const extracted = await callClaude(content);
+
+  if ((extracted as Record<string, string>).error === "not_auction_data") {
+    return { success: true, extracted: null, reason: "Could not identify auction data in this text." };
+  }
+
+  return { success: true, extracted, sourceUrl: null };
+}
+
 async function handleImageMode(image: string) {
   if (!image || typeof image !== "string" || image.length < 100) {
     return { success: false, error: "No image provided" };
@@ -304,16 +347,18 @@ Deno.serve(async (req) => {
 
     const { mode } = body;
 
-    if (mode !== "image" && mode !== "url") {
-      return respond({ success: false, error: "Invalid mode. Use 'image' or 'url'.", error_stage: "validation" });
+    if (mode !== "image" && mode !== "url" && mode !== "text") {
+      return respond({ success: false, error: "Invalid mode. Use 'image', 'url', or 'text'.", error_stage: "validation" });
     }
 
     let result: Record<string, unknown>;
 
     if (mode === "image") {
       result = await handleImageMode(body.image as string);
-    } else {
+    } else if (mode === "url") {
       result = await handleUrlMode(body.url as string);
+    } else {
+      result = await handleTextMode(body.text);
     }
 
     return respond({ ...result, processing_time_ms: Date.now() - startTime });
