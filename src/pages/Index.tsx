@@ -213,7 +213,7 @@ const Index = () => {
         </button>
         <button
           onClick={() => navigate("/knowledge")}
-          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+          className="tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors text-sm font-bold"
         >
           Knowledge Hub
         </button>
