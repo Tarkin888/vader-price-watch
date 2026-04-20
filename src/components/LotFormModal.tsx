@@ -22,7 +22,7 @@ const VARIANTS = Constants.public.Enums.variant_code;
 const GRADES = Constants.public.Enums.grade_tier_code;
 const ERAS = ["SW", "ESB", "ROTJ", "POTF", "UNKNOWN"] as const;
 const CARDBACK_CODES = [
-  "SW-12", "SW-12A", "SW-12A-DT", "SW-12B", "SW-12B-DT", "SW-12C", "SW-20", "SW-21",
+  "SW-12", "SW-12A", "SW-12A-DT", "SW-12B", "SW-12B-DT", "SW-12C", "SW-20", "SW-21", "SW-21A", "SW-21B", "SW-21C", "SW-21D", "SW-21E", "SW-21F", "SW-21G",
   "ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48",
   "ROTJ-48", "ROTJ-65", "ROTJ-65A", "ROTJ-65B", "ROTJ-65D", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79", "ROTJ-79A", "ROTJ-79B",
   "POTF-92",

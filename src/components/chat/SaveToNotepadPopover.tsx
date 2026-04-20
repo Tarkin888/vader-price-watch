@@ -28,7 +28,7 @@ interface Props {
 
 const ERA_CODES = ["SW", "ESB", "ROTJ", "POTF"];
 const CARDBACK_CODES = [
-  "SW-12", "SW-12A", "SW-12B", "SW-12C", "SW-12A-DT", "SW-12B-DT", "SW-20", "SW-21",
+  "SW-12", "SW-12A", "SW-12B", "SW-12C", "SW-12A-DT", "SW-12B-DT", "SW-20", "SW-21", "SW-21A", "SW-21B", "SW-21C", "SW-21D", "SW-21E", "SW-21F", "SW-21G",
   "ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48",
   "ROTJ-48", "ROTJ-65", "ROTJ-77", "ROTJ-79", "POTF-92",
 ];

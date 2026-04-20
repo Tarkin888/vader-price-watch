@@ -55,6 +55,11 @@ export function classifyLot(title: string, conditionNotes?: string): ClassifiedF
   else if (/41[\s-]?a?\s*-?back|41a\b|\besb[\s-]?41\b/i.test(text)) cardbackCode = "ESB-41";
   else if (/32[\s-]?back/i.test(text)) cardbackCode = "ESB-32";
   else if (/31[\s-]?back|\besb[\s-]?31\b/i.test(text)) cardbackCode = "ESB-31";
+  else if (/\b21[\s-]?back\s*([A-G])\b|\b21-?back-?([A-G])\b|\bsw[\s-]?21([A-G])\b|\b21([A-G])[\s-]?back\b/i.test(text)) {
+    const m = text.match(/\b21[\s-]?back\s*([A-G])\b|\b21-?back-?([A-G])\b|\bsw[\s-]?21([A-G])\b|\b21([A-G])[\s-]?back\b/i);
+    const sub = (m?.[1] || m?.[2] || m?.[3] || m?.[4] || "").toUpperCase();
+    cardbackCode = sub ? `SW-21${sub}` : "SW-21";
+  }
   else if (/21[\s-]?back|\b21\s*card\b/i.test(text)) cardbackCode = "SW-21";
   else if (/20[\s-]?back|\b20\s*card\b/i.test(text)) cardbackCode = "SW-20";
   // Palitoy "12 figure A/B/C back" patterns
