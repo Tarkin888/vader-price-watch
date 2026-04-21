@@ -351,6 +351,63 @@ export type Database = {
         }
         Relationships: []
       }
+      duplicate_ignore_list: {
+        Row: {
+          id: string
+          lot_id_a: string
+          lot_id_b: string
+          marked_by: string | null
+          marked_distinct_at: string
+        }
+        Insert: {
+          id?: string
+          lot_id_a: string
+          lot_id_b: string
+          marked_by?: string | null
+          marked_distinct_at?: string
+        }
+        Update: {
+          id?: string
+          lot_id_a?: string
+          lot_id_b?: string
+          marked_by?: string | null
+          marked_distinct_at?: string
+        }
+        Relationships: []
+      }
+      duplicate_merge_log: {
+        Row: {
+          deleted_lot_id: string
+          deleted_lot_ref: string | null
+          id: string
+          kept_lot_id: string
+          kept_lot_ref: string | null
+          merged_at: string
+          merged_by: string | null
+          source: string | null
+        }
+        Insert: {
+          deleted_lot_id: string
+          deleted_lot_ref?: string | null
+          id?: string
+          kept_lot_id: string
+          kept_lot_ref?: string | null
+          merged_at?: string
+          merged_by?: string | null
+          source?: string | null
+        }
+        Update: {
+          deleted_lot_id?: string
+          deleted_lot_ref?: string | null
+          id?: string
+          kept_lot_id?: string
+          kept_lot_ref?: string | null
+          merged_at?: string
+          merged_by?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       knowledge_articles: {
         Row: {
           category: string

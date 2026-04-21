@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import AdminOverviewTab from "@/components/admin/OverviewTab";
 import AdminScrapersTab from "@/components/admin/ScrapersTab";
 import AdminDataTab from "@/components/admin/DataTab";
+import AdminDuplicatesTab from "@/components/admin/DuplicatesTab";
 import AdminKnowledgeTab from "@/components/admin/KnowledgeTab";
 import AdminBugReportsTab from "@/components/admin/BugReportsTab";
 import AdminConfigTab from "@/components/admin/ConfigTab";
@@ -18,6 +19,7 @@ const TABS = [
   { key: "overview", label: "OVERVIEW" },
   { key: "scrapers", label: "SCRAPERS" },
   { key: "data", label: "DATA" },
+  { key: "duplicates", label: "DUPLICATES" },
   { key: "knowledge-hub", label: "KNOWLEDGE HUB" },
   { key: "bug-reports", label: "BUG REPORTS" },
   { key: "config", label: "CONFIG" },
@@ -210,6 +212,7 @@ const Admin = () => {
         {activeTab === "overview" && <AdminOverviewTab />}
         {activeTab === "scrapers" && <AdminScrapersTab />}
         {activeTab === "data" && <AdminDataTab />}
+        {activeTab === "duplicates" && <AdminDuplicatesTab />}
         {activeTab === "knowledge-hub" && <AdminKnowledgeTab />}
         {activeTab === "bug-reports" && <AdminBugReportsTab />}
         {activeTab === "config" && <AdminConfigTab />}
