@@ -338,6 +338,7 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
             Extract
           </button>
         </div>
+        </>
       )}
     </div>
   );
