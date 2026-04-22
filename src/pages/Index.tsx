@@ -18,7 +18,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Menu, X, Camera, LayoutGrid, List } from "lucide-react";
+import { Menu, X, ClipboardPaste, LayoutGrid, List } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import ScreenshotModal from "@/components/screenshot/ScreenshotModal";
 import PriceTrackerTileView from "@/components/PriceTrackerTileView";
 import Pagination from "@/components/Pagination";
@@ -289,13 +290,20 @@ const Index = () => {
               <LayoutGrid className="w-3.5 h-3.5" />
             </button>
           </div>
-          <button
-            onClick={() => setQuickImportOpen(true)}
-            title="Quick Import"
-            className="flex items-center gap-1.5 text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors border border-border rounded"
-          >
-            <Camera className="w-3.5 h-3.5" />
-          </button>
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setQuickImportOpen(true)}
+                  aria-label="Quick Import"
+                  className="flex items-center gap-1.5 text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors border border-border rounded"
+                >
+                  <ClipboardPaste className="w-3.5 h-3.5" style={{ color: "#C9A84C" }} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Quick Import</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <ToolsDropdown
             onReclassify={handleReclassify}
             reclassifying={reclassifying}
