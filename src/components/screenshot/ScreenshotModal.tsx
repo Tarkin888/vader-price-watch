@@ -200,13 +200,32 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
         onKeyDown={(e) => { if (e.key === "Escape") close(); }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-[#C9A84C33]">
-          <h2 className="text-[#C9A84C] text-base font-bold tracking-wider font-mono">
-            QUICK IMPORT
-          </h2>
+        <div className="flex items-start justify-between gap-3 px-5 py-3 border-b border-[#C9A84C33]">
+          <div className="flex-1 min-w-0">
+            {step === "capture" ? (
+              <>
+                <h2
+                  className="text-[#C9A84C] text-xl font-bold tracking-wider"
+                  style={{ fontFamily: '"Courier New", monospace' }}
+                >
+                  Quick Import
+                </h2>
+                <p
+                  className="text-[11px] mt-1 leading-snug"
+                  style={{ color: "#e0d8c0", fontFamily: '"Courier New", monospace' }}
+                >
+                  Add an auction record by pasting a screenshot, uploading a file, sharing a web link, or pasting raw text.
+                </p>
+              </>
+            ) : (
+              <h2 className="text-[#C9A84C] text-base font-bold tracking-wider font-mono">
+                QUICK IMPORT
+              </h2>
+            )}
+          </div>
           <button
             onClick={close}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
