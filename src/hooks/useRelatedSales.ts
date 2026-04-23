@@ -49,6 +49,107 @@ export function resolveMatchKeys(item: Pick<CollectionItem, "cardback_code" | "v
   return { cardback, variant, grade };
 }
 
+/**
+ * Cardback-only / cardback+variant comp lookup for the Knowledge Hub comp viewer.
+ * Additive overload — does not affect the inventory-card consumers above.
+ * `gradeTierCode` is optional; when omitted, all grades match.
+ * `variantCode` is optional; when omitted, all variants match.
+ */
+export interface UseCompsLookupOptions {
+  cardbackCode: string | null | undefined;
+  variantCode?: string | null;
+  gradeTierCode?: string | null;
+  limit?: number;
+}
+
+export function useCompsLookup(opts: UseCompsLookupOptions): UseRelatedSalesResult {
+  const cardback = (opts.cardbackCode ?? "").trim() || null;
+  const variant = (opts.variantCode ?? "").trim() || null;
+  const grade = (opts.gradeTierCode ?? "").trim() || null;
+  const limit = opts.limit ?? 25;
+  const matchKey = cardback ? `${cardback}::${variant ?? "*"}::${grade ?? "*"}::${limit}` : null;
+
+  const [data, setData] = useState<Lot[]>(() => {
+    if (matchKey) {
+      const cached = cache.get(matchKey);
+      if (cached?.data) return cached.data;
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (!matchKey) return false;
+    const cached = cache.get(matchKey);
+    return !cached?.data;
+  });
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!matchKey || !cardback) {
+      setData([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    let cancelled = false;
+    const cached = cache.get(matchKey);
+
+    if (cached?.data) {
+      setData(cached.data);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const fetcher = async () => {
+      let q = supabase.from("lots").select("*").eq("cardback_code", cardback);
+      if (variant) q = q.eq("variant_code", variant as any);
+      if (grade) q = q.eq("grade_tier_code", grade as any);
+      const { data: rows, error: err } = await q.order("sale_date", { ascending: false }).limit(limit);
+      if (err) throw err;
+      return (rows ?? []) as Lot[];
+    };
+
+    const promise =
+      cached?.promise ??
+      fetcher().then((rows) => {
+        const entry = cache.get(matchKey);
+        if (entry) entry.data = rows;
+        return rows;
+      });
+
+    if (!cached) cache.set(matchKey, { promise });
+
+    promise
+      .then((rows) => {
+        if (cancelled) return;
+        setData(rows);
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err : new Error(String(err)));
+        setLoading(false);
+        cache.delete(matchKey);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [matchKey, cardback, variant, grade, limit]);
+
+  return {
+    data,
+    loading,
+    error,
+    stats: computeStats(data),
+    matchKey,
+  };
+}
+
 function computeStats(lots: Lot[]): RelatedSalesStats {
   if (lots.length === 0) return EMPTY_STATS;
   const prices = lots.map((l) => Number(l.total_paid_gbp) || 0).filter((n) => n > 0);
