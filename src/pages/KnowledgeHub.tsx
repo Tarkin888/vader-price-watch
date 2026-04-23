@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ResearchLibrary from "@/components/ResearchLibrary";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { Menu, X } from "lucide-react";
+import CompViewerModal from "@/components/knowledge-hub/CompViewerModal";
+import { Menu, X, Images } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 /* ───────── data ───────── */
@@ -124,6 +125,7 @@ const KnowledgeHub = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [lastScrapeDate, setLastScrapeDate] = useState<string | null>(null);
+  const [compsTarget, setCompsTarget] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("lots").select("capture_date", { count: "exact", head: false })
@@ -237,6 +239,7 @@ const KnowledgeHub = () => {
                   <th className={thCls}>Key Features</th>
                   <th className={thCls}>Rarity</th>
                   <th className={thCls}>Notes</th>
+                  <th className={thCls}>Comps</th>
                 </tr>
               </thead>
               <tbody>
@@ -249,6 +252,16 @@ const KnowledgeHub = () => {
                     <td className={tdCls}>{r.features}</td>
                     <td className={`${tdCls} whitespace-nowrap text-primary`}>{r.rarity}</td>
                     <td className={tdCls}>{r.notes}</td>
+                    <td className={`${tdCls} whitespace-nowrap`}>
+                      <button
+                        onClick={() => setCompsTarget(r.code)}
+                        title="View auction comps"
+                        aria-label={`View auction comps for ${r.code}`}
+                        className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors"
+                      >
+                        <Images className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
