@@ -429,6 +429,15 @@ const KnowledgeHub = () => {
       <footer className="border-t border-border px-6 py-2 text-center text-[10px] text-muted-foreground tracking-wider">
         IMPERIAL PRICE TERMINAL v4.1 · Galactic Empire · Classified
       </footer>
+
+      {compsTarget && (
+        <CompViewerModal
+          cardbackCode={compsTarget}
+          variantCode={compsTarget}
+          open={!!compsTarget}
+          onClose={() => setCompsTarget(null)}
+        />
+      )}
     </div>
   );
 };
