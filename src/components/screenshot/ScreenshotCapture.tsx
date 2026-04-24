@@ -318,12 +318,57 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
 
       {method === "text" && (
         <>
-          <p
-            className="text-[10px] leading-snug"
-            style={{ color: "#8a826a", fontFamily: '"Courier New", monospace' }}
-          >
-            Paste raw text — scraper console output, auction page copy-paste, email forward, or forum post. Minimum 50 characters.
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <p
+              className="text-[10px] leading-snug flex-1"
+              style={{ color: "#8a826a", fontFamily: '"Courier New", monospace' }}
+            >
+              Paste raw text — scraper console output, auction page copy-paste, email forward, or forum post. Minimum 50 characters.
+            </p>
+            <div className="relative shrink-0" ref={sampleMenuRef}>
+              <button
+                type="button"
+                onClick={() => setSampleMenuOpen((v) => !v)}
+                title="Drop a pre-canned auction text block into the textarea to try the extractor"
+                aria-haspopup="menu"
+                aria-expanded={sampleMenuOpen}
+                className="inline-flex items-center gap-1 text-[12px] tracking-wider hover:underline"
+                style={{ color: "#C9A84C", fontFamily: '"Courier New", monospace' }}
+              >
+                [ Load sample
+                <ChevronDown className="w-3 h-3" />
+                ]
+              </button>
+              {sampleMenuOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 mt-1 z-50 min-w-[260px] rounded border-2 shadow-lg"
+                  style={{
+                    backgroundColor: "#080806",
+                    borderColor: "#C9A84C",
+                    fontFamily: '"Courier New", monospace',
+                  }}
+                >
+                  {(Object.keys(SAMPLE_LABELS) as SampleKey[]).map((k) => (
+                    <button
+                      key={k}
+                      role="menuitem"
+                      type="button"
+                      onClick={() => loadSample(k)}
+                      className="w-full text-left px-3 py-2 hover:bg-[#1a1810] border-b border-[#C9A84C22] last:border-b-0"
+                    >
+                      <div className="text-[12px]" style={{ color: "#C9A84C" }}>
+                        {SAMPLE_LABELS[k].title}
+                      </div>
+                      <div className="text-[10px]" style={{ color: "#8a826a" }}>
+                        {SAMPLE_LABELS[k].description}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         <div className="flex flex-col gap-2 p-4 border-2 border-dashed border-[#C9A84C44] rounded-lg">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-[#C9A84C]" />
@@ -332,6 +377,7 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
             </span>
           </div>
           <textarea
+            ref={textareaRef}
             value={textValue}
             onChange={handleTextChange}
             rows={12}
