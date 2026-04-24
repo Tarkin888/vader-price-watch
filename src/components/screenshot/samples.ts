@@ -3,7 +3,7 @@
 // source keyword, hammer + BP + total, sale date, cardback code, and grade so
 // the extractor has real data to chew on.
 
-export type SampleKey = "heritage" | "hakes" | "vectis";
+export type SampleKey = "heritage" | "hakes" | "vectis" | "multiLotHakes";
 
 export const SAMPLE_TEXTS: Record<SampleKey, string> = {
   heritage: `Heritage Auctions — Lot 34521
@@ -34,6 +34,20 @@ Total paid: £2,294 GBP
 Auction date: 8 April 2026
 Notes: Return of the Jedi 65-back, clean bubble, tape discolouration on back.
 Lot page: https://www.vectis.co.uk/Auctions/auc19237`,
+
+  multiLotHakes: `Hake's Auctions console dump — batch of 3 lots
+
+Lot 228844: STAR WARS DARTH VADER ESB-45 AFA 90 NM+/MT
+Hammer: $3,100.00 · BP 21% · Total $3,751.00 · Sold 2026-04-10
+URL: https://hakes.com/Auction/ItemDetail/228844
+
+Lot 228902: STAR WARS LUKE SKYWALKER SW-12A AFA 85 NM+
+Hammer: $2,450.00 · BP 21% · Total $2,964.50 · Sold 2026-04-10
+URL: https://hakes.com/Auction/ItemDetail/228902
+
+Lot 229015: STAR WARS BOBA FETT ROTJ-65 UKG 80 NM
+Hammer: $1,720.00 · BP 21% · Total $2,081.20 · Sold 2026-04-10
+URL: https://hakes.com/Auction/ItemDetail/229015`,
 };
 
 export const SAMPLE_LABELS: Record<SampleKey, { title: string; description: string }> = {
@@ -48,5 +62,9 @@ export const SAMPLE_LABELS: Record<SampleKey, { title: string; description: stri
   vectis: {
     title: "Vectis sample",
     description: "Vectis Toy Auctions lot with VAT-style pricing",
+  },
+  multiLotHakes: {
+    title: "Hake's (multi-lot) sample",
+    description: "Three-lot console dump to exercise the multi-lot flow",
   },
 };
