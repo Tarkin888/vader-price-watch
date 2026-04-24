@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import ScreenshotCapture from "./ScreenshotCapture";
 import ScreenshotPreview from "./ScreenshotPreview";
 import ExtractionReviewForm from "./ExtractionReviewForm";
+import MultiLotReviewList, { type BatchOutcome } from "./MultiLotReviewList";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { logActivity } from "@/lib/activity-log";
@@ -15,7 +16,7 @@ interface Props {
   onSaved: () => void;
 }
 
-type Step = "pin" | "capture" | "preview" | "review" | "done";
+type Step = "pin" | "capture" | "preview" | "review" | "review-multi" | "done";
 
 const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
   const hasPin = () => !!sessionStorage.getItem("admin_pin");
@@ -23,6 +24,8 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
   const [isPinVerified, setIsPinVerified] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>("");
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
+  const [extractedList, setExtractedList] = useState<ExtractedData[] | null>(null);
+  const [truncatedAt, setTruncatedAt] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +71,8 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
     setIsPinVerified(hasPin());
     setImageSrc("");
     setExtracted(null);
+    setExtractedList(null);
+    setTruncatedAt(null);
     setLoading(false);
     setSaving(false);
     setError(null);
@@ -116,6 +121,20 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       });
       if (fnErr) throw new Error(data?.error || fnErr.message);
       if (!data.success) throw new Error(data.error);
+
+      // Multi-lot path
+      if (Array.isArray(data.extractedList) && data.extractedList.length >= 2) {
+        setExtractedList(data.extractedList as ExtractedData[]);
+        setTruncatedAt(typeof data.truncatedAt === "number" ? data.truncatedAt : null);
+        setStep("review-multi");
+        logActivity("quickimport.text.multi_extract", null, {
+          lotCount: data.extractedList.length,
+          truncated: !!data.truncatedAt,
+        });
+        return;
+      }
+
+      // Single-lot path (backward compatible)
       if (!data.extracted) {
         setError(data.reason || "Could not identify auction data in this text.");
         return;
