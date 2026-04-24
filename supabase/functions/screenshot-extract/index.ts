@@ -117,7 +117,7 @@ function extractEbaySaleDate(html: string): string | null {
   return null;
 }
 
-async function callClaude(content: Array<Record<string, unknown>>): Promise<Record<string, unknown>> {
+async function callClaude(content: Array<Record<string, unknown>>, maxTokens = 2048): Promise<unknown> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -127,7 +127,7 @@ async function callClaude(content: Array<Record<string, unknown>>): Promise<Reco
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 2048,
+      max_tokens: maxTokens,
       messages: [{ role: "user", content }],
     }),
   });
