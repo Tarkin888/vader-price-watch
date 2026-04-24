@@ -14,6 +14,10 @@ interface Props {
   onBack: () => void;
   saving: boolean;
   imageSrc?: string;
+  /** Optional label override for the primary action button (defaults to "Save Record"). */
+  saveLabel?: string;
+  /** Optional label override for the secondary back button (defaults to "Back"). */
+  backLabel?: string;
 }
 
 type Confidence = "extracted" | "inferred" | "missing";
@@ -54,7 +58,7 @@ function normalizeVariant(val: string | null): string | null {
   return VARIANT_ALIASES[upper] ?? val;
 }
 
-const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: Props) => {
+const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc, saveLabel, backLabel }: Props) => {
   // Classify from title
   const classified = useMemo(() => {
     const text = [extracted.title, extracted.conditionNotes].filter(Boolean).join(" ");
@@ -362,14 +366,14 @@ const ExtractionReviewForm = ({ extracted, onSave, onBack, saving, imageSrc }: P
           onClick={onBack}
           className="flex-1 py-2 text-xs tracking-wider font-mono border border-border rounded text-muted-foreground hover:text-foreground"
         >
-          Back
+          {backLabel ?? "Back"}
         </button>
         <button
           onClick={handleSubmit}
           disabled={saving}
           className="flex-1 py-2 text-sm tracking-wider font-mono bg-[#C9A84C] text-background rounded disabled:opacity-60"
         >
-          {saving ? "Saving..." : "Save Record"}
+          {saving ? "Saving..." : (saveLabel ?? "Save Record")}
         </button>
       </div>
     </div>
