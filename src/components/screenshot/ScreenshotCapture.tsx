@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Clipboard, Upload, Link, FileText } from "lucide-react";
+import { Clipboard, Upload, Link, FileText, ChevronDown } from "lucide-react";
+import { SAMPLE_TEXTS, SAMPLE_LABELS, type SampleKey } from "./samples";
+import { logActivity } from "@/lib/activity-log";
 
 type Method = "paste" | "upload" | "url" | "text";
 
@@ -50,7 +52,10 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
   const [urlSource, setUrlSource] = useState<SourceHint | null>(null);
   const [textValue, setTextValue] = useState("");
   const [textSource, setTextSource] = useState<SourceHint | null>(null);
+  const [sampleMenuOpen, setSampleMenuOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const sampleMenuRef = useRef<HTMLDivElement>(null);
 
   const handlePaste = useCallback(
     (e: ClipboardEvent) => {
