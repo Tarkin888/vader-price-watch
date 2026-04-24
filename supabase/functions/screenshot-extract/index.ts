@@ -343,11 +343,17 @@ async function handleUrlMode(url: string) {
     content = [{ type: "text", text: EXTRACTION_PROMPT + metadataContext }];
   }
 
-  const extracted = await callClaude(content);
+  const raw = await callClaude(content);
 
-  if ((extracted as Record<string, string>).error === "not_auction_data") {
+  if (
+    raw && typeof raw === "object" && !Array.isArray(raw) &&
+    (raw as Record<string, string>).error === "not_auction_data"
+  ) {
     return { success: true, extracted: null, reason: "Could not identify auction data from this page." };
   }
+
+  // URL mode is single-lot only — if Claude returned an array, take the first.
+  const extracted = (Array.isArray(raw) ? raw[0] : raw) as Record<string, unknown>;
 
   // Merge detected source and URL
   if (!extracted.source || extracted.source === "Other") {
