@@ -36,6 +36,7 @@ export type ActivityEventType =
   | "inventory.csv_import"
   | "notepad.export"
   | "quickimport.text"
+  | "quickimport.text.sample_loaded"
   | "knowledge_hub.comps_view";
 
 /**
