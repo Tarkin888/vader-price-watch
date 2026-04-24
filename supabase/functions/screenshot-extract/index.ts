@@ -258,13 +258,16 @@ async function handleImageMode(image: string) {
     { type: "text", text: EXTRACTION_PROMPT },
   ];
 
-  const extracted = await callClaude(content);
+  const result = await callClaude(content);
 
-  if ((extracted as Record<string, string>).error === "not_auction_data") {
+  if (
+    result && typeof result === "object" && !Array.isArray(result) &&
+    (result as Record<string, string>).error === "not_auction_data"
+  ) {
     return { success: true, extracted: null, reason: "Could not identify auction data in this image." };
   }
 
-  return { success: true, extracted };
+  return { success: true, extracted: result };
 }
 
 async function handleUrlMode(url: string) {
