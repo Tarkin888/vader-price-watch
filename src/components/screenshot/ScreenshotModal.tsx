@@ -204,6 +204,46 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
     }
   };
 
+  /**
+   * Per-row save used by the multi-lot batch. Returns true on success, false on
+   * any failure (no throw, no confirm prompt — the user already opted in via
+   * the row checkbox, including for flagged duplicates).
+   */
+  const handleSaveOne = async (record: Record<string, unknown>): Promise<boolean> => {
+    try {
+      const res = await adminWrite({
+        table: "lots",
+        operation: "insert",
+        data: record as Record<string, unknown>,
+      });
+      if (!res.success) {
+        console.warn("Batch row save failed:", res.error);
+        return false;
+      }
+      logActivity("quickimport.text");
+      return true;
+    } catch (e: unknown) {
+      console.warn("Batch row save threw:", e);
+      return false;
+    }
+  };
+
+  const handleBatchComplete = (outcome: BatchOutcome) => {
+    logActivity("quickimport.text.batch_save", null, {
+      attempted: outcome.attempted,
+      saved: outcome.saved,
+      failed: outcome.failed,
+      skippedAsDuplicate: outcome.skippedAsDuplicate,
+    });
+    if (outcome.saved > 0) {
+      onSaved();
+      toast.success(`${outcome.saved} record${outcome.saved === 1 ? "" : "s"} saved`);
+    }
+    if (outcome.failed > 0) {
+      toast.error(`${outcome.failed} record${outcome.failed === 1 ? "" : "s"} failed to save`);
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -256,7 +296,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
           <div className="flex items-center gap-2 px-5 py-2 text-[10px] tracking-wider font-mono text-muted-foreground">
             <span className={step === "capture" || step === "preview" ? "text-primary" : ""}>CAPTURE</span>
             <span>→</span>
-            <span className={step === "review" ? "text-primary" : ""}>REVIEW</span>
+            <span className={step === "review" || step === "review-multi" ? "text-primary" : ""}>REVIEW</span>
             <span>→</span>
             <span className={step === "done" ? "text-primary" : ""}>CONFIRM</span>
           </div>
@@ -325,6 +365,17 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
               onBack={reset}
               saving={saving}
               imageSrc={imageSrc || undefined}
+            />
+          )}
+
+          {step === "review-multi" && extractedList && (
+            <MultiLotReviewList
+              list={extractedList}
+              truncatedAt={truncatedAt}
+              onSaveOne={handleSaveOne}
+              onBatchComplete={handleBatchComplete}
+              onReset={reset}
+              onClose={close}
             />
           )}
 
