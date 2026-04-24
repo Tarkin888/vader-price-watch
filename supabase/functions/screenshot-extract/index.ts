@@ -182,6 +182,8 @@ C) If the text is clearly not an auction record (e.g. plain prose, code, random 
 
 Apply the same classification priority rules used in Section 4.7 of the Knowledge Base (era, cardback code, variant, grade tier) to EVERY lot you extract. Do not invent fields. Do not merge two lots. Do not split a single lot into multiple records.`;
 
+const MAX_LOTS_PER_BATCH = 50;
+
 async function handleTextMode(text: unknown) {
   if (!text || typeof text !== "string" || text.trim().length < 50) {
     return { success: false, error: "Please paste at least 50 characters of auction text." };
@@ -193,13 +195,53 @@ async function handleTextMode(text: unknown) {
     { type: "text", text: `${TEXT_EXTRACTION_PROMPT}\n\n--- PASTED TEXT ---\n${input}` },
   ];
 
-  const extracted = await callClaude(content);
+  // Multi-lot batches can return well over 2k tokens of JSON. Bump the cap
+  // so a 30–50 lot console dump doesn't get truncated mid-array (which would
+  // throw a JSON parse error and lose the whole batch).
+  const result = await callClaude(content, 8192);
 
-  if ((extracted as Record<string, string>).error === "not_auction_data") {
-    return { success: true, extracted: null, reason: "Could not identify auction data in this text." };
+  // Single-object error shape from the prompt.
+  if (
+    result && typeof result === "object" && !Array.isArray(result) &&
+    (result as Record<string, string>).error === "not_auction_data"
+  ) {
+    return {
+      success: true,
+      extracted: null,
+      extractedList: null,
+      reason: "Could not identify auction data in this text.",
+    };
   }
 
-  return { success: true, extracted, sourceUrl: null };
+  // Multi-lot path — Claude returned an array.
+  if (Array.isArray(result)) {
+    // Defensive: drop falsy / non-object entries before truncation.
+    const cleaned = result.filter((r): r is Record<string, unknown> => !!r && typeof r === "object" && !Array.isArray(r));
+    if (cleaned.length === 0) {
+      return {
+        success: true,
+        extracted: null,
+        extractedList: null,
+        reason: "Could not identify auction data in this text.",
+      };
+    }
+    if (cleaned.length === 1) {
+      // Collapse to single-lot shape — keeps existing UI flow intact.
+      return { success: true, extracted: cleaned[0], extractedList: null, sourceUrl: null };
+    }
+    const truncated = cleaned.length > MAX_LOTS_PER_BATCH;
+    const list = truncated ? cleaned.slice(0, MAX_LOTS_PER_BATCH) : cleaned;
+    return {
+      success: true,
+      extracted: null,
+      extractedList: list,
+      sourceUrl: null,
+      ...(truncated ? { truncatedAt: MAX_LOTS_PER_BATCH } : {}),
+    };
+  }
+
+  // Single-lot path — return as today.
+  return { success: true, extracted: result, extractedList: null, sourceUrl: null };
 }
 
 async function handleImageMode(image: string) {
