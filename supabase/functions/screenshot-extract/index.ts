@@ -117,7 +117,7 @@ function extractEbaySaleDate(html: string): string | null {
   return null;
 }
 
-async function callClaude(content: Array<Record<string, unknown>>): Promise<Record<string, unknown>> {
+async function callClaude(content: Array<Record<string, unknown>>, maxTokens = 2048): Promise<unknown> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -127,7 +127,7 @@ async function callClaude(content: Array<Record<string, unknown>>): Promise<Reco
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 2048,
+      max_tokens: maxTokens,
       messages: [{ role: "user", content }],
     }),
   });
@@ -149,7 +149,9 @@ async function callClaude(content: Array<Record<string, unknown>>): Promise<Reco
   return JSON.parse(jsonStr);
 }
 
-const TEXT_EXTRACTION_PROMPT = `You are a data extraction specialist for vintage Kenner Star Wars action figure auction records. The user has pasted raw unstructured text that may be: scraper output, a copy-paste from an auction site, an email forward, a forum post, or a chat message referencing a sold lot. Extract every field you can identify. Return ONLY a JSON object with these fields (use null for anything you cannot determine):
+const TEXT_EXTRACTION_PROMPT = `You are a data extraction specialist for vintage Kenner Star Wars action figure auction records. The user has pasted raw unstructured text that may be: scraper output, a copy-paste from an auction site, an email forward, a forum post, or a chat message referencing a sold lot. Extract every field you can identify.
+
+Each lot has these fields (use null for anything you cannot determine):
 
 {
   "source": "Heritage | Hakes | LCG | Vectis | CandT | eBay | Facebook | Other",
@@ -170,7 +172,17 @@ const TEXT_EXTRACTION_PROMPT = `You are a data extraction specialist for vintage
   "title": "the most likely full lot title"
 }
 
-Apply the same classification priority rules used in Section 4.7 of the Knowledge Base (era, cardback code, variant, grade tier). If the text mentions multiple lots, extract ONLY the first clearly-identifiable one and ignore the rest — the user will paste each lot separately. If the text is clearly not an auction record (e.g. plain prose, code, random chat), return: { "error": "not_auction_data" }`;
+OUTPUT FORMAT — choose ONE based on the input:
+
+A) If the text describes a SINGLE lot, return ONLY that lot object directly: { ...fields }
+
+B) If the text contains MULTIPLE lots (clear markers: repeated "Lot N" headers, repeated hammer/sale-date blocks, a console dump with repeated record separators, a numbered list of distinct sales), return an ARRAY of lot objects, one per lot, in the order they appear: [ { ...fields }, { ...fields }, ... ]
+
+C) If the text is clearly not an auction record (e.g. plain prose, code, random chat), return: { "error": "not_auction_data" }
+
+Apply the same classification priority rules used in Section 4.7 of the Knowledge Base (era, cardback code, variant, grade tier) to EVERY lot you extract. Do not invent fields. Do not merge two lots. Do not split a single lot into multiple records.`;
+
+const MAX_LOTS_PER_BATCH = 50;
 
 async function handleTextMode(text: unknown) {
   if (!text || typeof text !== "string" || text.trim().length < 50) {
@@ -183,13 +195,53 @@ async function handleTextMode(text: unknown) {
     { type: "text", text: `${TEXT_EXTRACTION_PROMPT}\n\n--- PASTED TEXT ---\n${input}` },
   ];
 
-  const extracted = await callClaude(content);
+  // Multi-lot batches can return well over 2k tokens of JSON. Bump the cap
+  // so a 30–50 lot console dump doesn't get truncated mid-array (which would
+  // throw a JSON parse error and lose the whole batch).
+  const result = await callClaude(content, 8192);
 
-  if ((extracted as Record<string, string>).error === "not_auction_data") {
-    return { success: true, extracted: null, reason: "Could not identify auction data in this text." };
+  // Single-object error shape from the prompt.
+  if (
+    result && typeof result === "object" && !Array.isArray(result) &&
+    (result as Record<string, string>).error === "not_auction_data"
+  ) {
+    return {
+      success: true,
+      extracted: null,
+      extractedList: null,
+      reason: "Could not identify auction data in this text.",
+    };
   }
 
-  return { success: true, extracted, sourceUrl: null };
+  // Multi-lot path — Claude returned an array.
+  if (Array.isArray(result)) {
+    // Defensive: drop falsy / non-object entries before truncation.
+    const cleaned = result.filter((r): r is Record<string, unknown> => !!r && typeof r === "object" && !Array.isArray(r));
+    if (cleaned.length === 0) {
+      return {
+        success: true,
+        extracted: null,
+        extractedList: null,
+        reason: "Could not identify auction data in this text.",
+      };
+    }
+    if (cleaned.length === 1) {
+      // Collapse to single-lot shape — keeps existing UI flow intact.
+      return { success: true, extracted: cleaned[0], extractedList: null, sourceUrl: null };
+    }
+    const truncated = cleaned.length > MAX_LOTS_PER_BATCH;
+    const list = truncated ? cleaned.slice(0, MAX_LOTS_PER_BATCH) : cleaned;
+    return {
+      success: true,
+      extracted: null,
+      extractedList: list,
+      sourceUrl: null,
+      ...(truncated ? { truncatedAt: MAX_LOTS_PER_BATCH } : {}),
+    };
+  }
+
+  // Single-lot path — return as today.
+  return { success: true, extracted: result, extractedList: null, sourceUrl: null };
 }
 
 async function handleImageMode(image: string) {
@@ -206,13 +258,16 @@ async function handleImageMode(image: string) {
     { type: "text", text: EXTRACTION_PROMPT },
   ];
 
-  const extracted = await callClaude(content);
+  const result = await callClaude(content);
 
-  if ((extracted as Record<string, string>).error === "not_auction_data") {
+  if (
+    result && typeof result === "object" && !Array.isArray(result) &&
+    (result as Record<string, string>).error === "not_auction_data"
+  ) {
     return { success: true, extracted: null, reason: "Could not identify auction data in this image." };
   }
 
-  return { success: true, extracted };
+  return { success: true, extracted: result };
 }
 
 async function handleUrlMode(url: string) {
@@ -288,11 +343,17 @@ async function handleUrlMode(url: string) {
     content = [{ type: "text", text: EXTRACTION_PROMPT + metadataContext }];
   }
 
-  const extracted = await callClaude(content);
+  const raw = await callClaude(content);
 
-  if ((extracted as Record<string, string>).error === "not_auction_data") {
+  if (
+    raw && typeof raw === "object" && !Array.isArray(raw) &&
+    (raw as Record<string, string>).error === "not_auction_data"
+  ) {
     return { success: true, extracted: null, reason: "Could not identify auction data from this page." };
   }
+
+  // URL mode is single-lot only — if Claude returned an array, take the first.
+  const extracted = (Array.isArray(raw) ? raw[0] : raw) as Record<string, unknown>;
 
   // Merge detected source and URL
   if (!extracted.source || extracted.source === "Other") {

@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import ScreenshotCapture from "./ScreenshotCapture";
 import ScreenshotPreview from "./ScreenshotPreview";
 import ExtractionReviewForm from "./ExtractionReviewForm";
+import MultiLotReviewList, { type BatchOutcome } from "./MultiLotReviewList";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { logActivity } from "@/lib/activity-log";
@@ -15,7 +16,7 @@ interface Props {
   onSaved: () => void;
 }
 
-type Step = "pin" | "capture" | "preview" | "review" | "done";
+type Step = "pin" | "capture" | "preview" | "review" | "review-multi" | "done";
 
 const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
   const hasPin = () => !!sessionStorage.getItem("admin_pin");
@@ -23,6 +24,8 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
   const [isPinVerified, setIsPinVerified] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>("");
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
+  const [extractedList, setExtractedList] = useState<ExtractedData[] | null>(null);
+  const [truncatedAt, setTruncatedAt] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +71,8 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
     setIsPinVerified(hasPin());
     setImageSrc("");
     setExtracted(null);
+    setExtractedList(null);
+    setTruncatedAt(null);
     setLoading(false);
     setSaving(false);
     setError(null);
@@ -116,6 +121,20 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
       });
       if (fnErr) throw new Error(data?.error || fnErr.message);
       if (!data.success) throw new Error(data.error);
+
+      // Multi-lot path
+      if (Array.isArray(data.extractedList) && data.extractedList.length >= 2) {
+        setExtractedList(data.extractedList as ExtractedData[]);
+        setTruncatedAt(typeof data.truncatedAt === "number" ? data.truncatedAt : null);
+        setStep("review-multi");
+        logActivity("quickimport.text.multi_extract", null, {
+          lotCount: data.extractedList.length,
+          truncated: !!data.truncatedAt,
+        });
+        return;
+      }
+
+      // Single-lot path (backward compatible)
       if (!data.extracted) {
         setError(data.reason || "Could not identify auction data in this text.");
         return;
@@ -185,6 +204,46 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
     }
   };
 
+  /**
+   * Per-row save used by the multi-lot batch. Returns true on success, false on
+   * any failure (no throw, no confirm prompt — the user already opted in via
+   * the row checkbox, including for flagged duplicates).
+   */
+  const handleSaveOne = async (record: Record<string, unknown>): Promise<boolean> => {
+    try {
+      const res = await adminWrite({
+        table: "lots",
+        operation: "insert",
+        data: record as Record<string, unknown>,
+      });
+      if (!res.success) {
+        console.warn("Batch row save failed:", res.error);
+        return false;
+      }
+      logActivity("quickimport.text");
+      return true;
+    } catch (e: unknown) {
+      console.warn("Batch row save threw:", e);
+      return false;
+    }
+  };
+
+  const handleBatchComplete = (outcome: BatchOutcome) => {
+    logActivity("quickimport.text.batch_save", null, {
+      attempted: outcome.attempted,
+      saved: outcome.saved,
+      failed: outcome.failed,
+      skippedAsDuplicate: outcome.skippedAsDuplicate,
+    });
+    if (outcome.saved > 0) {
+      onSaved();
+      toast.success(`${outcome.saved} record${outcome.saved === 1 ? "" : "s"} saved`);
+    }
+    if (outcome.failed > 0) {
+      toast.error(`${outcome.failed} record${outcome.failed === 1 ? "" : "s"} failed to save`);
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -237,7 +296,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
           <div className="flex items-center gap-2 px-5 py-2 text-[10px] tracking-wider font-mono text-muted-foreground">
             <span className={step === "capture" || step === "preview" ? "text-primary" : ""}>CAPTURE</span>
             <span>→</span>
-            <span className={step === "review" ? "text-primary" : ""}>REVIEW</span>
+            <span className={step === "review" || step === "review-multi" ? "text-primary" : ""}>REVIEW</span>
             <span>→</span>
             <span className={step === "done" ? "text-primary" : ""}>CONFIRM</span>
           </div>
@@ -306,6 +365,17 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
               onBack={reset}
               saving={saving}
               imageSrc={imageSrc || undefined}
+            />
+          )}
+
+          {step === "review-multi" && extractedList && (
+            <MultiLotReviewList
+              list={extractedList}
+              truncatedAt={truncatedAt}
+              onSaveOne={handleSaveOne}
+              onBatchComplete={handleBatchComplete}
+              onReset={reset}
+              onClose={close}
             />
           )}
 

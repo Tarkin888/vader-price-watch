@@ -37,6 +37,8 @@ export type ActivityEventType =
   | "notepad.export"
   | "quickimport.text"
   | "quickimport.text.sample_loaded"
+  | "quickimport.text.multi_extract"
+  | "quickimport.text.batch_save"
   | "knowledge_hub.comps_view";
 
 /**
