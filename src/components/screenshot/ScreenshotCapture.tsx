@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Clipboard, Upload, Link, FileText } from "lucide-react";
+import { Clipboard, Upload, Link, FileText, ChevronDown } from "lucide-react";
+import { SAMPLE_TEXTS, SAMPLE_LABELS, type SampleKey } from "./samples";
+import { logActivity } from "@/lib/activity-log";
 
 type Method = "paste" | "upload" | "url" | "text";
 
@@ -50,7 +52,10 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
   const [urlSource, setUrlSource] = useState<SourceHint | null>(null);
   const [textValue, setTextValue] = useState("");
   const [textSource, setTextSource] = useState<SourceHint | null>(null);
+  const [sampleMenuOpen, setSampleMenuOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const sampleMenuRef = useRef<HTMLDivElement>(null);
 
   const handlePaste = useCallback(
     (e: ClipboardEvent) => {
@@ -75,6 +80,46 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
     document.addEventListener("paste", handlePaste);
     return () => document.removeEventListener("paste", handlePaste);
   }, [handlePaste, enabled]);
+
+  // Close the sample dropdown on outside click / Escape
+  useEffect(() => {
+    if (!sampleMenuOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (sampleMenuRef.current && !sampleMenuRef.current.contains(e.target as Node)) {
+        setSampleMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSampleMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [sampleMenuOpen]);
+
+  const loadSample = (key: SampleKey) => {
+    setSampleMenuOpen(false);
+    if (textValue.trim().length > 0) {
+      const ok = confirm("Discard pasted text?");
+      if (!ok) return;
+    }
+    const text = SAMPLE_TEXTS[key];
+    setTextValue(text);
+    setTextSource(detectSourceFromText(text));
+    logActivity("quickimport.text.sample_loaded", null, { sample: key });
+    // Focus textarea at end on next tick
+    requestAnimationFrame(() => {
+      const ta = textareaRef.current;
+      if (ta) {
+        ta.focus();
+        ta.setSelectionRange(text.length, text.length);
+        ta.scrollTop = ta.scrollHeight;
+      }
+    });
+  };
 
   const readFile = (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
@@ -273,12 +318,57 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
 
       {method === "text" && (
         <>
-          <p
-            className="text-[10px] leading-snug"
-            style={{ color: "#8a826a", fontFamily: '"Courier New", monospace' }}
-          >
-            Paste raw text — scraper console output, auction page copy-paste, email forward, or forum post. Minimum 50 characters.
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <p
+              className="text-[10px] leading-snug flex-1"
+              style={{ color: "#8a826a", fontFamily: '"Courier New", monospace' }}
+            >
+              Paste raw text — scraper console output, auction page copy-paste, email forward, or forum post. Minimum 50 characters.
+            </p>
+            <div className="relative shrink-0" ref={sampleMenuRef}>
+              <button
+                type="button"
+                onClick={() => setSampleMenuOpen((v) => !v)}
+                title="Drop a pre-canned auction text block into the textarea to try the extractor"
+                aria-haspopup="menu"
+                aria-expanded={sampleMenuOpen}
+                className="inline-flex items-center gap-1 text-[12px] tracking-wider hover:underline"
+                style={{ color: "#C9A84C", fontFamily: '"Courier New", monospace' }}
+              >
+                [ Load sample
+                <ChevronDown className="w-3 h-3" />
+                ]
+              </button>
+              {sampleMenuOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 mt-1 z-50 min-w-[260px] rounded border-2 shadow-lg"
+                  style={{
+                    backgroundColor: "#080806",
+                    borderColor: "#C9A84C",
+                    fontFamily: '"Courier New", monospace',
+                  }}
+                >
+                  {(Object.keys(SAMPLE_LABELS) as SampleKey[]).map((k) => (
+                    <button
+                      key={k}
+                      role="menuitem"
+                      type="button"
+                      onClick={() => loadSample(k)}
+                      className="w-full text-left px-3 py-2 hover:bg-[#1a1810] border-b border-[#C9A84C22] last:border-b-0"
+                    >
+                      <div className="text-[12px]" style={{ color: "#C9A84C" }}>
+                        {SAMPLE_LABELS[k].title}
+                      </div>
+                      <div className="text-[10px]" style={{ color: "#8a826a" }}>
+                        {SAMPLE_LABELS[k].description}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         <div className="flex flex-col gap-2 p-4 border-2 border-dashed border-[#C9A84C44] rounded-lg">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-[#C9A84C]" />
@@ -287,6 +377,7 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
             </span>
           </div>
           <textarea
+            ref={textareaRef}
             value={textValue}
             onChange={handleTextChange}
             rows={12}
