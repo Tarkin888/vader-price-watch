@@ -81,6 +81,46 @@ const ScreenshotCapture = ({ onImageCaptured, onUrlSubmitted, onTextSubmitted, e
     return () => document.removeEventListener("paste", handlePaste);
   }, [handlePaste, enabled]);
 
+  // Close the sample dropdown on outside click / Escape
+  useEffect(() => {
+    if (!sampleMenuOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (sampleMenuRef.current && !sampleMenuRef.current.contains(e.target as Node)) {
+        setSampleMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSampleMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [sampleMenuOpen]);
+
+  const loadSample = (key: SampleKey) => {
+    setSampleMenuOpen(false);
+    if (textValue.trim().length > 0) {
+      const ok = confirm("Discard pasted text?");
+      if (!ok) return;
+    }
+    const text = SAMPLE_TEXTS[key];
+    setTextValue(text);
+    setTextSource(detectSourceFromText(text));
+    logActivity("quickimport.text.sample_loaded", null, { sample: key });
+    // Focus textarea at end on next tick
+    requestAnimationFrame(() => {
+      const ta = textareaRef.current;
+      if (ta) {
+        ta.focus();
+        ta.setSelectionRange(text.length, text.length);
+        ta.scrollTop = ta.scrollHeight;
+      }
+    });
+  };
+
   const readFile = (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
       alert("Image is too large. Please use a smaller screenshot (max 10 MB).");
