@@ -5,10 +5,6 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   ResponsiveContainer, Legend,
 } from "recharts";
-import {
-  startOfWeek, endOfWeek, startOfMonth, endOfMonth,
-  subWeeks, subMonths, startOfDay, endOfDay,
-} from "date-fns";
 
 const GOLD = "#C9A84C";
 const BG = "#0D0D0B";
@@ -30,41 +26,6 @@ const STACK_COLORS = [
   "#C9A84C", "#4A90D9", "#5BA55B", "#C75050", "#8B5CF6",
   "#D4A843", "#E07A5F", "#3D5A80", "#81B29A", "#F2CC8F",
   "#9D4EDD", "#F08080", "#90BE6D", "#577590", "#43AA8B",
-];
-
-/**
- * Preset windows compute a (from, to) pair in UTC using a Monday-start week.
- * They map to the closest existing `range` key for the actual data fetch
- * (the admin-activity Edge Function takes range, not arbitrary dates).
- * The from/to is sent as extra metadata for the Edge Function and used
- * for active-state matching on the chips.
- */
-type PresetKey = "this_week" | "last_week" | "this_month" | "last_month";
-type PresetWindow = { from: Date; to: Date; range: RangeKey };
-
-function computePreset(key: PresetKey, now: Date = new Date()): PresetWindow {
-  const weekOpts = { weekStartsOn: 1 as const };
-  switch (key) {
-    case "this_week":
-      return { from: startOfWeek(now, weekOpts), to: endOfDay(now), range: "7d" };
-    case "last_week": {
-      const lw = subWeeks(now, 1);
-      return { from: startOfWeek(lw, weekOpts), to: endOfWeek(lw, weekOpts), range: "7d" };
-    }
-    case "this_month":
-      return { from: startOfMonth(now), to: endOfDay(now), range: "30d" };
-    case "last_month": {
-      const lm = subMonths(now, 1);
-      return { from: startOfMonth(lm), to: endOfMonth(lm), range: "30d" };
-    }
-  }
-}
-
-const PRESETS: { key: PresetKey; label: string }[] = [
-  { key: "this_week", label: "This week" },
-  { key: "last_week", label: "Last week" },
-  { key: "this_month", label: "This month" },
-  { key: "last_month", label: "Last month" },
 ];
 
 function fmtDate(s: string | null) {
@@ -98,7 +59,6 @@ type SortKey =
 
 export default function ActivityTab() {
   const [range, setRange] = useState<RangeKey>("30d");
-  const [activePreset, setActivePreset] = useState<PresetKey | null>(null);
   const [kpis, setKpis] = useState<any>(null);
   const [users, setUsers] = useState<any[] | null>(null);
   const [charts, setCharts] = useState<any>(null);
@@ -109,17 +69,6 @@ export default function ActivityTab() {
   const [sortAsc, setSortAsc] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const handleRangeChange = useCallback((k: RangeKey) => {
-    setRange(k);
-    setActivePreset(null);
-  }, []);
-
-  const handlePresetChange = useCallback((key: PresetKey) => {
-    const w = computePreset(key);
-    setRange(w.range);
-    setActivePreset(key);
-  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -185,28 +134,24 @@ export default function ActivityTab() {
 
   return (
     <div className="space-y-6">
-      {/* Range picker + preset chips */}
-      <div className="space-y-3">
+      {/* Range picker */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-[10px] tracking-widest" style={{ color: TEXT, opacity: 0.6 }}>RANGE:</span>
-        {RANGES.map((r) => {
-          const isActive = range === r.key && activePreset === null;
-          return (
-            <button
-              key={r.key}
-              onClick={() => handleRangeChange(r.key)}
-              className="px-3 py-1.5 text-[10px] tracking-widest rounded transition-colors"
-              style={{
-                border: `1px solid ${isActive ? GOLD : BORDER}`,
-                background: isActive ? "rgba(201,168,76,0.1)" : "transparent",
-                color: isActive ? GOLD : TEXT,
-                minHeight: 32,
-              }}
-            >
-              {r.label.toUpperCase()}
-            </button>
-          );
-        })}
+        {RANGES.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => setRange(r.key)}
+            className="px-3 py-1.5 text-[10px] tracking-widest rounded transition-colors"
+            style={{
+              border: `1px solid ${range === r.key ? GOLD : BORDER}`,
+              background: range === r.key ? "rgba(201,168,76,0.1)" : "transparent",
+              color: range === r.key ? GOLD : TEXT,
+              minHeight: 32,
+            }}
+          >
+            {r.label.toUpperCase()}
+          </button>
+        ))}
         <button
           onClick={load}
           className="ml-auto px-3 py-1.5 text-[10px] tracking-widest rounded"
@@ -214,37 +159,6 @@ export default function ActivityTab() {
         >
           REFRESH
         </button>
-      </div>
-
-      {/* Preset chips */}
-      <div className="flex items-center gap-2 flex-wrap pb-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
-        <span className="text-[10px] tracking-widest" style={{ color: TEXT, opacity: 0.4 }}>PRESET:</span>
-        {PRESETS.map((p) => {
-          const isActive = activePreset === p.key;
-          return (
-            <button
-              key={p.key}
-              onClick={() => handlePresetChange(p.key)}
-              className="px-3 py-1 text-[12px] rounded-full border transition-colors"
-              style={{
-                fontFamily: "'Courier New', monospace",
-                background: isActive ? GOLD : "#0f0e0a",
-                color: isActive ? "#080806" : "#C9A84C",
-                borderColor: "#C9A84C",
-                minHeight: 28,
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.background = "#1a1810";
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.background = "#0f0e0a";
-              }}
-            >
-              {p.label}
-            </button>
-          );
-        })}
-      </div>
       </div>
 
       {/* KPI cards */}
