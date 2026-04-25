@@ -184,8 +184,9 @@ export default function ActivityTab() {
   }
 
   return (
-    <div className="space-y-3">
-      {/* Range picker */}
+    <div className="space-y-6">
+      {/* Range picker + preset chips */}
+      <div className="space-y-3">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-[10px] tracking-widest" style={{ color: TEXT, opacity: 0.6 }}>RANGE:</span>
         {RANGES.map((r) => {
@@ -243,6 +244,7 @@ export default function ActivityTab() {
             </button>
           );
         })}
+      </div>
       </div>
 
       {/* KPI cards */}
