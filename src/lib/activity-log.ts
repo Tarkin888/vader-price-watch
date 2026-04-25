@@ -40,7 +40,8 @@ export type ActivityEventType =
   | "quickimport.text.multi_extract"
   | "quickimport.text.batch_save"
   | "knowledge_hub.comps_view"
-  | "kenny.suggestion_chip_click";
+  | "kenny.suggestion_chip_click"
+  | "kenny.view_in_price_tracker";
 
 /**
  * Fire-and-forget activity log insert.
