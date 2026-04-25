@@ -39,7 +39,8 @@ export type ActivityEventType =
   | "quickimport.text.sample_loaded"
   | "quickimport.text.multi_extract"
   | "quickimport.text.batch_save"
-  | "knowledge_hub.comps_view";
+  | "knowledge_hub.comps_view"
+  | "kenny.suggestion_chip_click";
 
 /**
  * Fire-and-forget activity log insert.
