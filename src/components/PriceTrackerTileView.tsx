@@ -4,6 +4,7 @@ import type { Currency } from "@/components/FilterBar";
 import SourceBadge from "@/components/SourceBadge";
 import { Copy, ExternalLink, X } from "lucide-react";
 import { toast } from "sonner";
+import { PLACEHOLDER_BG, PLACEHOLDER_SIZE, applyPlaceholderOnError } from "@/lib/imagePlaceholder";
 import { adminWrite } from "@/lib/admin-write";
 
 /* ── image helpers (same as LotsTable) ── */
@@ -135,30 +136,23 @@ const PriceTrackerTileView = ({ lots, currency = "GBP", onChanged }: Props) => {
             onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#1a1a14")}
           >
             {/* Image */}
-            <div className="relative w-full" style={{ aspectRatio: "4/3", background: "#080806" }}>
+            <div
+              className="relative w-full"
+              style={
+                imgUrl
+                  ? { aspectRatio: "4/3", background: "#080806" }
+                  : { aspectRatio: "4/3", background: "#080806", backgroundImage: PLACEHOLDER_BG, backgroundSize: PLACEHOLDER_SIZE }
+              }
+            >
               {imgUrl ? (
                 <img
                   src={imgUrl}
                   alt={lot.variant_grade_key}
                   className="w-full h-full object-cover"
                   loading="lazy"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display = "none";
-                    const parent = (e.currentTarget as HTMLImageElement).parentElement;
-                    if (parent && !parent.querySelector(".no-img-label")) {
-                      const lbl = document.createElement("span");
-                      lbl.className = "no-img-label absolute inset-0 flex items-center justify-center text-xs tracking-wider";
-                      lbl.style.color = "rgba(224,216,192,0.3)";
-                      lbl.textContent = "No Image";
-                      parent.appendChild(lbl);
-                    }
-                  }}
+                  onError={applyPlaceholderOnError}
                 />
-              ) : (
-                <span className="absolute inset-0 flex items-center justify-center text-xs tracking-wider" style={{ color: "rgba(224,216,192,0.3)" }}>
-                  No Image
-                </span>
-              )}
+              ) : null}
               {isEstimate && (
                 <span className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(245,158,11,0.9)", color: "#080806" }}>
                   ESTIMATE
