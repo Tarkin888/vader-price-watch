@@ -96,11 +96,19 @@ export default function PriceResultCards({ metadata }: PriceResultCardsProps) {
           <ResultRow item={item} />
         </div>
       ))}
-      {totalMatches > 5 && (
-        <a href="/" className="text-xs mt-1 underline" style={{ color: "#C9A84C" }}>
-          View all {totalMatches} results in Price Tracker →
-        </a>
-      )}
+      {totalMatches > 5 && (() => {
+        const href = buildPriceTrackerUrl(metadata.query);
+        return (
+          <a
+            href={href}
+            className="text-xs mt-1 underline"
+            style={{ color: "#C9A84C" }}
+            onClick={() => logActivity("kenny.view_in_price_tracker", null, { href, totalMatches })}
+          >
+            View all {totalMatches} results in Price Tracker →
+          </a>
+        );
+      })()}
     </div>
   );
 }
