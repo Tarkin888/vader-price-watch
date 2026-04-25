@@ -59,7 +59,6 @@ type SortKey =
 
 export default function ActivityTab() {
   const [range, setRange] = useState<RangeKey>("30d");
-  const [activePreset, setActivePreset] = useState<PresetKey | null>(null);
   const [kpis, setKpis] = useState<any>(null);
   const [users, setUsers] = useState<any[] | null>(null);
   const [charts, setCharts] = useState<any>(null);
@@ -70,17 +69,6 @@ export default function ActivityTab() {
   const [sortAsc, setSortAsc] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const handleRangeChange = useCallback((k: RangeKey) => {
-    setRange(k);
-    setActivePreset(null);
-  }, []);
-
-  const handlePresetChange = useCallback((key: PresetKey) => {
-    const w = computePreset(key);
-    setRange(w.range);
-    setActivePreset(key);
-  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
