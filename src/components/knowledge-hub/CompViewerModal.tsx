@@ -17,9 +17,6 @@ const fmtGBP = (n: number | null | undefined) => {
   const v = Number(n) || 0;
   return `£${v.toLocaleString("en-GB", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
-
-const PLACEHOLDER_BG = "linear-gradient(135deg, rgba(201,168,76,0.05) 25%, transparent 25%, transparent 50%, rgba(201,168,76,0.05) 50%, rgba(201,168,76,0.05) 75%, transparent 75%)";
-
 const CompViewerModal = ({ cardbackCode, variantCode, open, onClose }: CompViewerModalProps) => {
   const { data: lots, loading, stats } = useCompsLookup({
     cardbackCode: open ? cardbackCode : null,
