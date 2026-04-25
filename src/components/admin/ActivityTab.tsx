@@ -134,28 +134,24 @@ export default function ActivityTab() {
 
   return (
     <div className="space-y-6">
-      {/* Range picker + preset chips */}
-      <div className="space-y-3">
+      {/* Range picker */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-[10px] tracking-widest" style={{ color: TEXT, opacity: 0.6 }}>RANGE:</span>
-        {RANGES.map((r) => {
-          const isActive = range === r.key && activePreset === null;
-          return (
-            <button
-              key={r.key}
-              onClick={() => handleRangeChange(r.key)}
-              className="px-3 py-1.5 text-[10px] tracking-widest rounded transition-colors"
-              style={{
-                border: `1px solid ${isActive ? GOLD : BORDER}`,
-                background: isActive ? "rgba(201,168,76,0.1)" : "transparent",
-                color: isActive ? GOLD : TEXT,
-                minHeight: 32,
-              }}
-            >
-              {r.label.toUpperCase()}
-            </button>
-          );
-        })}
+        {RANGES.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => setRange(r.key)}
+            className="px-3 py-1.5 text-[10px] tracking-widest rounded transition-colors"
+            style={{
+              border: `1px solid ${range === r.key ? GOLD : BORDER}`,
+              background: range === r.key ? "rgba(201,168,76,0.1)" : "transparent",
+              color: range === r.key ? GOLD : TEXT,
+              minHeight: 32,
+            }}
+          >
+            {r.label.toUpperCase()}
+          </button>
+        ))}
         <button
           onClick={load}
           className="ml-auto px-3 py-1.5 text-[10px] tracking-widest rounded"
@@ -163,37 +159,6 @@ export default function ActivityTab() {
         >
           REFRESH
         </button>
-      </div>
-
-      {/* Preset chips */}
-      <div className="flex items-center gap-2 flex-wrap pb-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
-        <span className="text-[10px] tracking-widest" style={{ color: TEXT, opacity: 0.4 }}>PRESET:</span>
-        {PRESETS.map((p) => {
-          const isActive = activePreset === p.key;
-          return (
-            <button
-              key={p.key}
-              onClick={() => handlePresetChange(p.key)}
-              className="px-3 py-1 text-[12px] rounded-full border transition-colors"
-              style={{
-                fontFamily: "'Courier New', monospace",
-                background: isActive ? GOLD : "#0f0e0a",
-                color: isActive ? "#080806" : "#C9A84C",
-                borderColor: "#C9A84C",
-                minHeight: 28,
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.background = "#1a1810";
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.background = "#0f0e0a";
-              }}
-            >
-              {p.label}
-            </button>
-          );
-        })}
-      </div>
       </div>
 
       {/* KPI cards */}
