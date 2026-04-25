@@ -5,6 +5,10 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
   ResponsiveContainer, Legend,
 } from "recharts";
+import {
+  startOfWeek, endOfWeek, startOfMonth, endOfMonth,
+  subWeeks, subMonths, startOfDay, endOfDay,
+} from "date-fns";
 
 const GOLD = "#C9A84C";
 const BG = "#0D0D0B";
