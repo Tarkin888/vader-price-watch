@@ -1,43 +1,52 @@
 import { useChat } from "./ChatProvider";
+import { logActivity } from "@/lib/activity-log";
 
-const SUGGESTIONS = [
-  "What's the highest ESB-41 sale?",
-  "Report a bug",
-  "How many POTF-92 records do we have?",
+const SUGGESTION_CHIPS = [
+  "How many SW-12A records do I have in 2025?",
+  "Show my Heritage lots",
+  "What's my most expensive figure?",
+  "Recent ROTJ comps",
 ];
 
 export default function ChatWelcome() {
   const { sendMessage } = useChat();
 
+  const handleChipClick = (chipText: string) => {
+    logActivity("kenny.suggestion_chip_click", null, { chipText });
+    sendMessage(chipText);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center h-full px-4 text-center gap-4">
+    <div className="flex-1 flex flex-col items-center justify-center px-4 text-center gap-4 py-6 overflow-y-auto">
       <h3 className="text-base font-bold" style={{ color: "#C9A84C" }}>
         Hi, I'm Kenny — your Imperial Price Terminal assistant
       </h3>
-      <p className="text-xs" style={{ color: "#e0d8c0" }}>
-        I can help you with:
+      <p
+        className="text-[11px] tracking-wider"
+        style={{ color: "#8a826a", fontFamily: "'Courier New', monospace" }}
+      >
+        Try one to get started:
       </p>
-      <div className="flex flex-col gap-2 w-full max-w-[280px]">
-        {SUGGESTIONS.map((s) => (
+      <div className="flex flex-wrap justify-center gap-2 max-w-[320px]">
+        {SUGGESTION_CHIPS.map((chip) => (
           <button
-            key={s}
-            onClick={() => sendMessage(s)}
-            className="text-left text-xs px-3 py-2 rounded-lg border transition-colors cursor-pointer"
+            key={chip}
+            onClick={() => handleChipClick(chip)}
+            className="text-[12px] px-3 py-1.5 rounded-full border transition-colors cursor-pointer"
             style={{
-              color: "#e0d8c0",
-              borderColor: "rgba(201,168,76,0.2)",
-              background: "rgba(201,168,76,0.06)",
+              fontFamily: "'Courier New', monospace",
+              color: "#C9A84C",
+              borderColor: "#C9A84C",
+              background: "#0f0e0a",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)";
-              e.currentTarget.style.background = "rgba(201,168,76,0.12)";
+              e.currentTarget.style.background = "#1a1810";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgba(201,168,76,0.2)";
-              e.currentTarget.style.background = "rgba(201,168,76,0.06)";
+              e.currentTarget.style.background = "#0f0e0a";
             }}
           >
-            {s}
+            {chip}
           </button>
         ))}
       </div>
