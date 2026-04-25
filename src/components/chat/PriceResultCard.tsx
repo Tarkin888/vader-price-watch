@@ -1,5 +1,33 @@
 import { ExternalLink, Copy } from "lucide-react";
 import { toast } from "sonner";
+import { logActivity } from "@/lib/activity-log";
+
+/**
+ * Build a Price Tracker URL from Kenny's per-message filter object.
+ * Filter keys are snake_case (from chat edge function), URL params match
+ * those expected by Index.tsx hydration (`searchParams.get(...)`).
+ * Returns "/" with no query string when no filters are active.
+ */
+function buildPriceTrackerUrl(query: any): string {
+  if (!query || typeof query !== "object") return "/";
+  const map: Array<[string, unknown]> = [
+    ["source", query.source],
+    ["era", query.era],
+    ["cardback", query.cardback_code],
+    ["variant", query.variant_code],
+    ["grade", query.grade_tier_code],
+    ["dateFrom", query.date_from],
+    ["dateTo", query.date_to],
+  ];
+  const params = new URLSearchParams();
+  for (const [key, val] of map) {
+    if (val == null) continue;
+    const s = String(val).trim();
+    if (s) params.set(key, s);
+  }
+  const qs = params.toString();
+  return qs ? `/?${qs}` : "/";
+}
 
 const SOURCE_COLORS: Record<string, string> = {
   Heritage: "#4A90D9",
@@ -68,11 +96,19 @@ export default function PriceResultCards({ metadata }: PriceResultCardsProps) {
           <ResultRow item={item} />
         </div>
       ))}
-      {totalMatches > 5 && (
-        <a href="/" className="text-xs mt-1 underline" style={{ color: "#C9A84C" }}>
-          View all {totalMatches} results in Price Tracker →
-        </a>
-      )}
+      {totalMatches > 5 && (() => {
+        const href = buildPriceTrackerUrl(metadata.query);
+        return (
+          <a
+            href={href}
+            className="text-xs mt-1 underline"
+            style={{ color: "#C9A84C" }}
+            onClick={() => logActivity("kenny.view_in_price_tracker", null, { href, totalMatches })}
+          >
+            View all {totalMatches} results in Price Tracker →
+          </a>
+        );
+      })()}
     </div>
   );
 }
