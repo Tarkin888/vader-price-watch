@@ -32,6 +32,41 @@ const STACK_COLORS = [
   "#9D4EDD", "#F08080", "#90BE6D", "#577590", "#43AA8B",
 ];
 
+/**
+ * Preset windows compute a (from, to) pair in UTC using a Monday-start week.
+ * They map to the closest existing `range` key for the actual data fetch
+ * (the admin-activity Edge Function takes range, not arbitrary dates).
+ * The from/to is sent as extra metadata for the Edge Function and used
+ * for active-state matching on the chips.
+ */
+type PresetKey = "this_week" | "last_week" | "this_month" | "last_month";
+type PresetWindow = { from: Date; to: Date; range: RangeKey };
+
+function computePreset(key: PresetKey, now: Date = new Date()): PresetWindow {
+  const weekOpts = { weekStartsOn: 1 as const };
+  switch (key) {
+    case "this_week":
+      return { from: startOfWeek(now, weekOpts), to: endOfDay(now), range: "7d" };
+    case "last_week": {
+      const lw = subWeeks(now, 1);
+      return { from: startOfWeek(lw, weekOpts), to: endOfWeek(lw, weekOpts), range: "7d" };
+    }
+    case "this_month":
+      return { from: startOfMonth(now), to: endOfDay(now), range: "30d" };
+    case "last_month": {
+      const lm = subMonths(now, 1);
+      return { from: startOfMonth(lm), to: endOfMonth(lm), range: "30d" };
+    }
+  }
+}
+
+const PRESETS: { key: PresetKey; label: string }[] = [
+  { key: "this_week", label: "This week" },
+  { key: "last_week", label: "Last week" },
+  { key: "this_month", label: "This month" },
+  { key: "last_month", label: "Last month" },
+];
+
 function fmtDate(s: string | null) {
   if (!s) return "—";
   const d = new Date(s);
