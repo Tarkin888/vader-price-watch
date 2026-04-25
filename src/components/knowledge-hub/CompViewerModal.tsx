@@ -3,6 +3,7 @@ import { X, ExternalLink, ImageOff } from "lucide-react";
 import { useCompsLookup } from "@/hooks/useRelatedSales";
 import SourceBadge from "@/components/SourceBadge";
 import { logActivity } from "@/lib/activity-log";
+import { PLACEHOLDER_BG, PLACEHOLDER_SIZE, applyPlaceholderOnError } from "@/lib/imagePlaceholder";
 
 interface CompViewerModalProps {
   cardbackCode: string;
@@ -138,7 +139,7 @@ const CompViewerModal = ({ cardbackCode, variantCode, open, onClose }: CompViewe
                     {/* Thumbnail */}
                     <div
                       className="relative aspect-square bg-secondary/30 flex items-center justify-center overflow-hidden"
-                      style={img ? undefined : { backgroundImage: PLACEHOLDER_BG, backgroundSize: "12px 12px" }}
+                      style={img ? undefined : { backgroundImage: PLACEHOLDER_BG, backgroundSize: PLACEHOLDER_SIZE }}
                     >
                       {img ? (
                         <img
@@ -146,15 +147,7 @@ const CompViewerModal = ({ cardbackCode, variantCode, open, onClose }: CompViewe
                           alt={`${lot.variant_code} ${lot.lot_ref}`}
                           loading="lazy"
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const el = e.currentTarget;
-                            el.style.display = "none";
-                            const parent = el.parentElement;
-                            if (parent) {
-                              parent.style.backgroundImage = PLACEHOLDER_BG;
-                              parent.style.backgroundSize = "12px 12px";
-                            }
-                          }}
+                          onError={applyPlaceholderOnError}
                         />
                       ) : (
                         <ImageOff className="w-6 h-6 text-muted-foreground/50" />
