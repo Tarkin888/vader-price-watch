@@ -114,6 +114,10 @@ const ResearchLibrary = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [mobileSidebar, setMobileSidebar] = useState(false);
 
+  // Comp-viewer state — single-ref opens modal directly; multi-ref opens picker first
+  const [compsTarget, setCompsTarget] = useState<string | null>(null);
+  const [pickerArticleId, setPickerArticleId] = useState<string | null>(null);
+
   /* ── fetch ── */
   const fetchArticles = async () => {
     setLoading(true);
