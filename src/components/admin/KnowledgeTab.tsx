@@ -38,6 +38,7 @@ interface Article {
   last_researched: string | null;
   confidence: string | null;
   tags: string[] | null;
+  cardback_refs: string[] | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -54,12 +55,14 @@ interface EditorForm {
   image_urls: string;
   source_urls: string;
   content_md: string;
+  cardback_refs: string[];
 }
 
 const emptyForm = (): EditorForm => ({
   title: "", category: CATEGORIES[0].code, is_published: false,
   display_order: "0", slug: "", tags: "", confidence: "MEDIUM",
   last_researched: "", image_urls: "", source_urls: "", content_md: "",
+  cardback_refs: [],
 });
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
