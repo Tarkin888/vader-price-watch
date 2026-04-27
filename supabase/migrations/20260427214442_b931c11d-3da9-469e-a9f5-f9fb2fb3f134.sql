@@ -1,0 +1,1 @@
+ALTER TABLE public.knowledge_articles ADD COLUMN IF NOT EXISTS cardback_refs text[] NOT NULL DEFAULT '{}'::text[];

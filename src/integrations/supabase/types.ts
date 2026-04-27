@@ -410,6 +410,7 @@ export type Database = {
       }
       knowledge_articles: {
         Row: {
+          cardback_refs: string[]
           category: string
           confidence: string | null
           content_md: string
@@ -426,6 +427,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          cardback_refs?: string[]
           category: string
           confidence?: string | null
           content_md?: string
@@ -442,6 +444,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          cardback_refs?: string[]
           category?: string
           confidence?: string | null
           content_md?: string
