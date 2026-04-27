@@ -331,6 +331,46 @@ const AdminKnowledgeTab = () => {
           </div>
         </div>
 
+        {/* Cardback refs — links article to one or more cardback codes for the comp-viewer */}
+        <div>
+          <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>
+            CARDBACK REFS <span style={{ color: "rgba(224,216,192,0.4)" }}>(article relates to these cardbacks; powers the Images icon on the public Research Library)</span>
+          </label>
+          {form.cardback_refs.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {form.cardback_refs.map((code) => (
+                <span key={code} className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-bold" style={{ background: "rgba(201,168,76,0.18)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.4)" }}>
+                  {code}
+                  <button type="button" onClick={() => toggleCardbackRef(code)} aria-label={`Remove ${code}`} style={{ color: "#C9A84C" }} className="hover:opacity-70">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-1.5" style={{ maxHeight: 160, overflowY: "auto", border: "1px solid rgba(201,168,76,0.2)", padding: 8, borderRadius: 4, background: "#111110" }}>
+            {MASTER_TABLE_CODES.map((code) => {
+              const selected = form.cardback_refs.includes(code);
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => toggleCardbackRef(code)}
+                  className="px-2 py-1 rounded text-[10px] font-bold tracking-wider transition-colors"
+                  style={{
+                    background: selected ? "rgba(201,168,76,0.3)" : "transparent",
+                    color: selected ? "#C9A84C" : "rgba(224,216,192,0.6)",
+                    border: `1px solid ${selected ? "#C9A84C" : "rgba(201,168,76,0.2)"}`,
+                    minHeight: 28,
+                  }}
+                >
+                  {code}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Mobile editor tabs */}
         <div className="md:hidden flex gap-0 mb-2" style={{ borderBottom: "1px solid rgba(201,168,76,0.2)" }}>
           <button onClick={() => setMobilePreview(false)} className="flex-1 py-2 text-[11px] font-bold tracking-wider" style={{ color: !mobilePreview ? "#C9A84C" : "rgba(224,216,192,0.6)", borderBottom: !mobilePreview ? "2px solid #C9A84C" : "2px solid transparent", minHeight: 44 }}>EDIT</button>
