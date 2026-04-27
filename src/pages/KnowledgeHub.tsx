@@ -6,6 +6,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import CompViewerModal from "@/components/knowledge-hub/CompViewerModal";
 import { Menu, X, Images } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { MASTER_TABLE } from "@/lib/cardback-master";
 
 /* ───────── data ───────── */
 
@@ -16,7 +17,7 @@ const TIMELINE_NODES = [
   { era: "POTF", label: "POTF", years: "1985", sub: "92-back" },
 ];
 
-const MASTER_TABLE = [
+const _UNUSED_INLINE_MASTER = [
   { code: "SW-12A", era: "SW", cardback: "12-Back A", year: "1977–78", features: "Action Display Stand offer; DT saber instructions; earliest release", rarity: "★★★★★", notes: "15–25% premium over SW-12C" },
   { code: "SW-12A-DT", era: "SW", cardback: "12-Back A Double-Telescoping", year: "1977–78", features: "Double-telescoping saber; extreme rarity", rarity: "★★★★★ (EXTREME)", notes: "See DT Variant Spotlight for details" },
   { code: "SW-12B", era: "SW", cardback: "12-Back B", year: "1978", features: "POP cut-out for second Display Stand; minor text variation", rarity: "★★★★☆", notes: "5–10% premium over SW-12C" },
