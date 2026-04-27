@@ -2,9 +2,10 @@ import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
-import { RefreshCw, ArrowLeft, Trash2, Bold, Heading2, Link as LinkIcon, Image, Table, List } from "lucide-react";
+import { RefreshCw, ArrowLeft, Trash2, Bold, Heading2, Link as LinkIcon, Image, Table, List, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { MASTER_TABLE_CODES } from "@/lib/cardback-master";
 
 const CATEGORIES = [
   { code: "CARDBACK_GUIDE", label: "US Kenner Cardback Guide", color: "#4A90D9" },
