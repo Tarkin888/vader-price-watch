@@ -192,6 +192,7 @@ const AdminKnowledgeTab = () => {
       image_urls: form.image_urls ? form.image_urls.split("\n").map((s: string) => s.trim()).filter(Boolean) : [],
       source_urls: form.source_urls ? form.source_urls.split("\n").map((s: string) => s.trim()).filter(Boolean) : [],
       content_md: form.content_md,
+      cardback_refs: form.cardback_refs,
     };
     if (id) {
       const res = await adminWrite({ table: "knowledge_articles", operation: "update", data: row, match: { column: "id", value: id } });
