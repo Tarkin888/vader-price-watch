@@ -2,9 +2,10 @@ import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { toast } from "sonner";
-import { RefreshCw, ArrowLeft, Trash2, Bold, Heading2, Link as LinkIcon, Image, Table, List } from "lucide-react";
+import { RefreshCw, ArrowLeft, Trash2, Bold, Heading2, Link as LinkIcon, Image, Table, List, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { MASTER_TABLE_CODES } from "@/lib/cardback-master";
 
 const CATEGORIES = [
   { code: "CARDBACK_GUIDE", label: "US Kenner Cardback Guide", color: "#4A90D9" },
@@ -37,6 +38,7 @@ interface Article {
   last_researched: string | null;
   confidence: string | null;
   tags: string[] | null;
+  cardback_refs: string[] | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -53,12 +55,14 @@ interface EditorForm {
   image_urls: string;
   source_urls: string;
   content_md: string;
+  cardback_refs: string[];
 }
 
 const emptyForm = (): EditorForm => ({
   title: "", category: CATEGORIES[0].code, is_published: false,
   display_order: "0", slug: "", tags: "", confidence: "MEDIUM",
   last_researched: "", image_urls: "", source_urls: "", content_md: "",
+  cardback_refs: [],
 });
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -126,6 +130,7 @@ const AdminKnowledgeTab = () => {
         image_urls: (article.image_urls ?? []).join("\n"),
         source_urls: (article.source_urls ?? []).join("\n"),
         content_md: article.content_md,
+        cardback_refs: article.cardback_refs ?? [],
       });
     } else {
       setEditingId(null);
@@ -135,9 +140,9 @@ const AdminKnowledgeTab = () => {
     setSaveStatus("idle");
   };
 
-  const setField = (key: keyof EditorForm, val: string | boolean) => {
+  const setField = (key: keyof EditorForm, val: string | boolean | string[]) => {
     setForm((f) => {
-      const next = { ...f, [key]: val };
+      const next = { ...f, [key]: val } as EditorForm;
       if (key === "title" && creating && !f.slug) {
         next.slug = slugify(val as string);
       }
@@ -145,6 +150,18 @@ const AdminKnowledgeTab = () => {
     });
     // Auto-save for existing articles
     if (editingId && key !== "is_published") {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => autoSave(), 10000);
+    }
+  };
+
+  const toggleCardbackRef = (code: string) => {
+    setForm((f) => {
+      const has = f.cardback_refs.includes(code);
+      const next = { ...f, cardback_refs: has ? f.cardback_refs.filter((c) => c !== code) : [...f.cardback_refs, code] };
+      return next;
+    });
+    if (editingId) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => autoSave(), 10000);
     }
@@ -175,6 +192,7 @@ const AdminKnowledgeTab = () => {
       image_urls: form.image_urls ? form.image_urls.split("\n").map((s: string) => s.trim()).filter(Boolean) : [],
       source_urls: form.source_urls ? form.source_urls.split("\n").map((s: string) => s.trim()).filter(Boolean) : [],
       content_md: form.content_md,
+      cardback_refs: form.cardback_refs,
     };
     if (id) {
       const res = await adminWrite({ table: "knowledge_articles", operation: "update", data: row, match: { column: "id", value: id } });
@@ -310,6 +328,46 @@ const AdminKnowledgeTab = () => {
           <div>
             <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>SOURCE URLS (one per line)</label>
             <textarea value={form.source_urls} onChange={(e) => setField("source_urls", e.target.value)} rows={2} style={{ ...inputStyle, minHeight: 60 }} />
+          </div>
+        </div>
+
+        {/* Cardback refs — links article to one or more cardback codes for the comp-viewer */}
+        <div>
+          <label className="text-[10px] tracking-wider block mb-1" style={{ color: "rgba(224,216,192,0.6)" }}>
+            CARDBACK REFS <span style={{ color: "rgba(224,216,192,0.4)" }}>(article relates to these cardbacks; powers the Images icon on the public Research Library)</span>
+          </label>
+          {form.cardback_refs.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {form.cardback_refs.map((code) => (
+                <span key={code} className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-bold" style={{ background: "rgba(201,168,76,0.18)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.4)" }}>
+                  {code}
+                  <button type="button" onClick={() => toggleCardbackRef(code)} aria-label={`Remove ${code}`} style={{ color: "#C9A84C" }} className="hover:opacity-70">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-1.5" style={{ maxHeight: 160, overflowY: "auto", border: "1px solid rgba(201,168,76,0.2)", padding: 8, borderRadius: 4, background: "#111110" }}>
+            {MASTER_TABLE_CODES.map((code) => {
+              const selected = form.cardback_refs.includes(code);
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => toggleCardbackRef(code)}
+                  className="px-2 py-1 rounded text-[10px] font-bold tracking-wider transition-colors"
+                  style={{
+                    background: selected ? "rgba(201,168,76,0.3)" : "transparent",
+                    color: selected ? "#C9A84C" : "rgba(224,216,192,0.6)",
+                    border: `1px solid ${selected ? "#C9A84C" : "rgba(201,168,76,0.2)"}`,
+                    minHeight: 28,
+                  }}
+                >
+                  {code}
+                </button>
+              );
+            })}
           </div>
         </div>
 

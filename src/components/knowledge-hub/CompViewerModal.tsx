@@ -11,13 +11,15 @@ interface CompViewerModalProps {
   variantCode?: string;
   open: boolean;
   onClose: () => void;
+  /** Surface that opened the modal — recorded against the activity event. */
+  source?: "master_table" | "research_library";
 }
 
 const fmtGBP = (n: number | null | undefined) => {
   const v = Number(n) || 0;
   return `£${v.toLocaleString("en-GB", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
-const CompViewerModal = ({ cardbackCode, variantCode, open, onClose }: CompViewerModalProps) => {
+const CompViewerModal = ({ cardbackCode, variantCode, open, onClose, source }: CompViewerModalProps) => {
   const { data: lots, loading, stats } = useCompsLookup({
     cardbackCode: open ? cardbackCode : null,
     variantCode: open ? variantCode : null,
@@ -28,7 +30,7 @@ const CompViewerModal = ({ cardbackCode, variantCode, open, onClose }: CompViewe
   useEffect(() => {
     if (!open) return;
     if (loading) return;
-    logActivity("knowledge_hub.comps_view", cardbackCode, { cardbackCode, variantCode: variantCode ?? null, matchCount: stats.count });
+    logActivity("knowledge_hub.comps_view", cardbackCode, { cardbackCode, variantCode: variantCode ?? null, matchCount: stats.count, source: source ?? null });
     // Only log once per (open, results-resolved) cycle
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, loading]);
