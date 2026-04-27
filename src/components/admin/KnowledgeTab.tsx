@@ -130,6 +130,7 @@ const AdminKnowledgeTab = () => {
         image_urls: (article.image_urls ?? []).join("\n"),
         source_urls: (article.source_urls ?? []).join("\n"),
         content_md: article.content_md,
+        cardback_refs: article.cardback_refs ?? [],
       });
     } else {
       setEditingId(null);
