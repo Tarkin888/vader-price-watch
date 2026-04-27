@@ -67,6 +67,7 @@ interface Article {
   is_published: boolean;
   last_researched: string | null;
   confidence: string | null;
+  cardback_refs: string[] | null;
   created_at: string;
   updated_at: string;
 }
