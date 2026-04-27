@@ -140,9 +140,9 @@ const AdminKnowledgeTab = () => {
     setSaveStatus("idle");
   };
 
-  const setField = (key: keyof EditorForm, val: string | boolean) => {
+  const setField = (key: keyof EditorForm, val: string | boolean | string[]) => {
     setForm((f) => {
-      const next = { ...f, [key]: val };
+      const next = { ...f, [key]: val } as EditorForm;
       if (key === "title" && creating && !f.slug) {
         next.slug = slugify(val as string);
       }
@@ -150,6 +150,18 @@ const AdminKnowledgeTab = () => {
     });
     // Auto-save for existing articles
     if (editingId && key !== "is_published") {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => autoSave(), 10000);
+    }
+  };
+
+  const toggleCardbackRef = (code: string) => {
+    setForm((f) => {
+      const has = f.cardback_refs.includes(code);
+      const next = { ...f, cardback_refs: has ? f.cardback_refs.filter((c) => c !== code) : [...f.cardback_refs, code] };
+      return next;
+    });
+    if (editingId) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => autoSave(), 10000);
     }
