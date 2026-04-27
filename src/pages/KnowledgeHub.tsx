@@ -411,6 +411,7 @@ const KnowledgeHub = () => {
           variantCode={compsTarget}
           open={!!compsTarget}
           onClose={() => setCompsTarget(null)}
+          source="master_table"
         />
       )}
     </div>
