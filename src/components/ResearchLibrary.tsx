@@ -571,6 +571,16 @@ const ResearchLibrary = () => {
         .prose-custom th { background: rgba(201, 168, 76, 0.1); color: #C9A84C; }
         .prose-custom strong { color: #C9A84C; }
       `}</style>
+
+      {compsTarget && (
+        <CompViewerModal
+          cardbackCode={compsTarget}
+          variantCode={compsTarget}
+          open={!!compsTarget}
+          onClose={() => setCompsTarget(null)}
+          source="research_library"
+        />
+      )}
     </div>
   );
 };
