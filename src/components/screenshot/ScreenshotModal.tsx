@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import ScreenshotCapture from "./ScreenshotCapture";
 import ScreenshotPreview from "./ScreenshotPreview";
 import ExtractionReviewForm from "./ExtractionReviewForm";
-import MultiLotReviewList, { type BatchOutcome } from "./MultiLotReviewList";
+import MultiLotReviewPager, { type PagerOutcome } from "./MultiLotReviewPager";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { logActivity } from "@/lib/activity-log";
@@ -228,7 +228,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
     }
   };
 
-  const handleBatchComplete = (outcome: BatchOutcome) => {
+  const handleBatchComplete = (outcome: PagerOutcome) => {
     logActivity("quickimport.text.batch_save", null, {
       attempted: outcome.attempted,
       saved: outcome.saved,
@@ -369,7 +369,7 @@ const ScreenshotModal = ({ open, onOpenChange, onSaved }: Props) => {
           )}
 
           {step === "review-multi" && extractedList && (
-            <MultiLotReviewList
+            <MultiLotReviewPager
               list={extractedList}
               truncatedAt={truncatedAt}
               onSaveOne={handleSaveOne}
