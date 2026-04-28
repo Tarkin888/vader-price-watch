@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { calculatePrices, type ExtractedData } from "@/lib/screenshot-prices";
+import { classifyLot } from "@/lib/classify-lot";
 import ExtractionReviewForm from "./ExtractionReviewForm";
 
 type SaveStatus = "pending" | "saved" | "failed" | "skipped-duplicate";
@@ -447,10 +448,6 @@ const MultiLotReviewPager = ({
 
 /** Build a default record without user edits — mirrors ExtractionReviewForm.handleSubmit. */
 function buildDefaultRecord(extracted: ExtractedData): Record<string, unknown> {
-  // Re-use the same logic the review form uses by importing classifier
-  // (kept inline to avoid a circular import on the form itself).
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { classifyLot } = require("@/lib/classify-lot");
   const text = [extracted.title, extracted.conditionNotes].filter(Boolean).join(" ");
   const classified = classifyLot(text);
   const pick = (claude: string | null | undefined, fallback: string) =>
