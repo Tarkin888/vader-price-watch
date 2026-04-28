@@ -105,6 +105,7 @@ const KnowledgeHub = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [lastScrapeDate, setLastScrapeDate] = useState<string | null>(null);
   const [compsTarget, setCompsTarget] = useState<string | null>(null);
+  const [spotlightTarget, setSpotlightTarget] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("lots").select("capture_date", { count: "exact", head: false })
