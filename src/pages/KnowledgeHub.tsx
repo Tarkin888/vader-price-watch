@@ -429,6 +429,16 @@ const KnowledgeHub = () => {
           source="master_table"
         />
       )}
+
+      {spotlightTarget && (
+        <CompViewerModal
+          cardbackCode={spotlightTarget}
+          variantCode={null}
+          open={!!spotlightTarget}
+          onClose={() => setSpotlightTarget(null)}
+          source="variant_spotlight"
+        />
+      )}
     </div>
   );
 };
