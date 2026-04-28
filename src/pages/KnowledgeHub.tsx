@@ -18,22 +18,26 @@ const TIMELINE_NODES = [
 ];
 
 
-const SPOTLIGHT_CARDS = [
+const SPOTLIGHT_CARDS: Array<{ title: string; body: string; primaryCardback: string }> = [
   {
     title: "DOUBLE-TELESCOPING SABER (SW-12A-DT / SW-12B-DT)",
     body: "The rarest production variant in the entire vintage Kenner line. The double-telescoping lightsaber has a visible inner wick that extends from the outer tube. Only approximately 3–4 carded SW-12A-DT examples are known to exist worldwide. A SW-12B-DT example with a single documented carded specimen is equally extreme. Prices for graded examples start at £30,000 and can exceed £60,000.",
+    primaryCardback: "SW-12A-DT",
   },
   {
     title: "VADER POINTING (ROTJ-65-VP)",
     body: "An alternate front-card photograph showing Darth Vader with his right arm raised and finger extended — distinct from the standard lightsaber-raised pose used across most ROTJ Vader cards. Confirmed on the 65-back, 77-back, and 79-back. Rarer than the standard pose on all cardbacks it appears on. Collectors treat this as a standalone variant requiring a separate carded example.",
+    primaryCardback: "ROTJ-65-VP",
   },
   {
     title: "MADE IN MEXICO / LILI LEDY (ROTJ-65D)",
     body: "Produced under licence by Lili Ledy for the Mexican market. Features different card stock and finish from U.S. Kenner issues. The ROTJ-65D is the most documented example. At time of writing, the AFA population report shows only POP 2 — making this one of the rarest graded ROTJ Vader cards in any registry. Commands a significant premium over equivalent U.S. issues.",
+    primaryCardback: "ROTJ-65D",
   },
   {
     title: "POTF COIN (POTF-92)",
     body: "The Power of the Force 92-back is the final release in the vintage Kenner line. Every figure was packaged with a unique collector coin inside the bubble. The Darth Vader coin is among the most sought-after in the set. A complete sealed POTF-92 Vader with coin intact commands a strong premium, with AFA Y-85 examples documented at Heritage Auctions.",
+    primaryCardback: "POTF-92",
   },
 ];
 
