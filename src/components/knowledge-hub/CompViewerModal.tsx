@@ -8,11 +8,11 @@ import { PLACEHOLDER_BG, PLACEHOLDER_SIZE, applyPlaceholderOnError } from "@/lib
 interface CompViewerModalProps {
   cardbackCode: string;
   /** Optional variant narrowing — when present, narrows lookup to this variant. */
-  variantCode?: string;
+  variantCode?: string | null;
   open: boolean;
   onClose: () => void;
   /** Surface that opened the modal — recorded against the activity event. */
-  source?: "master_table" | "research_library";
+  source?: "master_table" | "research_library" | "variant_spotlight";
 }
 
 const fmtGBP = (n: number | null | undefined) => {
