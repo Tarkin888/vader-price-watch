@@ -12,7 +12,7 @@ interface CompViewerModalProps {
   open: boolean;
   onClose: () => void;
   /** Surface that opened the modal — recorded against the activity event. */
-  source?: "master_table" | "research_library";
+  source?: "master_table" | "research_library" | "variant_spotlight";
 }
 
 const fmtGBP = (n: number | null | undefined) => {
