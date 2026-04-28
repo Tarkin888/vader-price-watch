@@ -258,7 +258,17 @@ const KnowledgeHub = () => {
                 key={card.title}
                 className="border border-primary/50 p-5 bg-card shadow-[0_0_12px_hsl(43_50%_54%/0.1)]"
               >
-                <h4 className="text-xs font-bold text-primary tracking-wider mb-3">{card.title}</h4>
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <h4 className="text-xs font-bold text-primary tracking-wider">{card.title}</h4>
+                  <button
+                    onClick={() => setSpotlightTarget(card.primaryCardback)}
+                    title={`View auction comps for ${card.primaryCardback}`}
+                    aria-label={`View auction comps for ${card.primaryCardback}`}
+                    className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors shrink-0"
+                  >
+                    <Images className="w-4 h-4" />
+                  </button>
+                </div>
                 <p className="text-xs text-foreground leading-relaxed">{card.body}</p>
               </div>
             ))}
