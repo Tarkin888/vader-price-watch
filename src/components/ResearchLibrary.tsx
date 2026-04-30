@@ -118,6 +118,7 @@ const ResearchLibrary = () => {
   // Comp-viewer state — single-ref opens modal directly; multi-ref opens picker first
   const [compsTarget, setCompsTarget] = useState<string | null>(null);
   const [pickerArticleId, setPickerArticleId] = useState<string | null>(null);
+  const [imageEditArticle, setImageEditArticle] = useState<Article | null>(null);
 
   /* ── fetch ── */
   const fetchArticles = async () => {
