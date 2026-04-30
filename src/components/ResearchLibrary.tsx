@@ -3,9 +3,10 @@ import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { useAuth } from "@/hooks/use-auth";
-import { Search, ArrowLeft, Plus, Upload, Edit2, Trash2, Eye, EyeOff, X, Images } from "lucide-react";
+import { Search, ArrowLeft, Plus, Upload, Edit2, Trash2, Eye, EyeOff, X, Images, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 import CompViewerModal from "@/components/knowledge-hub/CompViewerModal";
+import ImageManagerModal from "@/components/knowledge-hub/ImageManagerModal";
 
 /* ───────── constants ───────── */
 
