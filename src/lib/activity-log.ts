@@ -41,6 +41,7 @@ export type ActivityEventType =
   | "quickimport.text.multi_extract"
   | "quickimport.text.batch_save"
   | "knowledge_hub.comps_view"
+  | "knowledge_hub.image_replace"
   | "kenny.suggestion_chip_click"
   | "kenny.view_in_price_tracker";
 
