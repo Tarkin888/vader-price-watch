@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import {
-  Pin, PinOff, Plus, Search, Trash2, Copy, X, ExternalLink, StickyNote, Download,
+  Pin, PinOff, Plus, Search, Trash2, Copy, X, ExternalLink, StickyNote, Download, Upload,
 } from "lucide-react";
 import { logActivity } from "@/lib/activity-log";
+import NotepadImportModal from "@/components/NotepadImportModal";
 
 /* ── types ── */
 interface Note {
@@ -100,6 +101,9 @@ export default function Notepad() {
 
   // Delete confirmation
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  // Import modal
+  const [importOpen, setImportOpen] = useState(false);
 
   // Refs for keyboard
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -525,6 +529,23 @@ export default function Notepad() {
                         size="sm"
                         variant="outline"
                         className="h-7 w-7 p-0"
+                        disabled={isFull}
+                        onClick={() => setImportOpen(true)}
+                        aria-label="Import notes from Markdown"
+                      >
+                        <Upload size={14} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {isFull ? "Notepad full — delete an entry first" : "Import notes (.md)"}
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 w-7 p-0"
                         disabled={notes.length === 0}
                         onClick={handleExport}
                         aria-label="Export notes to Markdown"
@@ -832,6 +853,15 @@ export default function Notepad() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Import modal */}
+      <NotepadImportModal
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        userId={profile?.id ?? null}
+        currentCount={count}
+        onImported={fetchNotes}
+      />
     </div>
   );
 }

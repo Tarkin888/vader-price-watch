@@ -35,6 +35,7 @@ export type ActivityEventType =
   | "inventory.edit"
   | "inventory.csv_import"
   | "notepad.export"
+  | "notepad.import"
   | "quickimport.text"
   | "quickimport.text.sample_loaded"
   | "quickimport.text.multi_extract"
