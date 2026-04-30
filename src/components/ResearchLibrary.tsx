@@ -586,9 +586,20 @@ const ResearchLibrary = () => {
           source="research_library"
         />
       )}
-    </div>
-  );
-};
+
+      {imageEditArticle && (
+        <ImageManagerModal
+          articleId={imageEditArticle.id}
+          articleTitle={imageEditArticle.title}
+          mode={(imageEditArticle.image_urls?.length ?? 0) > 1 ? "multi" : "single"}
+          initialUrls={imageEditArticle.image_urls ?? []}
+          open={!!imageEditArticle}
+          onClose={() => setImageEditArticle(null)}
+          onSaved={(newUrls) => {
+            setArticles((prev) => prev.map((x) => x.id === imageEditArticle.id ? { ...x, image_urls: newUrls } : x));
+          }}
+        />
+      )}
 
 /* ───────── small helpers ───────── */
 
