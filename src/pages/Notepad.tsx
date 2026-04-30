@@ -853,6 +853,15 @@ export default function Notepad() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Import modal */}
+      <NotepadImportModal
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        userId={profile?.id ?? null}
+        currentCount={count}
+        onImported={fetchNotes}
+      />
     </div>
   );
 }
