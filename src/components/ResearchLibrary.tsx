@@ -3,9 +3,10 @@ import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { adminWrite } from "@/lib/admin-write";
 import { useAuth } from "@/hooks/use-auth";
-import { Search, ArrowLeft, Plus, Upload, Edit2, Trash2, Eye, EyeOff, X, Images } from "lucide-react";
+import { Search, ArrowLeft, Plus, Upload, Edit2, Trash2, Eye, EyeOff, X, Images, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 import CompViewerModal from "@/components/knowledge-hub/CompViewerModal";
+import ImageManagerModal from "@/components/knowledge-hub/ImageManagerModal";
 
 /* ───────── constants ───────── */
 
@@ -117,6 +118,7 @@ const ResearchLibrary = () => {
   // Comp-viewer state — single-ref opens modal directly; multi-ref opens picker first
   const [compsTarget, setCompsTarget] = useState<string | null>(null);
   const [pickerArticleId, setPickerArticleId] = useState<string | null>(null);
+  const [imageEditArticle, setImageEditArticle] = useState<Article | null>(null);
 
   /* ── fetch ── */
   const fetchArticles = async () => {
@@ -432,6 +434,9 @@ const ResearchLibrary = () => {
                   </div>
                   {isAdmin && (
                     <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={(e) => { e.stopPropagation(); setImageEditArticle(a); }} className="p-1 text-muted-foreground hover:text-primary transition-colors" title="Replace image">
+                        <ImagePlus className="w-3 h-3" />
+                      </button>
                       <button onClick={(e) => { e.stopPropagation(); startEdit(a); }} className="p-1 text-muted-foreground hover:text-primary transition-colors" title="Edit">
                         <Edit2 className="w-3 h-3" />
                       </button>
@@ -581,11 +586,26 @@ const ResearchLibrary = () => {
           source="research_library"
         />
       )}
+
+      {imageEditArticle && (
+        <ImageManagerModal
+          articleId={imageEditArticle.id}
+          articleTitle={imageEditArticle.title}
+          mode={(imageEditArticle.image_urls?.length ?? 0) > 1 ? "multi" : "single"}
+          initialUrls={imageEditArticle.image_urls ?? []}
+          open={!!imageEditArticle}
+          onClose={() => setImageEditArticle(null)}
+          onSaved={(newUrls) => {
+            setArticles((prev) => prev.map((x) => x.id === imageEditArticle.id ? { ...x, image_urls: newUrls } : x));
+          }}
+        />
+      )}
     </div>
   );
 };
 
 /* ───────── small helpers ───────── */
+
 
 const CategoryBadge = ({ category }: { category: string }) => {
   const colour = CATEGORY_COLOURS[category as Category] || "#666";

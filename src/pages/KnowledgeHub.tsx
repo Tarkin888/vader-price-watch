@@ -4,9 +4,13 @@ import Header from "@/components/Header";
 import ResearchLibrary from "@/components/ResearchLibrary";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import CompViewerModal from "@/components/knowledge-hub/CompViewerModal";
-import { Menu, X, Images } from "lucide-react";
+import ImageManagerModal from "@/components/knowledge-hub/ImageManagerModal";
+import { Menu, X, Images, ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { MASTER_TABLE } from "@/lib/cardback-master";
+
+type ArticleStub = { id: string; title: string; image_urls: string[] | null; cardback_refs: string[] | null };
 
 /* ───────── data ───────── */
 
@@ -106,6 +110,9 @@ const KnowledgeHub = () => {
   const [lastScrapeDate, setLastScrapeDate] = useState<string | null>(null);
   const [compsTarget, setCompsTarget] = useState<string | null>(null);
   const [spotlightTarget, setSpotlightTarget] = useState<string | null>(null);
+  const { isAdmin } = useAuth();
+  const [articleStubs, setArticleStubs] = useState<ArticleStub[]>([]);
+  const [imageEditArticle, setImageEditArticle] = useState<ArticleStub | null>(null);
 
   useEffect(() => {
     supabase.from("lots").select("capture_date", { count: "exact", head: false })
@@ -115,6 +122,18 @@ const KnowledgeHub = () => {
         if (data && data.length > 0) setLastScrapeDate(data[0].capture_date);
       });
   }, []);
+
+  const loadArticleStubs = () => {
+    supabase.from("knowledge_articles" as any).select("id, title, image_urls, cardback_refs")
+      .then(({ data }) => {
+        if (data) setArticleStubs(data as unknown as ArticleStub[]);
+      });
+  };
+  useEffect(() => { if (isAdmin) loadArticleStubs(); }, [isAdmin]);
+
+  // Map cardback code → first matching article (for Master Table image-replace pencil)
+  const articleByCardback = (code: string): ArticleStub | undefined =>
+    articleStubs.find((a) => Array.isArray(a.cardback_refs) && a.cardback_refs.includes(code));
 
   const filteredMaster = eraFilter === "All" ? MASTER_TABLE : MASTER_TABLE.filter((r) => r.era === eraFilter);
 
@@ -233,14 +252,30 @@ const KnowledgeHub = () => {
                     <td className={`${tdCls} whitespace-nowrap text-primary`}>{r.rarity}</td>
                     <td className={tdCls}>{r.notes}</td>
                     <td className={`${tdCls} whitespace-nowrap`}>
-                      <button
-                        onClick={() => setCompsTarget(r.code)}
-                        title="View auction comps"
-                        aria-label={`View auction comps for ${r.code}`}
-                        className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors"
-                      >
-                        <Images className="w-4 h-4" />
-                      </button>
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          onClick={() => setCompsTarget(r.code)}
+                          title="View auction comps"
+                          aria-label={`View auction comps for ${r.code}`}
+                          className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors"
+                        >
+                          <Images className="w-4 h-4" />
+                        </button>
+                        {isAdmin && (() => {
+                          const art = articleByCardback(r.code);
+                          return (
+                            <button
+                              onClick={() => art && setImageEditArticle(art)}
+                              disabled={!art}
+                              title={art ? `Replace image for ${art.title}` : "No article record yet — create one in Research Library first"}
+                              aria-label="Replace image"
+                              className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                            >
+                              <ImagePlus className="w-4 h-4" />
+                            </button>
+                          );
+                        })()}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -437,6 +472,20 @@ const KnowledgeHub = () => {
           open={!!spotlightTarget}
           onClose={() => setSpotlightTarget(null)}
           source="variant_spotlight"
+        />
+      )}
+
+      {imageEditArticle && (
+        <ImageManagerModal
+          articleId={imageEditArticle.id}
+          articleTitle={imageEditArticle.title}
+          mode={(imageEditArticle.image_urls?.length ?? 0) > 1 ? "multi" : "single"}
+          initialUrls={imageEditArticle.image_urls ?? []}
+          open={!!imageEditArticle}
+          onClose={() => setImageEditArticle(null)}
+          onSaved={(newUrls) => {
+            setArticleStubs((prev) => prev.map((x) => x.id === imageEditArticle.id ? { ...x, image_urls: newUrls } : x));
+          }}
         />
       )}
     </div>
