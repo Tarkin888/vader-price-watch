@@ -4,9 +4,13 @@ import Header from "@/components/Header";
 import ResearchLibrary from "@/components/ResearchLibrary";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import CompViewerModal from "@/components/knowledge-hub/CompViewerModal";
-import { Menu, X, Images } from "lucide-react";
+import ImageManagerModal from "@/components/knowledge-hub/ImageManagerModal";
+import { Menu, X, Images, ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { MASTER_TABLE } from "@/lib/cardback-master";
+
+type ArticleStub = { id: string; title: string; image_urls: string[] | null; cardback_refs: string[] | null };
 
 /* ───────── data ───────── */
 
