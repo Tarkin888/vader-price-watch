@@ -252,14 +252,30 @@ const KnowledgeHub = () => {
                     <td className={`${tdCls} whitespace-nowrap text-primary`}>{r.rarity}</td>
                     <td className={tdCls}>{r.notes}</td>
                     <td className={`${tdCls} whitespace-nowrap`}>
-                      <button
-                        onClick={() => setCompsTarget(r.code)}
-                        title="View auction comps"
-                        aria-label={`View auction comps for ${r.code}`}
-                        className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors"
-                      >
-                        <Images className="w-4 h-4" />
-                      </button>
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          onClick={() => setCompsTarget(r.code)}
+                          title="View auction comps"
+                          aria-label={`View auction comps for ${r.code}`}
+                          className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors"
+                        >
+                          <Images className="w-4 h-4" />
+                        </button>
+                        {isAdmin && (() => {
+                          const art = articleByCardback(r.code);
+                          return (
+                            <button
+                              onClick={() => art && setImageEditArticle(art)}
+                              disabled={!art}
+                              title={art ? `Replace image for ${art.title}` : "No article record yet — create one in Research Library first"}
+                              aria-label="Replace image"
+                              className="inline-flex items-center justify-center p-1.5 rounded text-primary hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                            >
+                              <ImagePlus className="w-4 h-4" />
+                            </button>
+                          );
+                        })()}
+                      </div>
                     </td>
                   </tr>
                 ))}
