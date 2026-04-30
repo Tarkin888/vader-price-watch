@@ -434,6 +434,9 @@ const ResearchLibrary = () => {
                   </div>
                   {isAdmin && (
                     <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={(e) => { e.stopPropagation(); setImageEditArticle(a); }} className="p-1 text-muted-foreground hover:text-primary transition-colors" title="Replace image">
+                        <ImagePlus className="w-3 h-3" />
+                      </button>
                       <button onClick={(e) => { e.stopPropagation(); startEdit(a); }} className="p-1 text-muted-foreground hover:text-primary transition-colors" title="Edit">
                         <Edit2 className="w-3 h-3" />
                       </button>
