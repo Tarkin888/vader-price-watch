@@ -110,6 +110,9 @@ const KnowledgeHub = () => {
   const [lastScrapeDate, setLastScrapeDate] = useState<string | null>(null);
   const [compsTarget, setCompsTarget] = useState<string | null>(null);
   const [spotlightTarget, setSpotlightTarget] = useState<string | null>(null);
+  const { isAdmin } = useAuth();
+  const [articleStubs, setArticleStubs] = useState<ArticleStub[]>([]);
+  const [imageEditArticle, setImageEditArticle] = useState<ArticleStub | null>(null);
 
   useEffect(() => {
     supabase.from("lots").select("capture_date", { count: "exact", head: false })
@@ -119,6 +122,18 @@ const KnowledgeHub = () => {
         if (data && data.length > 0) setLastScrapeDate(data[0].capture_date);
       });
   }, []);
+
+  const loadArticleStubs = () => {
+    supabase.from("knowledge_articles" as any).select("id, title, image_urls, cardback_refs")
+      .then(({ data }) => {
+        if (data) setArticleStubs(data as unknown as ArticleStub[]);
+      });
+  };
+  useEffect(() => { if (isAdmin) loadArticleStubs(); }, [isAdmin]);
+
+  // Map cardback code → first matching article (for Master Table image-replace pencil)
+  const articleByCardback = (code: string): ArticleStub | undefined =>
+    articleStubs.find((a) => Array.isArray(a.cardback_refs) && a.cardback_refs.includes(code));
 
   const filteredMaster = eraFilter === "All" ? MASTER_TABLE : MASTER_TABLE.filter((r) => r.era === eraFilter);
 
