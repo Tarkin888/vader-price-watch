@@ -600,8 +600,12 @@ const ResearchLibrary = () => {
           }}
         />
       )}
+    </div>
+  );
+};
 
 /* ───────── small helpers ───────── */
+
 
 const CategoryBadge = ({ category }: { category: string }) => {
   const colour = CATEGORY_COLOURS[category as Category] || "#666";
