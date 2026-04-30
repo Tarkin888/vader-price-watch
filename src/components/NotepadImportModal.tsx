@@ -149,7 +149,7 @@ const NotepadImportModal = ({ open, onOpenChange, userId, currentCount, onImport
         continue;
       }
       inserted++;
-      const insertedId = (data as { id: string } | null)?.id ?? null;
+      const insertedId = (data as unknown as { id: string } | null)?.id ?? null;
       logActivity("notepad.import", insertedId, {
         title: n.title,
         source: n.source,
