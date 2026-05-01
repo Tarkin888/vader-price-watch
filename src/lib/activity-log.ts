@@ -42,6 +42,8 @@ export type ActivityEventType =
   | "quickimport.text.batch_save"
   | "knowledge_hub.comps_view"
   | "knowledge_hub.image_replace"
+  | "changelog.entry_created"
+  | "changelog.polish_request"
   | "kenny.suggestion_chip_click"
   | "kenny.view_in_price_tracker";
 

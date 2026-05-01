@@ -1,7 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCw, Pencil, Trash2 } from "lucide-react";
+import { RefreshCw, Pencil, Trash2, Sparkles } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { logActivity } from "@/lib/activity-log";
+import ChangelogPolishPreview from "./ChangelogPolishPreview";
 
 interface ChangelogEntry {
   id: string;
@@ -15,7 +18,22 @@ interface ChangelogEntry {
 
 const CATEGORIES = ["Feature", "Fix", "Improvement", "Security", "Data"];
 
+/** Increment patch segment of a semver-ish string. v7.1.0 → v7.1.1, 7.0 → 7.0.1. */
+function incrementPatch(v: string): string {
+  if (!v) return "";
+  const prefix = v.startsWith("v") ? "v" : "";
+  const core = v.replace(/^v/, "").trim();
+  const parts = core.split(".");
+  if (parts.length === 0 || parts.length > 3) return "";
+  while (parts.length < 3) parts.push("0");
+  const nums = parts.map((p) => Number(p));
+  if (nums.some((n) => !Number.isFinite(n) || n < 0)) return "";
+  nums[2] = nums[2] + 1;
+  return prefix + nums.join(".");
+}
+
 const AdminChangelogTab = () => {
+  const { profile, user } = useAuth();
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [spinning, setSpinning] = useState(false);
@@ -28,6 +46,19 @@ const AdminChangelogTab = () => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Feature");
   const [description, setDescription] = useState("");
+  const [author, setAuthor] = useState("");
+
+  // Polish state
+  const [polishing, setPolishing] = useState(false);
+  const [polishedText, setPolishedText] = useState<string | null>(null);
+  const [polishOriginal, setPolishOriginal] = useState<string>("");
+  const [usedPolish, setUsedPolish] = useState(false);
+
+  // Track if form has been manually edited (dirty) so we don't overwrite on prefill
+  const dirtyRef = useRef(false);
+  const prefilledRef = useRef(false);
+
+  const markDirty = () => { dirtyRef.current = true; };
 
   const fetchAll = useCallback(async () => {
     setSpinning(true);
@@ -38,13 +69,13 @@ const AdminChangelogTab = () => {
         .order("release_date", { ascending: false });
       const rows = (data ?? []) as ChangelogEntry[];
       setEntries(rows);
-      if (!editingId && rows.length > 0) {
-        const latest = rows[0].version;
-        const parts = latest.split(".");
-        if (parts.length === 3) {
-          parts[2] = String(Number(parts[2]) + 1);
-          setVersion(parts.join("."));
-        }
+
+      // Auto-prefill on clean form open (not editing, not dirty)
+      if (!editingId && !dirtyRef.current && rows.length > 0 && !prefilledRef.current) {
+        const next = incrementPatch(rows[0].version);
+        setVersion(next);
+        setReleaseDate(new Date().toISOString().split("T")[0]);
+        prefilledRef.current = true;
       }
     } finally {
       setLoading(false);
@@ -54,13 +85,26 @@ const AdminChangelogTab = () => {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
+  // Prefill author from signed-in admin
+  useEffect(() => {
+    if (!author && (profile?.display_name || user?.email)) {
+      setAuthor(profile?.display_name || user?.email || "");
+    }
+  }, [profile, user, author]);
+
   const resetForm = () => {
     setEditingId(null);
     setTitle("");
     setCategory("Feature");
     setDescription("");
     setReleaseDate(new Date().toISOString().split("T")[0]);
-    // version will be auto-set on next fetch
+    setPolishedText(null);
+    setPolishOriginal("");
+    setUsedPolish(false);
+    dirtyRef.current = false;
+    prefilledRef.current = false;
+    // Re-trigger prefill
+    fetchAll();
   };
 
   const handleSave = async () => {
@@ -77,16 +121,18 @@ const AdminChangelogTab = () => {
         if (error) throw error;
         toast.success("Entry updated");
       } else {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
         const { error } = await supabase.from("changelog").insert({
           version, release_date: releaseDate, title, category, description,
-          created_by: user?.id,
+          created_by: authUser?.id,
         });
         if (error) throw error;
         toast.success("Entry added");
+        logActivity("changelog.entry_created", version, {
+          version, category, used_polish: usedPolish,
+        });
       }
       resetForm();
-      fetchAll();
     } catch (e: any) {
       toast.error("Save failed: " + e.message);
     } finally {
@@ -101,6 +147,9 @@ const AdminChangelogTab = () => {
     setTitle(entry.title);
     setCategory(entry.category);
     setDescription(entry.description);
+    setPolishedText(null);
+    setUsedPolish(false);
+    dirtyRef.current = true;
   };
 
   const handleDelete = async () => {
@@ -113,6 +162,48 @@ const AdminChangelogTab = () => {
       fetchAll();
     }
     setDeleteId(null);
+  };
+
+  const handlePolish = async () => {
+    if (!description.trim()) {
+      toast.error("Write a description before polishing");
+      return;
+    }
+    if (description.length > 10000) {
+      toast.error("Description exceeds 10,000 characters");
+      return;
+    }
+    const pin = sessionStorage.getItem("admin_pin") ?? "";
+    if (!pin) {
+      toast.error("No admin PIN — authenticate via Admin Dashboard first");
+      return;
+    }
+    setPolishing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("changelog-polish", {
+        body: { pin, text: description },
+        headers: { "x-admin-pin": pin },
+      });
+      if (error) {
+        // Try to extract structured error
+        let msg = error.message;
+        try {
+          const ctx: any = (error as any).context;
+          if (ctx?.clone) {
+            const body = await ctx.clone().json();
+            if (body?.error) msg = body.error;
+          }
+        } catch { /* ignore */ }
+        throw new Error(msg);
+      }
+      if (!data?.polished) throw new Error(data?.error || "Empty polish response");
+      setPolishOriginal(description);
+      setPolishedText(data.polished);
+    } catch (e: any) {
+      toast.error("Polish failed: " + (e?.message || "Unknown error"));
+    } finally {
+      setPolishing(false);
+    }
   };
 
   const inputStyle: React.CSSProperties = {
@@ -137,27 +228,109 @@ const AdminChangelogTab = () => {
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
               <label className="text-[11px] mb-1 block" style={{ color: "rgba(224,216,192,0.6)" }}>Version</label>
-              <input value={version} onChange={(e) => setVersion(e.target.value)} style={inputStyle} placeholder="e.g. 7.1.0" />
+              <input value={version} onChange={(e) => { setVersion(e.target.value); markDirty(); }} style={inputStyle} placeholder="e.g. v7.1.1" />
             </div>
             <div className="flex-1">
               <label className="text-[11px] mb-1 block" style={{ color: "rgba(224,216,192,0.6)" }}>Release Date</label>
-              <input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} style={inputStyle} />
+              <input type="date" value={releaseDate} onChange={(e) => { setReleaseDate(e.target.value); markDirty(); }} style={inputStyle} />
             </div>
             <div className="flex-1">
-              <label className="text-[11px] mb-1 block" style={{ color: "rgba(224,216,192,0.6)" }}>Category</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} style={inputStyle}>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <label className="text-[11px] mb-1 block" style={{ color: "rgba(224,216,192,0.6)" }}>Author</label>
+              <input value={author} onChange={(e) => { setAuthor(e.target.value); markDirty(); }} style={inputStyle} placeholder="Signed-in admin" />
             </div>
           </div>
+
+          {/* Category as segmented control */}
+          <div>
+            <label className="text-[11px] mb-1 block" style={{ color: "rgba(224,216,192,0.6)" }}>Category</label>
+            <div role="radiogroup" aria-label="Category" className="flex flex-wrap gap-2">
+              {CATEGORIES.map((c) => {
+                const active = category === c;
+                return (
+                  <button
+                    key={c}
+                    role="radio"
+                    aria-checked={active}
+                    type="button"
+                    onClick={() => { setCategory(c); markDirty(); }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setCategory(c); markDirty(); }
+                    }}
+                    style={{
+                      background: active ? "#C9A84C" : "#080806",
+                      color: active ? "#080806" : "#e0d8c0",
+                      border: `1px solid ${active ? "#C9A84C" : "rgba(201,168,76,0.4)"}`,
+                      padding: "8px 16px",
+                      borderRadius: 4,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: "0.1em",
+                      minHeight: 44,
+                      cursor: "pointer",
+                      flex: "1 1 auto",
+                      minWidth: 90,
+                    }}
+                  >
+                    {c.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div>
             <label className="text-[11px] mb-1 block" style={{ color: "rgba(224,216,192,0.6)" }}>Title</label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} placeholder="Short title" />
+            <input value={title} onChange={(e) => { setTitle(e.target.value); markDirty(); }} style={inputStyle} placeholder="Short title" />
           </div>
+
           <div>
-            <label className="text-[11px] mb-1 block" style={{ color: "rgba(224,216,192,0.6)" }}>Description (Markdown)</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} style={{ ...inputStyle, minHeight: 100 }} placeholder="Describe the changes…" />
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px]" style={{ color: "rgba(224,216,192,0.6)" }}>Description (Markdown)</label>
+              <button
+                type="button"
+                onClick={handlePolish}
+                disabled={polishing || !description.trim()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] font-bold tracking-wider"
+                style={{
+                  background: "transparent",
+                  color: "#C9A84C",
+                  border: "1px solid rgba(201,168,76,0.4)",
+                  minHeight: 36,
+                  opacity: polishing || !description.trim() ? 0.5 : 1,
+                  cursor: polishing || !description.trim() ? "not-allowed" : "pointer",
+                }}
+              >
+                <Sparkles className={`w-3 h-3 ${polishing ? "animate-pulse" : ""}`} />
+                {polishing ? "POLISHING…" : "POLISH WITH CLAUDE"}
+              </button>
+            </div>
+            <textarea
+              value={description}
+              onChange={(e) => { setDescription(e.target.value); markDirty(); }}
+              rows={4}
+              style={{ ...inputStyle, minHeight: 100 }}
+              placeholder="Describe the changes…"
+            />
+            {polishedText && (
+              <ChangelogPolishPreview
+                original={polishOriginal}
+                polished={polishedText}
+                onAccept={() => {
+                  setDescription(polishedText);
+                  setUsedPolish(true);
+                  setPolishedText(null);
+                  toast.success("Polished version applied");
+                }}
+                onReject={() => setPolishedText(null)}
+                onEditPolished={() => {
+                  setDescription(polishedText);
+                  setUsedPolish(true);
+                  toast.success("Polished text loaded — edit and re-polish if needed");
+                }}
+              />
+            )}
           </div>
+
           <div className="flex gap-2">
             <button
               onClick={handleSave}
