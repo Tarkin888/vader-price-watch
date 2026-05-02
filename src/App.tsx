@@ -71,6 +71,7 @@ const AppRoutes = () => {
         <Route path="/notepad" element={<Notepad />} />
         <Route path="/changelog" element={<Changelog />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/kh-images" element={<AdminKhImages />} />
         <Route path="/dev/kenny-avatar" element={<DevKennyAvatar />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
