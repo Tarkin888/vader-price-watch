@@ -21,6 +21,7 @@ import Stats from "./pages/Stats";
 import Notepad from "./pages/Notepad";
 import Changelog from "./pages/Changelog";
 import DevKennyAvatar from "./pages/DevKennyAvatar";
+import AdminKhImages from "./pages/AdminKhImages";
 import NotFound from "./pages/NotFound";
 import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal";
 
