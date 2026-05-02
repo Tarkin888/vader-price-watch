@@ -21,6 +21,7 @@ import Stats from "./pages/Stats";
 import Notepad from "./pages/Notepad";
 import Changelog from "./pages/Changelog";
 import DevKennyAvatar from "./pages/DevKennyAvatar";
+import AdminKhImages from "./pages/AdminKhImages";
 import NotFound from "./pages/NotFound";
 import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal";
 
@@ -70,6 +71,7 @@ const AppRoutes = () => {
         <Route path="/notepad" element={<Notepad />} />
         <Route path="/changelog" element={<Changelog />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/kh-images" element={<AdminKhImages />} />
         <Route path="/dev/kenny-avatar" element={<DevKennyAvatar />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
