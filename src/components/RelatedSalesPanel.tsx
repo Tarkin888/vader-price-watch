@@ -4,6 +4,7 @@ import { useRelatedSales, resolveMatchKeys } from "@/hooks/useRelatedSales";
 import type { CollectionItem } from "@/lib/collection-db";
 import SourceBadge from "@/components/SourceBadge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 
 interface Props {
   item: CollectionItem;
