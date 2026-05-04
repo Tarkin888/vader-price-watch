@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getAllLots, fixUnknownEraCardback, type Lot } from "@/lib/db";
 import Header from "@/components/Header";

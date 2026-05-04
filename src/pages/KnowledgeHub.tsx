@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ResearchLibrary from "@/components/ResearchLibrary";
