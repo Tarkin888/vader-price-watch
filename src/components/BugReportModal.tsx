@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, X } from "lucide-react";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 
 const PAGES = [
   "Price Tracker",
   "Price Tracker / Filters",
   "Price Tracker / Tile View",
-  "My Collection",
+  ...(COLLECTION_FEATURE_ENABLED ? ["My Collection"] : []),
   "Dashboard",
   "Knowledge Hub",
   "Changelog",

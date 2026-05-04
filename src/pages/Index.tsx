@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getAllLots, fixUnknownEraCardback, type Lot } from "@/lib/db";
 import Header from "@/components/Header";
@@ -218,12 +219,14 @@ const Index = () => {
         >
           Knowledge Hub
         </button>
-        <button
-          onClick={() => navigate("/collection")}
-          className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          My Collection
-        </button>
+         {COLLECTION_FEATURE_ENABLED && (
+           <button
+             onClick={() => navigate("/collection")}
+             className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors"
+           >
+             My Collection
+           </button>
+         )}
       </div>
       {/* Mobile hamburger */}
       <div className="md:hidden flex items-center justify-between border-b border-border px-4 py-2">
@@ -235,7 +238,7 @@ const Index = () => {
         <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
           <button className="text-[11px] tracking-wider px-3 py-2 text-primary text-left" aria-current="page">Price Tracker</button>
           <button onClick={() => { setMobileNavOpen(false); navigate("/knowledge"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Knowledge Hub</button>
-          <button onClick={() => { setMobileNavOpen(false); navigate("/collection"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">My Collection</button>
+          {COLLECTION_FEATURE_ENABLED && <button onClick={() => { setMobileNavOpen(false); navigate("/collection"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">My Collection</button>}
         </div>
       )}
       <FilterBar filters={filters} onChange={updateFilters} />

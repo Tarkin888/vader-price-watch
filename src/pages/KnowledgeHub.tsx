@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ResearchLibrary from "@/components/ResearchLibrary";
@@ -153,7 +154,7 @@ const KnowledgeHub = () => {
       <div className="hidden md:flex items-center gap-1 border-b border-border px-6 py-2">
         <button onClick={() => navigate("/")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">Price Tracker</button>
         <button className="text-[10px] tracking-wider px-3 py-1 text-primary border-b border-primary">Knowledge Hub</button>
-        <button onClick={() => navigate("/collection")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">My Collection</button>
+        {COLLECTION_FEATURE_ENABLED && <button onClick={() => navigate("/collection")} className="text-[10px] tracking-wider px-3 py-1 text-muted-foreground hover:text-primary transition-colors">My Collection</button>}
       </div>
       {/* Mobile hamburger */}
       <div className="md:hidden flex items-center border-b border-border px-4 py-2">
@@ -165,7 +166,7 @@ const KnowledgeHub = () => {
         <div className="md:hidden border-b border-border bg-secondary/50 px-4 py-2 flex flex-col gap-1">
           <button onClick={() => { setMobileNavOpen(false); navigate("/"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">Price Tracker</button>
           <button className="text-[11px] tracking-wider px-3 py-2 text-primary text-left">Knowledge Hub</button>
-          <button onClick={() => { setMobileNavOpen(false); navigate("/collection"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">My Collection</button>
+          {COLLECTION_FEATURE_ENABLED && <button onClick={() => { setMobileNavOpen(false); navigate("/collection"); }} className="text-[11px] tracking-wider px-3 py-2 text-muted-foreground hover:text-primary text-left transition-colors">My Collection</button>}
         </div>
       )}
 

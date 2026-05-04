@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { ConfigProvider } from "@/hooks/use-config";
 import { useEffect } from "react";
@@ -66,7 +67,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/knowledge" element={<KnowledgeHub />} />
-        <Route path="/collection" element={<Collection />} />
+        <Route path="/collection" element={COLLECTION_FEATURE_ENABLED ? <Collection /> : <Navigate to="/" replace />} />
         <Route path="/stats" element={<Stats />} />
         <Route path="/notepad" element={<Notepad />} />
         <Route path="/changelog" element={<Changelog />} />

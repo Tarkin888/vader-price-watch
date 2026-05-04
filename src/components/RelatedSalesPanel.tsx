@@ -4,6 +4,7 @@ import { useRelatedSales, resolveMatchKeys } from "@/hooks/useRelatedSales";
 import type { CollectionItem } from "@/lib/collection-db";
 import SourceBadge from "@/components/SourceBadge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 
 interface Props {
   item: CollectionItem;
@@ -48,6 +49,7 @@ const SkeletonChip = () => (
 );
 
 export default function RelatedSalesPanel({ item, defaultExpanded = false, compact = false }: Props) {
+  if (!COLLECTION_FEATURE_ENABLED) return null;
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { data, loading, error, stats, matchKey } = useRelatedSales(item);
   const { cardback, variant, grade } = resolveMatchKeys(item);
