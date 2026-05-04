@@ -49,6 +49,7 @@ const SkeletonChip = () => (
 );
 
 export default function RelatedSalesPanel({ item, defaultExpanded = false, compact = false }: Props) {
+  if (!COLLECTION_FEATURE_ENABLED) return null;
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { data, loading, error, stats, matchKey } = useRelatedSales(item);
   const { cardback, variant, grade } = resolveMatchKeys(item);
