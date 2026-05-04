@@ -818,7 +818,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      lots_dedupe_index: {
+        Row: {
+          lot_ref: string | null
+          source: Database["public"]["Enums"]["lot_source"] | null
+        }
+        Insert: {
+          lot_ref?: string | null
+          source?: Database["public"]["Enums"]["lot_source"] | null
+        }
+        Update: {
+          lot_ref?: string | null
+          source?: Database["public"]["Enums"]["lot_source"] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       is_admin: { Args: { check_user_id: string }; Returns: boolean }
