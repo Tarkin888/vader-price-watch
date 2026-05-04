@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -143,10 +144,10 @@ export default function Stats() {
       scrapes30d: count("scrape_run", thirtyDaysAgo),
       scrapesAll: count("scrape_run"),
       lastScrape: lastScrape?.created_at ?? null,
-      added30d: count("record_added", thirtyDaysAgo) + count("collection_added", thirtyDaysAgo),
-      addedAll: count("record_added") + count("collection_added"),
-      edited30d: count("record_edited", thirtyDaysAgo) + count("collection_edited", thirtyDaysAgo),
-      editedAll: count("record_edited") + count("collection_edited"),
+      added30d: count("record_added", thirtyDaysAgo) + (COLLECTION_FEATURE_ENABLED ? count("collection_added", thirtyDaysAgo) : 0),
+      addedAll: count("record_added") + (COLLECTION_FEATURE_ENABLED ? count("collection_added") : 0),
+      edited30d: count("record_edited", thirtyDaysAgo) + (COLLECTION_FEATURE_ENABLED ? count("collection_edited", thirtyDaysAgo) : 0),
+      editedAll: count("record_edited") + (COLLECTION_FEATURE_ENABLED ? count("collection_edited") : 0),
       classified30d: count("classification_fixed", thirtyDaysAgo),
       classifiedAll: count("classification_fixed"),
       notes30d: count("note_created", thirtyDaysAgo),
@@ -166,7 +167,7 @@ export default function Stats() {
       days.push(d.toISOString().slice(0, 10));
     }
 
-    const eventTypes = ["record_added", "record_edited", "record_viewed", "collection_added", "classification_fixed", "scrape_run"];
+    const eventTypes = ["record_added", "record_edited", "record_viewed", ...(COLLECTION_FEATURE_ENABLED ? ["collection_added"] : []), "classification_fixed", "scrape_run"];
     return days.map((day) => {
       const row: any = { day: day.slice(5) }; // "MM-DD"
       for (const et of eventTypes) {
@@ -453,7 +454,7 @@ function TimelineCard({ data }: { data: any[] }) {
     { key: "record_added", label: "Added" },
     { key: "record_edited", label: "Edited" },
     { key: "record_viewed", label: "Viewed" },
-    { key: "collection_added", label: "Collection" },
+    ...(COLLECTION_FEATURE_ENABLED ? [{ key: "collection_added", label: "Collection" }] : []),
     { key: "classification_fixed", label: "Classified" },
     { key: "scrape_run", label: "Scrapes" },
   ];
