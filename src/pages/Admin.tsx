@@ -218,7 +218,7 @@ const Admin = () => {
         {activeTab === "scrapers" && <AdminScrapersTab />}
         {activeTab === "data" && <AdminDataTab />}
         {activeTab === "duplicates" && <AdminDuplicatesTab />}
-        {activeTab === "knowledge-hub" && <AdminKnowledgeTab />}
+        {RESEARCH_LIBRARY_FEATURE_ENABLED && activeTab === "knowledge-hub" && <AdminKnowledgeTab />}
         {activeTab === "bug-reports" && <AdminBugReportsTab />}
         {activeTab === "config" && <AdminConfigTab />}
         {activeTab === "audit-log" && <AdminAuditLogTab />}
