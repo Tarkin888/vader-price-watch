@@ -34,7 +34,7 @@ const TABS = RESEARCH_LIBRARY_FEATURE_ENABLED
   ? ALL_TABS
   : ALL_TABS.filter((t) => t.key !== "knowledge-hub");
 
-type TabKey = (typeof TABS)[number]["key"];
+type TabKey = (typeof ALL_TABS)[number]["key"];
 
 const Admin = () => {
   const { isAdmin, isLoading: authLoading } = useAuth();
