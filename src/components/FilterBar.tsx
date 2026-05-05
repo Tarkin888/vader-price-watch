@@ -30,7 +30,7 @@ const CARDBACK_GROUPS: { label: string; codes: string[] }[] = [
   { label: "ESB", codes: ["ESB-31", "ESB-32", "ESB-41", "ESB-45", "ESB-47", "ESB-48"] },
   { label: "ROTJ", codes: ["ROTJ-48", "ROTJ-65", "ROTJ-65A", "ROTJ-65B", "ROTJ-65D", "ROTJ-65-VP", "ROTJ-70", "ROTJ-77", "ROTJ-79", "ROTJ-79A", "ROTJ-79B"] },
   { label: "POTF", codes: ["POTF-92"] },
-  { label: "International", codes: ["CAN", "PAL", "MEX"] },
+  { label: "International", codes: ["CAN", "PAL", "MEX", "TT-SW", "TT-ESB", "TT-ROTJ"] },
 ];
 
 export type Currency = "GBP" | "USD";

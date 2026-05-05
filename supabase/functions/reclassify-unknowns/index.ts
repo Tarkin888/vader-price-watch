@@ -44,6 +44,9 @@ function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
   else if (/12[\s-]?(?:figure\s*)?c[\s-]?back|12-?back\s*c|\b12c\b/i.test(text)) cardbackCode = "SW-12C";
   else if (/12[\s-]?back|12[\s-]?figure|\b12\s*card\b|12[\s-]card[\s-]?back/i.test(text)) cardbackCode = "SW-12";
 
+  // POTF default: POTF-92 is the only Vader POTF cardback
+  if (cardbackCode === "UNKNOWN" && era === "POTF") cardbackCode = "POTF-92";
+
   let variantCode = cardbackCode;
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
   if (isDT) variantCode = cardbackCode + "-DT";
@@ -75,6 +78,9 @@ function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
     variantCode = "PAL";
   } else if (isTopToys) {
     variantCode = "TT";
+    if (cardbackCode === "UNKNOWN" && era === "SW")   cardbackCode = "TT-SW";
+    if (cardbackCode === "UNKNOWN" && era === "ESB")  cardbackCode = "TT-ESB";
+    if (cardbackCode === "UNKNOWN" && era === "ROTJ") cardbackCode = "TT-ROTJ";
   } else if (isTakara) {
     variantCode = "TAK";
   } else if (isHarbert) {
@@ -126,6 +132,9 @@ function deriveFromVariantCode(variantCode: string): { era: string; cardback_cod
   if (vc === "PAL-TL") return { era: "ROTJ", cardback_code: "ROTJ-70" };
   if (vc === "MEX") return { era: "ROTJ", cardback_code: "ROTJ-65" };
   if (vc === "VP") return { era: "ROTJ", cardback_code: "ROTJ-65" };
+  if (vc === "TT-SW")   return { era: "SW",   cardback_code: "TT-SW" };
+  if (vc === "TT-ESB")  return { era: "ESB",  cardback_code: "TT-ESB" };
+  if (vc === "TT-ROTJ") return { era: "ROTJ", cardback_code: "TT-ROTJ" };
   return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
 }
 
@@ -167,6 +176,22 @@ Deno.serve(async (req) => {
         const derived = deriveFromVariantCode(lot.variant_code || classified.variant_code);
         if (finalClassifiedEra === "UNKNOWN" && derived.era !== "UNKNOWN") finalClassifiedEra = derived.era;
         if (finalClassifiedCardback === "UNKNOWN" && derived.cardback_code !== "UNKNOWN") finalClassifiedCardback = derived.cardback_code;
+      }
+
+      // Use existing DB era + variant_code for cases the text classifier can't resolve
+      const effectiveEra = lot.era !== "UNKNOWN" ? lot.era : finalClassifiedEra;
+      const effectiveVariant = lot.variant_code !== "UNKNOWN" ? lot.variant_code : classified.variant_code;
+
+      // TT cardback from era
+      if (finalClassifiedCardback === "UNKNOWN" && effectiveVariant === "TT") {
+        if (effectiveEra === "SW")   finalClassifiedCardback = "TT-SW";
+        if (effectiveEra === "ESB")  finalClassifiedCardback = "TT-ESB";
+        if (effectiveEra === "ROTJ") finalClassifiedCardback = "TT-ROTJ";
+      }
+
+      // POTF default cardback
+      if (finalClassifiedCardback === "UNKNOWN" && effectiveEra === "POTF") {
+        finalClassifiedCardback = "POTF-92";
       }
 
       if (lot.variant_code === "UNKNOWN" && classified.variant_code !== "UNKNOWN") {
