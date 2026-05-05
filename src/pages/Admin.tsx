@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { RESEARCH_LIBRARY_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { Link } from "react-router-dom";
 import AdminOverviewTab from "@/components/admin/OverviewTab";
 import AdminScrapersTab from "@/components/admin/ScrapersTab";
@@ -15,7 +16,7 @@ import AdminUsersTab from "@/components/admin/UsersTab";
 import AdminChangelogTab from "@/components/admin/ChangelogTab";
 import AdminActivityTab from "@/components/admin/ActivityTab";
 
-const TABS = [
+const ALL_TABS = [
   { key: "overview", label: "OVERVIEW" },
   { key: "scrapers", label: "SCRAPERS" },
   { key: "data", label: "DATA" },
@@ -28,6 +29,10 @@ const TABS = [
   { key: "users", label: "USERS" },
   { key: "changelog", label: "CHANGELOG" },
 ] as const;
+
+const TABS = RESEARCH_LIBRARY_FEATURE_ENABLED
+  ? ALL_TABS
+  : ALL_TABS.filter((t) => t.key !== "knowledge-hub");
 
 type TabKey = (typeof TABS)[number]["key"];
 
