@@ -178,6 +178,22 @@ Deno.serve(async (req) => {
         if (finalClassifiedCardback === "UNKNOWN" && derived.cardback_code !== "UNKNOWN") finalClassifiedCardback = derived.cardback_code;
       }
 
+      // Use existing DB era + variant_code for cases the text classifier can't resolve
+      const effectiveEra = lot.era !== "UNKNOWN" ? lot.era : finalClassifiedEra;
+      const effectiveVariant = lot.variant_code !== "UNKNOWN" ? lot.variant_code : classified.variant_code;
+
+      // TT cardback from era
+      if (finalClassifiedCardback === "UNKNOWN" && effectiveVariant === "TT") {
+        if (effectiveEra === "SW")   finalClassifiedCardback = "TT-SW";
+        if (effectiveEra === "ESB")  finalClassifiedCardback = "TT-ESB";
+        if (effectiveEra === "ROTJ") finalClassifiedCardback = "TT-ROTJ";
+      }
+
+      // POTF default cardback
+      if (finalClassifiedCardback === "UNKNOWN" && effectiveEra === "POTF") {
+        finalClassifiedCardback = "POTF-92";
+      }
+
       if (lot.variant_code === "UNKNOWN" && classified.variant_code !== "UNKNOWN") {
         updates.variant_code = classified.variant_code;
       }
