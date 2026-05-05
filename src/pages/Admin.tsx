@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { RESEARCH_LIBRARY_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { Link } from "react-router-dom";
 import AdminOverviewTab from "@/components/admin/OverviewTab";
 import AdminScrapersTab from "@/components/admin/ScrapersTab";
@@ -15,7 +16,7 @@ import AdminUsersTab from "@/components/admin/UsersTab";
 import AdminChangelogTab from "@/components/admin/ChangelogTab";
 import AdminActivityTab from "@/components/admin/ActivityTab";
 
-const TABS = [
+const ALL_TABS = [
   { key: "overview", label: "OVERVIEW" },
   { key: "scrapers", label: "SCRAPERS" },
   { key: "data", label: "DATA" },
@@ -29,7 +30,11 @@ const TABS = [
   { key: "changelog", label: "CHANGELOG" },
 ] as const;
 
-type TabKey = (typeof TABS)[number]["key"];
+const TABS = RESEARCH_LIBRARY_FEATURE_ENABLED
+  ? ALL_TABS
+  : ALL_TABS.filter((t) => t.key !== "knowledge-hub");
+
+type TabKey = (typeof ALL_TABS)[number]["key"];
 
 const Admin = () => {
   const { isAdmin, isLoading: authLoading } = useAuth();
@@ -213,7 +218,7 @@ const Admin = () => {
         {activeTab === "scrapers" && <AdminScrapersTab />}
         {activeTab === "data" && <AdminDataTab />}
         {activeTab === "duplicates" && <AdminDuplicatesTab />}
-        {activeTab === "knowledge-hub" && <AdminKnowledgeTab />}
+        {RESEARCH_LIBRARY_FEATURE_ENABLED && activeTab === "knowledge-hub" && <AdminKnowledgeTab />}
         {activeTab === "bug-reports" && <AdminBugReportsTab />}
         {activeTab === "config" && <AdminConfigTab />}
         {activeTab === "audit-log" && <AdminAuditLogTab />}

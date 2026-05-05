@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { COLLECTION_FEATURE_ENABLED } from "@/lib/feature-flags";
+import { COLLECTION_FEATURE_ENABLED, RESEARCH_LIBRARY_FEATURE_ENABLED } from "@/lib/feature-flags";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ResearchLibrary from "@/components/ResearchLibrary";
@@ -88,7 +88,10 @@ const VALUE_RANKING = [
   { era: "POTF", highest: "POTF-92", reason: "End-of-line scarcity; coin adds collector appeal" },
 ];
 
-const SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value", "Research Library"] as const;
+const ALL_SECTIONS = ["Timeline", "Cardback Table", "Variant Spotlights", "International", "Auction Sources", "Grades & Value", "Research Library"] as const;
+const SECTIONS = RESEARCH_LIBRARY_FEATURE_ENABLED
+  ? ALL_SECTIONS
+  : ALL_SECTIONS.filter((s) => s !== "Research Library");
 
 const ERA_ROW_BG: Record<string, string> = {
   SW: "rgba(30, 58, 95, 0.18)",
@@ -103,7 +106,7 @@ const ERA_FILTERS = ["All", "SW", "ESB", "ROTJ", "POTF"] as const;
 
 const KnowledgeHub = () => {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<typeof SECTIONS[number]>("Research Library");
+  const [activeSection, setActiveSection] = useState<typeof ALL_SECTIONS[number]>(RESEARCH_LIBRARY_FEATURE_ENABLED ? "Research Library" : "Timeline");
   const [eraFilter, setEraFilter] = useState<string>("All");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -434,17 +437,19 @@ const KnowledgeHub = () => {
         </div>
 
         {/* ──── SECTION 7: RESEARCH LIBRARY ──── */}
-        <div ref={(el) => { sectionRefs.current["Research Library"] = el; }}>
-          {activeSection === "Research Library" && <ErrorBoundary><ResearchLibrary /></ErrorBoundary>}
-          {activeSection !== "Research Library" && (
-            <>
-              <SectionHeader title="Research Library" />
-              <p className="text-xs text-muted-foreground mt-3">
-                Select <button onClick={() => setActiveSection("Research Library")} className="text-primary hover:text-primary/80 underline transition-colors">Research Library</button> from the sub-nav to browse curated reference articles.
-              </p>
-            </>
-          )}
-        </div>
+        {RESEARCH_LIBRARY_FEATURE_ENABLED && (
+          <div ref={(el) => { sectionRefs.current["Research Library"] = el; }}>
+            {activeSection === "Research Library" && <ErrorBoundary><ResearchLibrary /></ErrorBoundary>}
+            {activeSection !== "Research Library" && (
+              <>
+                <SectionHeader title="Research Library" />
+                <p className="text-xs text-muted-foreground mt-3">
+                  Select <button onClick={() => setActiveSection("Research Library")} className="text-primary hover:text-primary/80 underline transition-colors">Research Library</button> from the sub-nav to browse curated reference articles.
+                </p>
+              </>
+            )}
+          </div>
+        )}
 
         {/* ──── FOOTER NOTE ──── */}
         <p className="text-[10px] text-primary/70 italic tracking-wider leading-relaxed pt-2 border-t border-border">
