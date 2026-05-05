@@ -27,6 +27,9 @@ export function deriveFromVariantCode(variantCode: string): { era: string; cardb
   if (vc === "TT") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
   if (vc === "PBP") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
   if (vc === "HAR") return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
+  if (vc === "TT-SW")   return { era: "SW",   cardback_code: "TT-SW" };
+  if (vc === "TT-ESB")  return { era: "ESB",  cardback_code: "TT-ESB" };
+  if (vc === "TT-ROTJ") return { era: "ROTJ", cardback_code: "TT-ROTJ" };
   return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
 }
 
@@ -106,6 +109,9 @@ export function classifyLot(title: string, conditionNotes?: string): ClassifiedF
     // Palitoy lots with no specific cardback number — leave as found or UNKNOWN
   } else if (isTopToys) {
     variantCode = "TT";
+    if (cardbackCode === "UNKNOWN" && era === "SW")   cardbackCode = "TT-SW";
+    if (cardbackCode === "UNKNOWN" && era === "ESB")  cardbackCode = "TT-ESB";
+    if (cardbackCode === "UNKNOWN" && era === "ROTJ") cardbackCode = "TT-ROTJ";
   } else if (isTakara) {
     variantCode = "TAK";
   } else if (isHarbert) {

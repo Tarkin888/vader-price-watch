@@ -75,6 +75,9 @@ function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
     variantCode = "PAL";
   } else if (isTopToys) {
     variantCode = "TT";
+    if (cardbackCode === "UNKNOWN" && era === "SW")   cardbackCode = "TT-SW";
+    if (cardbackCode === "UNKNOWN" && era === "ESB")  cardbackCode = "TT-ESB";
+    if (cardbackCode === "UNKNOWN" && era === "ROTJ") cardbackCode = "TT-ROTJ";
   } else if (isTakara) {
     variantCode = "TAK";
   } else if (isHarbert) {
@@ -126,6 +129,9 @@ function deriveFromVariantCode(variantCode: string): { era: string; cardback_cod
   if (vc === "PAL-TL") return { era: "ROTJ", cardback_code: "ROTJ-70" };
   if (vc === "MEX") return { era: "ROTJ", cardback_code: "ROTJ-65" };
   if (vc === "VP") return { era: "ROTJ", cardback_code: "ROTJ-65" };
+  if (vc === "TT-SW")   return { era: "SW",   cardback_code: "TT-SW" };
+  if (vc === "TT-ESB")  return { era: "ESB",  cardback_code: "TT-ESB" };
+  if (vc === "TT-ROTJ") return { era: "ROTJ", cardback_code: "TT-ROTJ" };
   return { era: "UNKNOWN", cardback_code: "UNKNOWN" };
 }
 
