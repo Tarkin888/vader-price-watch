@@ -44,6 +44,9 @@ function classifyLot(title: string, conditionNotes?: string): ClassifiedFields {
   else if (/12[\s-]?(?:figure\s*)?c[\s-]?back|12-?back\s*c|\b12c\b/i.test(text)) cardbackCode = "SW-12C";
   else if (/12[\s-]?back|12[\s-]?figure|\b12\s*card\b|12[\s-]card[\s-]?back/i.test(text)) cardbackCode = "SW-12";
 
+  // POTF default: POTF-92 is the only Vader POTF cardback
+  if (cardbackCode === "UNKNOWN" && era === "POTF") cardbackCode = "POTF-92";
+
   let variantCode = cardbackCode;
   const isDT = /double\s*telescoping|\bdt\b/i.test(text);
   if (isDT) variantCode = cardbackCode + "-DT";
